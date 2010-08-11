@@ -5,13 +5,56 @@
 * accessed through this interface. Whatever you do with GlueDB, this should almost
 * always be your entry point.
 *
-* @package Glue
+* @package GlueDB
 * @author Régis Lemaigre
 * @license MIT
 */
 
 class GlueDB {
-	public static function database($name = 'default') {
-		return GludDB_Database::get($name);
+	/**
+	 * Returns a database instance.
+	 *
+	 * @param string $name
+	 *
+	 * @return GlueDB_Database
+	 */
+	public static function db($name = 'main') {
+		return GlueDB_Database::get($name);
+	}
+
+	/**
+	 * Returns a select query object.
+	 *
+	 * @return GlueDB_Query_Select
+	 */
+	public static function select() {
+		return new GlueDB_Query_Select();
+	}
+
+	/**
+	 * Returns a select update object.
+	 *
+	 * @return GlueDB_Query_Update
+	 */
+	public static function update() {
+		return new GlueDB_Query_Update();
+	}
+
+	/**
+	 * Returns a select delete object.
+	 *
+	 * @return GlueDB_Query_Delete
+	 */
+	public static function delete() {
+		return new GlueDB_Query_Delete();
+	}
+
+	/**
+	 * Returns a select insert object.
+	 *
+	 * @return GlueDB_Query_Insert
+	 */
+	public static function insert() {
+		return new GlueDB_Query_Delete();
 	}
 }
