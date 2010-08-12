@@ -12,7 +12,11 @@
 
 class GlueDB {
 	/**
-	 * Returns a database instance.
+	 * Returns the database object identified by $name.
+	 *
+	 * Databases are classes that behave like singletons. Calling this function once will create and
+	 * return an instance of the class GlueDB_Database_$name. Subsequent calls to this function with
+	 * the same parameter will return the same database instance.
 	 *
 	 * @param string $name
 	 *
@@ -20,41 +24,5 @@ class GlueDB {
 	 */
 	public static function db($name = 'main') {
 		return GlueDB_Database::get($name);
-	}
-
-	/**
-	 * Returns a select query object.
-	 *
-	 * @return GlueDB_Query_Select
-	 */
-	public static function select() {
-		return new GlueDB_Query_Select();
-	}
-
-	/**
-	 * Returns a select update object.
-	 *
-	 * @return GlueDB_Query_Update
-	 */
-	public static function update() {
-		return new GlueDB_Query_Update();
-	}
-
-	/**
-	 * Returns a select delete object.
-	 *
-	 * @return GlueDB_Query_Delete
-	 */
-	public static function delete() {
-		return new GlueDB_Query_Delete();
-	}
-
-	/**
-	 * Returns a select insert object.
-	 *
-	 * @return GlueDB_Query_Insert
-	 */
-	public static function insert() {
-		return new GlueDB_Query_Delete();
 	}
 }

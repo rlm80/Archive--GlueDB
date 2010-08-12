@@ -15,6 +15,11 @@ abstract class GlueDB_Database extends PDO {
 	static protected $instances = array();
 
 	/**
+	 * @var string Identifier of the current database.
+	 */
+	protected $name;
+
+	/**
 	 * @var string The user name for the DSN string.
 	 */
 	protected $username;
@@ -40,9 +45,25 @@ abstract class GlueDB_Database extends PDO {
 	protected $persistent = FALSE;
 
 	/**
-	 * Constructor.
+	 * @var boolean Locks constructor access from anywhere but self::create.
+	 * 				This ensures correct singleton behaviour even though constructor must
+	 * 				remain public because parent constructor is.
 	 */
-	public function __construct() {
+	private static $constuctor_locked = TRUE;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param string $name
+	 */
+	public function __construct($name) {
+		// Check lock :
+		if (self::$constuctor_locked)
+			throw Kohana_Exception('Cannot instanciate database directly. Call GlueDB::db($name) instead.');
+
+		// Set identifier :
+		$this->name = $name;
+
 		// Set PDO options :
 		$options[PDO::ATTR_ERRMODE]		= PDO::ERRMODE_EXCEPTION;
 		$options[PDO::ATTR_PERSISTENT]	= $this->persistent;
@@ -65,6 +86,25 @@ abstract class GlueDB_Database extends PDO {
 	 * @returns string
 	 */
 	abstract protected function dsn();
+
+	/**
+	 * Returns a select query data structure meant to query this database.
+	 *
+	 * @return GlueDB_Query_Select
+	 */
+	public function select() {
+		return new GlueDB_Query_Select($this);
+	}
+
+	/**
+	 * Returns the table object of given name for current database.
+	 * Returned table may be real or virtual.
+	 *
+	 * @return GlueDB_Table
+	 */
+	public function table($name) {
+		return GlueDB_Table::get($this->name, $name);
+	}
 
 	/*
 	 * Same as PDO::query if statement is a string. If statement is a data structure
@@ -151,7 +191,14 @@ abstract class GlueDB_Database extends PDO {
 	 * @return object
 	 */
 	static protected function create($name) {
+		// Class name :
 		$class = 'GlueDB_Database_'.ucfirst($name);
-		return new $class;
+
+		// Unlock constructor, create instance and relock constructor :
+		self::$constuctor_locked = false;
+		$instance = new $class($name);
+		self::$constuctor_locked = true;
+
+		return $instance;
 	}
 }
