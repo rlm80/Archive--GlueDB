@@ -106,42 +106,6 @@ abstract class GlueDB_Database extends PDO {
 		return GlueDB_Table::get($this->name, $name);
 	}
 
-	/*
-	 * Same as PDO::query if statement is a string. If statement is a data structure
-	 * representing an SQL query, it is first compiled into an SQL string before being
-	 * handed over to the PDO corresponding method.
-	 *
-	 * @see PDO::query()
-	 */
-	public function query($statement) {
-		$sql = $this->compile($statement);
-		return parent::query($sql);
-	}
-
-	/*
-	 * Same as PDO::prepare if statement is a string. If statement is a data structure
-	 * representing an SQL query, it is first compiled into an SQL string before being
-	 * handed over to the PDO corresponding method.
-	 *
-	 * @see PDO::prepare()
-	 */
-	public function prepare($statement, $driver_options = null) {
-		$sql = $this->compile($statement);
-		return parent::prepare($sql);
-	}
-
-	/*
-	 * Same as PDO::exec if statement is a string. If statement is a data structure
-	 * representing an SQL query, it is first compiled into an SQL string before being
-	 * handed over to the PDO corresponding method.
-	 *
-	 * @see PDO::exec()
-	 */
-	public function exec($statement) {
-		$sql = $this->compile($statement);
-		return parent::exec($sql);
-	}
-
 	/**
 	 * Quotes an identifier according to the underlying rdbms conventions.
 	 *
