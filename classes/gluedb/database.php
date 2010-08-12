@@ -127,7 +127,7 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	public function prepare($statement, $driver_options = null) {
 		$sql = $this->compile($statement);
-		return parent::query($sql);
+		return parent::prepare($sql);
 	}
 
 	/*
@@ -139,7 +139,7 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	public function exec($statement) {
 		$sql = $this->compile($statement);
-		return parent::query($sql);
+		return parent::exec($sql);
 	}
 
 	/**
