@@ -47,7 +47,9 @@ abstract class GlueDB_Database extends PDO {
 	/**
 	 * @var boolean Locks constructor access from anywhere but self::create.
 	 * 				This ensures correct singleton behaviour even though constructor must
-	 * 				remain public because parent constructor is.
+	 * 				remain public because parent constructor is. The other solution was
+	 * 				to wrap the PDO instance into this class instead of extending PDO,
+	 * 				but this is not good because I wish to expose all PDO features.
 	 */
 	private static $constuctor_locked = TRUE;
 
@@ -59,7 +61,7 @@ abstract class GlueDB_Database extends PDO {
 	public function __construct($name) {
 		// Check lock :
 		if (self::$constuctor_locked)
-			throw Kohana_Exception('Cannot instanciate database directly. Call GlueDB::db($name) instead.');
+			throw Kohana_Exception('Cannot instanciate databases directly. Call GlueDB::db($name) instead.');
 
 		// Set identifier :
 		$this->name = $name;
@@ -72,7 +74,7 @@ abstract class GlueDB_Database extends PDO {
 		parent::__construct($this->dsn(), $this->username, $this->password, $this->options);
 
 		// Set connection charset :
-		$this->exec('SET NAMES ' . $this->quote($this->charset));
+		$this->set_charset();
 
 		// Unset connection parameters for security, to make sure no forgotten debug message
 		// displays them unintentionaly to a user :
@@ -81,11 +83,20 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Returns the DSN to the current database.
+	 * Returns the DSN pointing to the current database.
 	 *
 	 * @returns string
 	 */
 	abstract protected function dsn();
+	
+	/**
+	 * Issues the right query to set current connection charset. This is probably
+	 * rdbms specific so it's factored out from the constructor into a function
+	 * that can be redefined if necessary.
+	 */
+	protected function set_charset() {
+		$this->exec('SET NAMES ' . $this->quote($this->charset));
+	}	
 
 	/**
 	 * Returns a select query data structure meant to query this database.
