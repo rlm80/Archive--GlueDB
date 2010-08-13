@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Base MySQL database class.
+ * Base table class.
  *
  * @package    GlueDB
- * @author     Régis Lemaigre
+ * @author     RÃ©gis Lemaigre
  * @license    MIT
  */
 
@@ -15,12 +15,13 @@ abstract class GlueDB_Table {
 	static protected $instances = array();
 
 	/**
-	 * @var string Identifier of the database this table is stored into.
+	 * @var string	Identifier of the database this table (or its components if this is a virtual table)
+	 * 				is stored into.
 	 */
 	protected $dbname;
 
 	/**
-	 * @var string Name of this table.
+	 * @var string Name of this table, as it will be refered to in queries.
 	 */
 	protected $name;
 
@@ -38,7 +39,18 @@ abstract class GlueDB_Table {
 	}
 
 	/**
-	 * Returns a select update object for current table.
+	 * Returns a table helper to be used in a query where this table is refered to as $alias.
+	 *
+	 * @param string $alias
+	 *
+	 * @return GlueDB_Helper_Table
+	 */
+	public function helper($query, $alias) {
+		return new GlueDB_Helper_Table($this, $query, $alias);
+	}
+
+	/**
+	 * Returns an update query object for current table.
 	 *
 	 * @return GlueDB_Query_Update
 	 */
@@ -47,7 +59,7 @@ abstract class GlueDB_Table {
 	}
 
 	/**
-	 * Returns a select delete object for current table.
+	 * Returns a delete query object for current table.
 	 *
 	 * @return GlueDB_Query_Delete
 	 */
@@ -56,7 +68,7 @@ abstract class GlueDB_Table {
 	}
 
 	/**
-	 * Returns a select insert object for current table.
+	 * Returns a insert query object for current table.
 	 *
 	 * @return GlueDB_Query_Insert
 	 */
