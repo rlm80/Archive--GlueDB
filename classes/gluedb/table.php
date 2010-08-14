@@ -2,6 +2,19 @@
 
 /**
  * Base table class.
+ * 
+ * Information about a database table is represented as a table object that is
+ * instanciated on first access and then cached. There are two types of table objects :
+ * - simple tables : they map directly to a database table,
+ * - composite tables : they map to more than one database tables, joined together by primary key.
+ * 
+ * Representing tables as objects this way makes it possible to define a very convenient
+ * database introspection API. It also sets up a framework that makes it easy to define
+ * computed columns, columns formaters, composite tables, etc...in a way that is totally
+ * transparent to the application layers that sits on top of this library.
+ * 
+ * Moving this complexity down at the DBAL level makes the rest of the application easier
+ * to code and easier to understand.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
