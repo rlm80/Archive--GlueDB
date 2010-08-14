@@ -4,7 +4,7 @@
  * Base PostgreSQL database class.
  *
  * @package    GlueDB
- * @author     Régis Lemaigre
+ * @author     RÃ©gis Lemaigre
  * @license    MIT
  */
 
@@ -41,4 +41,13 @@ class GlueDB_Database_PostgreSQL extends GlueDB_Database {
 
 		return $dsn;
 	}
+	
+	/**
+	 * Creates a dialect object suitable for communicating with PostgreSQL.
+	 *
+	 * @return string
+	 */
+	protected function create_dialect() {
+		return new GlueDB_Dialect_PostgreSQL;
+	}	
 }

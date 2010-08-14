@@ -1,10 +1,12 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Base database class.
+ * Base database class. A database object is a PDO instance connected to a specific
+ * database. This class extends PDO and adds to it a unified interface for database
+ * introspection and a query compiler to generate RDBMS specific SQL queries.
  *
  * @package    GlueDB
- * @author     Régis Lemaigre
+ * @author     RÃ©gis Lemaigre
  * @license    MIT
  */
 
@@ -43,6 +45,11 @@ abstract class GlueDB_Database extends PDO {
 	 * @var boolean Whether or not the connection is persistent.
 	 */
 	protected $persistent = FALSE;
+	
+	/**
+	 * @var GlueDB_Dialect The dialect suitable for communication with current database.
+	 */	
+	protected $dialect;
 
 	/**
 	 * @var boolean Locks constructor access from anywhere but self::create.
@@ -56,7 +63,7 @@ abstract class GlueDB_Database extends PDO {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $name
+	 * @param string $name Identifier of this database.
 	 */
 	public function __construct($name) {
 		// Check lock :
@@ -65,21 +72,24 @@ abstract class GlueDB_Database extends PDO {
 
 		// Set identifier :
 		$this->name = $name;
+		
+		// Set SQL dialect :
+		$this->dialect = $this->create_dialect();		
 
 		// Set PDO options :
 		$options[PDO::ATTR_ERRMODE]		= PDO::ERRMODE_EXCEPTION;
 		$options[PDO::ATTR_PERSISTENT]	= $this->persistent;
 
-		// Call parent constructor :
+		// Call parent constructor to establish connection :
 		parent::__construct($this->dsn(), $this->username, $this->password, $this->options);
-
-		// Set connection charset :
-		$this->set_charset();
-
+		
 		// Unset connection parameters for security, to make sure no forgotten debug message
 		// displays them unintentionaly to a user :
 		$this->username = null;
-		$this->password = null;
+		$this->password = null;		
+		
+		// Set connection charset :
+		$this->set_charset();
 	}
 
 	/**
@@ -90,12 +100,61 @@ abstract class GlueDB_Database extends PDO {
 	abstract protected function dsn();
 	
 	/**
+	 * Creates a dialect object suitable for communicating with current database.
+	 *
+	 * @return string
+	 */
+	protected function create_dialect() {
+		return new GlueDB_Dialect_ANSI;
+	}
+	
+	/**
 	 * Issues the right query to set current connection charset. This is probably
-	 * rdbms specific so it's factored out from the constructor into a function
+	 * RDBMS specific so it's factored out of the constructor into a function
 	 * that can be redefined if necessary.
 	 */
 	protected function set_charset() {
 		$this->exec('SET NAMES ' . $this->quote($this->charset));
+	}	
+	
+	/**
+	 * Escapes a string according to current SQL dialect conventions.
+	 * 
+	 * Forwards call to dialect object. 
+	 *
+	 * @param string $string
+	 *
+	 * @return
+	 */
+	public function quote($string) {
+		return $this->dialect->quote($string);
+	}
+	
+	/**
+	 * Quotes an identifier according to current SQL dialect conventions.
+	 * 
+	 * Forwards call to dialect object. 
+	 * 
+	 * @param string $identifier
+	 *
+	 * @return
+	 */
+	public function quote_identifier($identifier) {
+		return $this->dialect->quote_identifier($identifier);
+	}
+
+	/**
+	 * Compiles a datastructure representing an SQL query into an SQL string
+	 * according to current SQL dialect conventions.
+	 * 
+	 * Forwards call to dialect object. 
+	 *
+	 * @param mixed $statement
+	 *
+	 * @return string
+	 */
+	public function compile($statement) {
+		return $this->dialect->compile($statement);
 	}	
 
 	/**
@@ -106,41 +165,31 @@ abstract class GlueDB_Database extends PDO {
 	public function select() {
 		return new GlueDB_Query_Select($this);
 	}
-
+	
 	/**
 	 * Returns the table object of given name for current database.
-	 * Returned table may be real or virtual.
+	 * Returned table may be simple or composite. This should always
+	 * be used internally instead of __get, because table names
+	 * may clash with protected properties of this class.
+	 *
+	 * @param string $table Table name.
 	 *
 	 * @return GlueDB_Table
 	 */
-	public function table($name) {
-		return GlueDB_Table::get($this->name, $name);
-	}
-
+	protected function table($table) {
+		return GlueDB_Table::get($this->name, $table);
+	}	
+	
 	/**
-	 * Quotes an identifier according to the underlying rdbms conventions.
+	 * Returns the table object of given name for current database.
+	 * Returned table may be simple or composite.
 	 *
-	 * @param string $identifier
+	 * @param string $table Table name.
 	 *
-	 * @return
+	 * @return GlueDB_Table
 	 */
-	public function quote_identifier($identifier) {
-		return '"' . $identifier . '"';
-	}
-
-	/**
-	 * Compiles a datastructure representing an SQL query into an SQL string.
-	 *
-	 * @param mixed $statement
-	 *
-	 * @return string
-	 */
-	public function compile($statement) {
-		if (is_string($statement))
-			return $statement;
-		else {
-			// This is where the magic happens.
-		}
+	public function __get($table) {
+		return $this->table($table);
 	}
 
 	/**

@@ -15,38 +15,50 @@ abstract class GlueDB_Table {
 	static protected $instances = array();
 
 	/**
-	 * @var string	Identifier of the database this table (or its components if this is a virtual table)
-	 * 				is stored into.
+	 * @var string	The database this table (or its components if this is a
+	 * 				composite table) is stored into.
 	 */
-	protected $dbname;
+	protected $database;
 
 	/**
 	 * @var string Name of this table, as it will be refered to in queries.
 	 */
 	protected $name;
+	
+	/**
+	 * @var array Columns of this table.
+	 */
+	protected $columns;	
+	
+	/**
+	 * @var array Primary key columns of this table.
+	 */
+	protected $pk;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string $name
+	 * @param GlueDB_Database	$database	Database.
+	 * @param string			$name		Table name.
 	 */
-	protected function __construct($dbname, $name) {
-		// Set database identifier :
-		$this->dbname = $dbname;
+	protected function __construct($database, $name) {
+		// Set database :
+		$this->database = $database;
 
 		// Set table name :
 		$this->name = $name;
 	}
 
 	/**
-	 * Returns a table helper to be used in a query where this table is refered to as $alias.
+	 * Returns a table helper for this table.
 	 *
-	 * @param string $alias
+	 * @param GlueDB_Query	$query	Query in the context of which the table helper is required.
+	 * @param string		$alias	Alias of current table in that query.
 	 *
 	 * @return GlueDB_Helper_Table
 	 */
-	public function helper($query, $alias) {
-		return new GlueDB_Helper_Table($this, $query, $alias);
+	public function helper(GlueDB_Query $query, $alias) {
+		return new GlueDB_Helper_Table($query, $this, $alias);
 	}
 
 	/**
@@ -101,7 +113,11 @@ abstract class GlueDB_Table {
 	 * @return object
 	 */
 	static protected function create($dbname, $name) {
-		$class = 'GlueDB_Table_' . ucfirst($dbname) . '_' . ucfirst($name);
-		return new $class($dbname, $name);
+		$db		= GlueDB::db($dbname);
+		$class	= 'GlueDB_Table_' . ucfirst($dbname) . '_' . ucfirst($name);
+		if (class_exists($class))
+			return new $class($db, $name);
+		else 
+			return new GlueDB_Table_Simple($db, $name);
 	}
 }

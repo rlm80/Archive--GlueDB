@@ -3,9 +3,9 @@
 /**
  * Base helper class.
  *
- * A helper is an object that helps building a query with the query builder.
- * You usually get such objects by passing parameters by reference to some
- * query builder methods.
+ * A helper is an object that helps in building specific parts of a query
+ * with the query builder. You usually get such objects by passing parameters
+ * by reference to some query builder methods.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre

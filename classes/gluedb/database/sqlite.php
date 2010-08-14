@@ -4,7 +4,7 @@
  * Base Sqlite database class.
  *
  * @package    GlueDB
- * @author     Régis Lemaigre
+ * @author     Rï¿½gis Lemaigre
  * @license    MIT
  */
 
@@ -29,4 +29,13 @@ class GlueDB_Database_Sqlite extends GlueDB_Database {
 
 		return $dsn;
 	}
+	
+	/**
+	 * Creates a dialect object suitable for communicating with PostgreSQL.
+	 *
+	 * @return string
+	 */
+	protected function create_dialect() {
+		return new GlueDB_Dialect_Sqlite;
+	}		
 }

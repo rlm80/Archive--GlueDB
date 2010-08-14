@@ -4,7 +4,7 @@
  * Base MySQL database class.
  *
  * @package    GlueDB
- * @author     Régis Lemaigre
+ * @author     Rï¿½gis Lemaigre
  * @license    MIT
  */
 
@@ -41,16 +41,13 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 
 		return $dsn;
 	}
-
+	
 	/**
-	 * Quotes an identifier according to the underlying rdbms conventions.
-	 * Mysql uses back-ticks for this instead of the ANSI double quote standard character.
+	 * Creates a dialect object suitable for communicating with MySQL.
 	 *
-	 * @param string $identifier
-	 *
-	 * @return
+	 * @return string
 	 */
-	public function quote_identifier($identifier) {
-		return '`' . $identifier . '`';
+	protected function create_dialect() {
+		return new GlueDB_Dialect_MySQL;
 	}
 }
