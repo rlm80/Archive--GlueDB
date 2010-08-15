@@ -60,8 +60,17 @@ abstract class GlueDB_Table {
 
 		// Set table name :
 		$this->name = $name;
+		
+		// Create columns :
+		$this->columns = $this->create_columns();
 	}
-
+	
+	
+	/**
+	 * Enter description here ...
+	 */
+	abstract protected function create_columns();
+	
 	/**
 	 * Returns a table helper for this table.
 	 *
@@ -100,6 +109,29 @@ abstract class GlueDB_Table {
 	public function insert() {
 		return new GlueDB_Query_Insert($this);
 	}
+	
+	/**
+	 * Returns the columns of this table.
+	 *
+	 * @return array
+	 */
+	public function columns() {
+		return $this->columns;
+	}
+	
+	/**
+	 * Returns the column object of given name for this table.
+	 *
+	 * @param string $table Table name.
+	 *
+	 * @return GlueDB_Table
+	 */
+	public function __get($column) {
+		if (isset($this->columns[$column]))
+			return $this->columns[$column];
+		else
+			; // TODO decide what to return here...null ? Dummy column object meaning undefined ? 
+	}	
 
 	/**
 	 * Lazy loads a table object, stores it in cache, and returns it.

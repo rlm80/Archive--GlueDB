@@ -1,8 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Base dialect class. A dialect object is capable of compiling data structures into
- * SQL strings according to a given SQL dialect.
+ * Base dialect class.
+ * 
+ * A dialect object is capable of compiling data structures representing queries or
+ * fragments of queries into SQL strings according to a given SQL dialect.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre

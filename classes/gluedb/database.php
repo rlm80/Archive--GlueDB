@@ -1,16 +1,18 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Base database class. A database object is a PDO instance connected to a specific
- * database. This class extends PDO and adds to it a unified interface for database
- * introspection and a query compiler to generate RDBMS specific SQL queries.
+ * Base database class.
+ * 
+ * A database object is a PDO instance connected to a specific database. This
+ * class extends PDO and adds to it a unified interface for database introspection
+ * and a query compiler to generate RDBMS specific SQL queries.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-abstract class GlueDB_Database extends PDO {
+abstract class GlueDB_Database extends PDO {	
 	/**
 	 * @var array Database instances cache.
 	 */
@@ -118,19 +120,6 @@ abstract class GlueDB_Database extends PDO {
 	}	
 	
 	/**
-	 * Escapes a string according to current SQL dialect conventions.
-	 * 
-	 * Forwards call to dialect object. 
-	 *
-	 * @param string $string
-	 *
-	 * @return
-	 */
-	public function quote($string) {
-		return $this->dialect->quote($string);
-	}
-	
-	/**
 	 * Quotes an identifier according to current SQL dialect conventions.
 	 * 
 	 * Forwards call to dialect object. 
@@ -165,6 +154,38 @@ abstract class GlueDB_Database extends PDO {
 	public function select() {
 		return new GlueDB_Query_Select($this);
 	}
+	
+	/**
+	 * Helper function to ensure the array representing a column's meta-data
+	 * always has the same structure.
+	 * 
+	 * @return array
+	 */
+	protected function column_info($name, $type, $max, $null, $default) {
+		return array(
+			'name'		=> $name,
+			'type'		=> $type,
+			'null'		=> $null,
+			'max'		=> $max,
+			'default'	=> $default
+		);
+	}
+	
+	/**
+	 * Returns a formatter object for the given native database type.
+	 * 
+	 * @return GlueDB_Formatter
+	 */
+	abstract public function get_default_formatter($type); 
+	
+	/**
+	 * Returns all tables present in current database as an array of table names. Be
+	 * aware that this function is totally ignorant of any GlueDB_Table class you may
+	 * have defined explicitely !
+	 *
+	 * @return array Array of table names, numerically indexed, alphabetically ordered.
+	 */
+	abstract public function tables();
 	
 	/**
 	 * Returns the table object of given name for current database.
