@@ -1,19 +1,18 @@
-﻿When I was working on the Glue-ORM module, I realised that much of its complexity could be advantageously moved down at the DBAL level.
+Much of the complexity of ORM modules could be advantageously moved down at the DBAL level.
 
 This includes :
 
-- type casting of strings coming from the database to the appropriate PHP types (and more complex formatting operations),
-- emulating in PHP something that no RDBMS fully supports, that is, deletable / insertable / updatable views, 
-- computed fields,
+- type casting of strings coming from the database to the appropriate PHP types, and more complex formatting operations,
+- emulating deletable / insertable / updatable views in PHP, 
+- computed fields, either by PHP or by the RDBMS,
 - aliasing of tables and columns.
 
+Other things where existing DBAL solutions for PHP may leave one wanting for more include :
 
-Some other things that left me wanting for more with existing DBALs are :
+- Query building, there is still room for improvement in making them more expressive AND more convenient to use.
+- Native prepared statements support.
+- PDO support, in a way that fully exposes its interface instead of hiding it behind a wrapper.
 
-- I think there is still room for improvement regarding query builders.
-- Native prepared statements should be supported.
-- IMHO a good DBAL should be based on PDO and fully expose its interface instead of hiding it behind a wrapper.
-
-No DBAL library for PHP seems to meet all these requirements. This is my modest attempt to fix this.
+No DBAL library for PHP seems to meet all these requirements. This is a modest attempt to fix this.
 
 Developement of Glue-ORM will cease until this module is complete.
