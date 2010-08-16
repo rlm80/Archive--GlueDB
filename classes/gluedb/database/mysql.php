@@ -23,36 +23,6 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 * @var string The name of the database.
 	 */
 	protected $dbname;
-	
-	// Native database types :
-	const TYPE_TINYINT		= 'TINYINT';
-	const TYPE_SMALLINT		= 'SMALLINT';
-	const TYPE_MEDIUMINT	= 'MEDIUMINT';
-	const TYPE_INT			= 'INT';
-	const TYPE_BIGINT		= 'BIGINT';
-	const TYPE_FLOAT		= 'FLOAT';
-	const TYPE_DOUBLE		= 'DOUBLE';
-	const TYPE_DECIMAL		= 'DECIMAL';
-	const TYPE_BIT			= 'BIT';
-	const TYPE_CHAR			= 'CHAR';
-	const TYPE_VARCHAR		= 'VARCHAR';
-	const TYPE_TINYTEXT		= 'TINYTEXT';
-	const TYPE_TEXT			= 'TEXT';
-	const TYPE_MEDIUMTEXT	= 'MEDIUMTEXT';
-	const TYPE_LONGTEXT		= 'LONGTEXT';
-	const TYPE_BINARY		= 'BINARY';
-	const TYPE_VARBINARY	= 'VARBINARY';
-	const TYPE_TINYBLOB		= 'TINYBLOB';
-	const TYPE_BLOB			= 'BLOB';
-	const TYPE_MEDIUMBLOB	= 'MEDIUMBLOB';
-	const TYPE_LONGBLOB		= 'LONGBLOB';
-	const TYPE_ENUM			= 'ENUM';
-	const TYPE_SET			= 'SET';
-	const TYPE_DATE			= 'DATE';
-	const TYPE_DATETIME		= 'DATETIME';
-	const TYPE_TIME			= 'TIME';
-	const TYPE_TIMESTAMP	= 'TIMESTAMP';
-	const TYPE_YEAR			= 'YEAR';	
 
 	/*
 	 * Builds DSN string ( http://www.php.net/manual/en/ref.pdo-mysql.connection.php ).
@@ -69,7 +39,7 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 
 		return $dsn;
 	}
-	
+
 	/**
 	 * Creates a dialect object suitable for communicating with MySQL.
 	 *
@@ -78,86 +48,75 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	protected function create_dialect() {
 		return new GlueDB_Dialect_MySQL;
 	}
-	
+
 	/**
-	 * Returns the default formatter object for the given native MySQL type.
-	 * 
-	 * @return GlueDB_Formatter
+	 * Returns structured information about a real database table and its columns.
+	 * Columns are returned alphabetically ordered.
+	 *
+	 * Be aware that this function is totally ignorant of any virtual table
+	 * you may have defined explicitely !
+	 *
+	 * @return array
 	 */
-	public function get_default_formatter($type) {
-		// Extract first word from type (MySQL may return things like "float unsigned" sometimes) :
-		if (preg_match('/^\S+/', $type, $matches))
-			$type = $matches[0];
-			
-		// Convert type to upper case :
-		$type = strtoupper($type);
-		
-		// Create appropriate formatter :
-		switch ($type) {
-			// Integer types :
-			case self::TYPE_TINYINT;
-			case self::TYPE_SMALLINT;
-			case self::TYPE_MEDIUMINT;
-			case self::TYPE_INT;
-			case self::TYPE_BIGINT;
-				$formatter = new GlueDB_Formatter_Integer;
-				break;
-			
-			// Real types :
-			case self::TYPE_FLOAT;
-			case self::TYPE_DOUBLE;
-			case self::TYPE_DECIMAL;
-				$formatter = new GlueDB_Formatter_Float;
-				break;
-			
-			// Boolean types :
-			case self::TYPE_BIT;
-				$formatter = new GlueDB_Formatter_Boolean;
-				break;
-	
-			// Character types :
-			case self::TYPE_CHAR;
-			case self::TYPE_VARCHAR;
-			case self::TYPE_TINYTEXT;
-			case self::TYPE_TEXT;
-			case self::TYPE_MEDIUMTEXT;
-			case self::TYPE_LONGTEXT;
-			case self::TYPE_ENUM;
-			case self::TYPE_SET;
-				$formatter = new GlueDB_Formatter_String;
-				break;
-			
-			// Binary types :
-			case self::TYPE_BINARY;
-			case self::TYPE_VARBINARY;
-			case self::TYPE_TINYBLOB;
-			case self::TYPE_BLOB;
-			case self::TYPE_MEDIUMBLOB;
-			case self::TYPE_LONGBLOB;
-				$formatter = new GlueDB_Formatter_String; // TODO Is this the right thing to do ?
-				break;
-			
-			// Time types :
-			case self::TYPE_DATE;
-			case self::TYPE_DATETIME;
-			case self::TYPE_TIME;
-			case self::TYPE_TIMESTAMP;
-			case self::TYPE_YEAR;
-				$formatter = new GlueDB_Formatter_String; // TODO Is this the right thing to do ?
-				break;
-				
-			// Default :
-			default;
-				throw new Kohana_Exception("Unknown MySQL native type " . $type);
+	public function table_info($name) {
+		// Get columns information :
+		$stmt = $this->prepare("
+			SELECT
+				column_name,
+				data_type,
+				is_nullable,
+				column_default,
+				character_maximum_length,
+				numeric_precision,
+				numeric_scale,
+				extra
+			FROM
+				information_schema.columns
+			WHERE
+				table_schema = :dbname AND
+				table_name = :tablename
+		");
+		$stmt->execute(array(':dbname' => $this->dbname, ':tablename' => $name));
+
+		// Creates columns data structure :
+		$columns = array();
+		while ($row = $stmt->fetch()) {
+			$name		= trim(strtolower($row[0]));
+			$dbtype		= trim(strtolower($row[1]));
+			$phptype	= $this->dialect->phptype($dbtype);
+			$nullable	= (boolean) $row[2];
+			$default	= $row[3];
+			$max		= isset($row[4]) ? (float)   $row[4] : null;
+			$precision	= isset($row[5]) ? (integer) $row[5] : null;
+			$scale		= isset($row[6]) ? (integer) $row[6] : null;
+			$auto		= trim(strtolower($row[7])) === 'auto_increment' ? true : false;
+			$columns[] = array(
+				'name'		=> $name,		// Column name.
+				'dbtype'	=> $dbtype,		// Native database type.
+				'phptype'	=> $phptype,	// Appropriate PHP type to represent column values.
+				'nullable'	=> $nullable,	// Whether or not the column is nullable.
+				'max'		=> $max,		// Max length of a text column, or maximum value of a numeric column.
+				'precision' => $precision,	// Precision of the column.
+				'scale' 	=> $scale,		// Scale of the column.
+				'default'	=> $default,	// Default value of the column (stored as is from the database, not type casted).
+				'auto'		=> $auto,		// Whether or not the column auto-incrementing.
+			);
 		}
-	} 
-	
+		sort($columns);
+
+		// Create indexes data structure :
+		// TODO
+
+		return array(
+				'columns' => $columns
+			);
+	}
+
 	/**
-	 * Returns all tables present in current database as an array of table names. Be
-	 * aware that this function is totally ignorant of any GlueDB_Table class you may
-	 * have defined explicitely !
-	 * 
-	 * TODO : cache result ?
+	 * Returns all tables present in current database as an array of table names.
+	 *
+	 * Be aware that this function is totally ignorant of any virtual table
+	 * you may have defined explicitely !
 	 *
 	 * @return array Array of table names, numerically indexed, alphabetically ordered.
 	 */

@@ -2,7 +2,7 @@
 
 /**
  * Base dialect class.
- * 
+ *
  * A dialect object is capable of compiling data structures representing queries or
  * fragments of queries into SQL strings according to a given SQL dialect.
  *
@@ -17,18 +17,27 @@ abstract class GlueDB_Dialect {
 	 *
 	 * @param string $string
 	 *
-	 * @return
+	 * @return string
 	 */
 	abstract public function quote($string);
-	
+
 	/**
 	 * Quotes an identifier according to current SQL dialect conventions.
 	 *
 	 * @param string $identifier
 	 *
-	 * @return
+	 * @return string
 	 */
 	abstract public function quote_identifier($identifier);
+
+	/**
+	 * Returns the appropriate PHP type to represent given native database type.
+	 *
+	 * @param string $dbtype
+	 *
+	 * @return string
+	 */
+	abstract public function phptype($dbtype);
 
 	/**
 	 * Compiles a datastructure representing an SQL query into an SQL string

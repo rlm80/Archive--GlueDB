@@ -1,18 +1,30 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Base table class.
- * 
- * Information about a database table is represented as a table object that is
- * instanciated on first access and then cached. There are two types of table objects :
- * - simple tables : they map directly to a database table,
- * - composite tables : they map to more than one database tables, joined together by primary key.
- * 
+ * Base virtual table class.
+ *
+ * The tables you are referring to when you work with the query builder or with the
+ * introspection API are not real database tables. They are PHP objects called virtual
+ * tables. Just like real tables, virtual tables have names, columns and belong to a
+ * database. By default, all virtual tables map to the corresponding table in the underlying
+ * database and have the same columns so you actually don't notice that this system even
+ * exists at all.
+ *
+ * But you may define your own virtual tables.
+ *
+ * You do so by creating a class called GlueDB_Table_<database name>_<virtual table name> that
+ * extends either :
+ * - GlueDB_Table_Simple : such a virtual table maps directly to a real database table,
+ * - GlueDB_Table_Composite : such a virtual table maps to a group of other virtual tables, simple or
+ * 							  composite, joined together by primary key.
+ *
  * Representing tables as objects this way makes it possible to define a very convenient
- * database introspection API. It also sets up a framework that makes it easy to define
- * computed columns, columns formaters, composite tables, etc...in a way that is totally
- * transparent to the application layers that sits on top of this library.
- * 
+ * database introspection API. It also sets up a framework that makes it easy for the user
+ * to define computed columns and columns formaters. It adds a level of indirection between
+ * the application and the database. Composite virtual tables allows to emulate in PHP
+ * updatable, deletable and insertable views, something that RDBMS don't support or
+ * support only partially.
+ *
  * Moving this complexity down at the DBAL level makes the rest of the application easier
  * to code and easier to understand.
  *
@@ -28,8 +40,8 @@ abstract class GlueDB_Table {
 	static protected $instances = array();
 
 	/**
-	 * @var string	The database this table (or its components if this is a
-	 * 				composite table) is stored into.
+	 * @var string	Name of the database this virtual table belongs to. A virtual table may not map
+	 * 				to real tables that belong to another database as this one.
 	 */
 	protected $database;
 
@@ -37,12 +49,12 @@ abstract class GlueDB_Table {
 	 * @var string Name of this table, as it will be refered to in queries.
 	 */
 	protected $name;
-	
+
 	/**
 	 * @var array Columns of this table.
 	 */
-	protected $columns;	
-	
+	protected $columns;
+
 	/**
 	 * @var array Primary key columns of this table.
 	 */
@@ -51,8 +63,8 @@ abstract class GlueDB_Table {
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Database	$database	Database.
-	 * @param string			$name		Table name.
+	 * @param string	$database	Database name.
+	 * @param string	$name	Table name.
 	 */
 	protected function __construct($database, $name) {
 		// Set database :
@@ -60,17 +72,17 @@ abstract class GlueDB_Table {
 
 		// Set table name :
 		$this->name = $name;
-		
+
 		// Create columns :
 		$this->columns = $this->create_columns();
 	}
-	
-	
+
+
 	/**
-	 * Enter description here ...
+	 * Returns the columns of this virtual table.
 	 */
 	abstract protected function create_columns();
-	
+
 	/**
 	 * Returns a table helper for this table.
 	 *
@@ -109,7 +121,7 @@ abstract class GlueDB_Table {
 	public function insert() {
 		return new GlueDB_Query_Insert($this);
 	}
-	
+
 	/**
 	 * Returns the columns of this table.
 	 *
@@ -118,51 +130,51 @@ abstract class GlueDB_Table {
 	public function columns() {
 		return $this->columns;
 	}
-	
+
 	/**
 	 * Returns the column object of given name for this table.
 	 *
 	 * @param string $table Table name.
 	 *
-	 * @return GlueDB_Table
+	 * @return GlueDB_Column
 	 */
 	public function __get($column) {
 		if (isset($this->columns[$column]))
 			return $this->columns[$column];
 		else
-			; // TODO decide what to return here...null ? Dummy column object meaning undefined ? 
-	}	
+			; // TODO decide what to return here...null ? Dummy column object meaning undefined ?
+	}
 
 	/**
 	 * Lazy loads a table object, stores it in cache, and returns it.
 	 *
-	 * @param string $dbname	Database name.
+	 * TODO : cache serialized virtual tables on disk
+	 *
+	 * @param string $database	Database name.
 	 * @param string $name		Table name.
 	 *
 	 * @return GlueDB_Table
 	 */
-	static public function get($dbname, $name) {
-		$dbname	= strtolower($dbname);
-		$name	= strtolower($name);
-		if( ! isset(self::$instances[$dbname][$name]))
-			self::$instances[$dbname][$name] = self::create($dbname, $name);
-		return self::$instances[$dbname][$name];
+	static public function get($database, $name) {
+		$database	= strtolower($database);
+		$name		= strtolower($name);
+		if( ! isset(self::$instances[$database][$name]))
+			self::$instances[$database][$name] = self::create($database, $name);
+		return self::$instances[$database][$name];
 	}
 
 	/**
-	 * Returns a new table instance. Throws class not found exception if
-	 * no class is defined for given table.
+	 * Returns a new table instance.
 	 *
 	 * @param string $name
 	 *
-	 * @return object
+	 * @return GlueDB_Table
 	 */
-	static protected function create($dbname, $name) {
-		$db		= GlueDB::db($dbname);
-		$class	= 'GlueDB_Table_' . ucfirst($dbname) . '_' . ucfirst($name);
+	static protected function create($database, $name) {
+		$class = 'GlueDB_Table_' . ucfirst($database) . '_' . ucfirst($name);
 		if (class_exists($class))
-			return new $class($db, $name);
-		else 
-			return new GlueDB_Table_Simple($db, $name);
+			return new $class($database, $name);
+		else
+			return new GlueDB_Table_Simple($database, $name);
 	}
 }

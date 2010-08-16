@@ -2,7 +2,7 @@
 
 /**
  * Base database class.
- * 
+ *
  * A database object is a PDO instance connected to a specific database. This
  * class extends PDO and adds to it a unified interface for database introspection
  * and a query compiler to generate RDBMS specific SQL queries.
@@ -12,7 +12,7 @@
  * @license    MIT
  */
 
-abstract class GlueDB_Database extends PDO {	
+abstract class GlueDB_Database extends PDO {
 	/**
 	 * @var array Database instances cache.
 	 */
@@ -47,10 +47,10 @@ abstract class GlueDB_Database extends PDO {
 	 * @var boolean Whether or not the connection is persistent.
 	 */
 	protected $persistent = FALSE;
-	
+
 	/**
 	 * @var GlueDB_Dialect The dialect suitable for communication with current database.
-	 */	
+	 */
 	protected $dialect;
 
 	/**
@@ -74,22 +74,22 @@ abstract class GlueDB_Database extends PDO {
 
 		// Set identifier :
 		$this->name = $name;
-		
+
 		// Set SQL dialect :
-		$this->dialect = $this->create_dialect();		
+		$this->dialect = $this->create_dialect();
 
 		// Set PDO options :
-		$options[PDO::ATTR_ERRMODE]		= PDO::ERRMODE_EXCEPTION;
-		$options[PDO::ATTR_PERSISTENT]	= $this->persistent;
+		$this->options[PDO::ATTR_ERRMODE]		= PDO::ERRMODE_EXCEPTION;
+		$this->options[PDO::ATTR_PERSISTENT]	= $this->persistent;
 
 		// Call parent constructor to establish connection :
 		parent::__construct($this->dsn(), $this->username, $this->password, $this->options);
-		
+
 		// Unset connection parameters for security, to make sure no forgotten debug message
 		// displays them unintentionaly to a user :
 		$this->username = null;
-		$this->password = null;		
-		
+		$this->password = null;
+
 		// Set connection charset :
 		$this->set_charset();
 	}
@@ -100,7 +100,7 @@ abstract class GlueDB_Database extends PDO {
 	 * @returns string
 	 */
 	abstract protected function dsn();
-	
+
 	/**
 	 * Creates a dialect object suitable for communicating with current database.
 	 *
@@ -109,7 +109,7 @@ abstract class GlueDB_Database extends PDO {
 	protected function create_dialect() {
 		return new GlueDB_Dialect_ANSI;
 	}
-	
+
 	/**
 	 * Issues the right query to set current connection charset. This is probably
 	 * RDBMS specific so it's factored out of the constructor into a function
@@ -117,13 +117,13 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function set_charset() {
 		$this->exec('SET NAMES ' . $this->quote($this->charset));
-	}	
-	
+	}
+
 	/**
 	 * Quotes an identifier according to current SQL dialect conventions.
-	 * 
-	 * Forwards call to dialect object. 
-	 * 
+	 *
+	 * Forwards call to dialect object.
+	 *
 	 * @param string $identifier
 	 *
 	 * @return
@@ -135,8 +135,8 @@ abstract class GlueDB_Database extends PDO {
 	/**
 	 * Compiles a datastructure representing an SQL query into an SQL string
 	 * according to current SQL dialect conventions.
-	 * 
-	 * Forwards call to dialect object. 
+	 *
+	 * Forwards call to dialect object.
 	 *
 	 * @param mixed $statement
 	 *
@@ -144,7 +144,7 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	public function compile($statement) {
 		return $this->dialect->compile($statement);
-	}	
+	}
 
 	/**
 	 * Returns a select query data structure meant to query this database.
@@ -154,53 +154,41 @@ abstract class GlueDB_Database extends PDO {
 	public function select() {
 		return new GlueDB_Query_Select($this);
 	}
-	
+
 	/**
-	 * Helper function to ensure the array representing a column's meta-data
-	 * always has the same structure.
-	 * 
+	 * Returns structured information about a real database table and its columns.
+	 * Columns are returned alphabetically ordered.
+	 *
+	 * Be aware that this function is totally ignorant of any virtual table
+	 * you may have defined explicitely !
+	 *
 	 * @return array
 	 */
-	protected function column_info($name, $type, $max, $null, $default) {
-		return array(
-			'name'		=> $name,
-			'type'		=> $type,
-			'null'		=> $null,
-			'max'		=> $max,
-			'default'	=> $default
-		);
-	}
-	
+	public abstract function table_info($name);
+
 	/**
-	 * Returns a formatter object for the given native database type.
-	 * 
-	 * @return GlueDB_Formatter
-	 */
-	abstract public function get_default_formatter($type); 
-	
-	/**
-	 * Returns all tables present in current database as an array of table names. Be
-	 * aware that this function is totally ignorant of any GlueDB_Table class you may
-	 * have defined explicitely !
+	 * Returns all tables present in current database as an array of table names.
+	 *
+	 * Be aware that this function is totally ignorant of any virtual table
+	 * you may have defined explicitely !
 	 *
 	 * @return array Array of table names, numerically indexed, alphabetically ordered.
 	 */
 	abstract public function tables();
-	
+
 	/**
-	 * Returns the table object of given name for current database.
-	 * Returned table may be simple or composite. This should always
-	 * be used internally instead of __get, because table names
-	 * may clash with protected properties of this class.
+	 * Returns the virtual table of given name for current database.
+	 * This should always be used internally instead of __get, because
+	 * table names may clash with protected properties of this class.
 	 *
 	 * @param string $table Table name.
 	 *
 	 * @return GlueDB_Table
 	 */
-	protected function table($table) {
+	public function table($table) {
 		return GlueDB_Table::get($this->name, $table);
-	}	
-	
+	}
+
 	/**
 	 * Returns the table object of given name for current database.
 	 * Returned table may be simple or composite.

@@ -19,7 +19,7 @@ class GlueDB_Dialect_ANSI extends GlueDB_Dialect {
 	public function quote($string) {
 		return addslashes($string);
 	}
-	
+
 	/**
 	 * Quotes an identifier according to ANSI conventions.
 	 *
@@ -29,6 +29,18 @@ class GlueDB_Dialect_ANSI extends GlueDB_Dialect {
 	 */
 	public function quote_identifier($identifier) {
 		return '"' . $identifier . '"';
+	}
+
+	/**
+	 * Returns the appropriate PHP type to represent given ANSI type.
+	 *
+	 * @param string $dbtype
+	 *
+	 * @return string
+	 */
+	public function phptype($dbtype) {
+		return 'string'; // TODO But is this really necessary ? It will be redefined entirely
+						 // in every children classes anyway.
 	}
 
 	/**
