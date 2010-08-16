@@ -1,4 +1,4 @@
-Much of the complexity of ORM modules could be advantageously moved down at the DBAL level.
+Some of the complexity of ORM modules could be advantageously moved down at the DBAL level.
 
 This includes :
 
