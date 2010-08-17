@@ -53,8 +53,9 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 * Returns structured information about a real database table and its columns.
 	 * Columns are returned alphabetically ordered.
 	 *
-	 * Be aware that this function is totally ignorant of any virtual table
-	 * you may have defined explicitely !
+	 * Be aware that this function is totally ignorant of any virtual table you may have
+	 * defined explicitely ! It's mostly useful internally to query the real underlying
+	 * database schema. Users should use the introspection API instead.
 	 *
 	 * @return array
 	 */
@@ -75,10 +76,12 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 			WHERE
 				table_schema = :dbname AND
 				table_name = :tablename
-		");
-		$stmt->execute(array(':dbname' => $this->dbname, ':tablename' => $name));
+		")->execute(array(
+			':dbname'		=> $this->dbname,
+			':tablename'	=> $name
+		));
 
-		// Creates columns data structure :
+		// Create columns data structure :
 		$columns = array();
 		while ($row = $stmt->fetch()) {
 			$name		= trim(strtolower($row[0]));

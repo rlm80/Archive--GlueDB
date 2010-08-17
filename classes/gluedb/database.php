@@ -159,8 +159,9 @@ abstract class GlueDB_Database extends PDO {
 	 * Returns structured information about a real database table and its columns.
 	 * Columns are returned alphabetically ordered.
 	 *
-	 * Be aware that this function is totally ignorant of any virtual table
-	 * you may have defined explicitely !
+	 * Be aware that this function is totally ignorant of any virtual table you may have
+	 * defined explicitely ! It's mostly useful internally to query the real underlying
+	 * database schema. Users should use the introspection API instead.
 	 *
 	 * @return array
 	 */
