@@ -133,6 +133,19 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
+	 * Returns the appropriate PHP type to represent given native database type.
+	 *
+	 * Forwards call to dialect object.
+	 *
+	 * @param string $dbtype
+	 *
+	 * @return string
+	 */
+	public function get_phptype($dbtype) {
+		return $this->dialect->get_phptype($dbtype);
+	}
+
+	/**
 	 * Compiles a datastructure representing an SQL query into an SQL string
 	 * according to current SQL dialect conventions.
 	 *
@@ -156,8 +169,31 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Returns structured information about a real database table and its columns.
+	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered.
+	 *
+	 * Structure :
+	 * array(
+	 * 		'columns' => array(
+	 * 			0 => array (
+	 * 				'dbcolumn'		=> < Column name >
+	 *				'dbtype'		=> < Native database type >
+	 *				'dbnullable'	=> < Whether or not the column is nullable >
+	 *				'dbmaxlength'	=> < Maximum length of a text column >
+	 *				'dbprecision' 	=> < Precision of the column >
+	 *				'dbscale' 		=> < Scale of the column >
+	 *				'dbdefault'		=> < Default value of the column (stored as is from the database, not type casted) >
+	 *				'dbauto'		=> <Whether or not the column auto-incrementing >
+	 *			)
+	 *			1 => ...
+	 *			...
+	 * 		)
+	 * 		'pk' => array(
+	 * 			0 => < columns 1>
+	 * 			1 => < columns 1>
+	 * 			...
+	 * 		)
+	 * )
 	 *
 	 * Be aware that this function is totally ignorant of any virtual table you may have
 	 * defined explicitely ! It's mostly useful internally to query the real underlying
@@ -165,7 +201,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return array
 	 */
-	public abstract function table_info($name);
+	public abstract function real_table($name);
 
 	/**
 	 * Returns all tables present in current database as an array of table names.
@@ -175,7 +211,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return array Array of table names, numerically indexed, alphabetically ordered.
 	 */
-	abstract public function tables();
+	abstract public function real_tables();
 
 	/**
 	 * Returns the virtual table of given name for current database.

@@ -1,14 +1,14 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Virtual table that map directly to a single real database table.
+ * Virtual table that map to several other virutal tables joined together by pk.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class GlueDB_Table extends GlueDB_Table_Base {
+class GlueDB_Table_Composite extends GlueDB_Table_Base {
 	/**
 	 * Returns the columns of this virtual table.
 	 */

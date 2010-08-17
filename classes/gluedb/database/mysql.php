@@ -50,8 +50,31 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	}
 
 	/**
-	 * Returns structured information about a real database table and its columns.
+	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered.
+	 *
+	 * Structure :
+	 * array(
+	 * 		'columns' => array(
+	 * 			0 => array (
+	 * 				'dbcolumn'		=> < Column name >
+	 *				'dbtype'		=> < Native database type >
+	 *				'dbnullable'	=> < Whether or not the column is nullable >
+	 *				'dbmaxlength'	=> < Maximum length of a text column >
+	 *				'dbprecision' 	=> < Precision of the column >
+	 *				'dbscale' 		=> < Scale of the column >
+	 *				'dbdefault'		=> < Default value of the column (stored as is from the database, not type casted) >
+	 *				'dbauto'		=> <Whether or not the column auto-incrementing >
+	 *			)
+	 *			1 => ...
+	 *			...
+	 * 		)
+	 * 		'pk' => array(
+	 * 			0 => < columns 1>
+	 * 			1 => < columns 1>
+	 * 			...
+	 * 		)
+	 * )
 	 *
 	 * Be aware that this function is totally ignorant of any virtual table you may have
 	 * defined explicitely ! It's mostly useful internally to query the real underlying
@@ -59,8 +82,8 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 *
 	 * @return array
 	 */
-	public function table_info($name) {
-		// Get columns information :
+	public function real_table($name) {
+		// Query information schema to get columns information :
 		$stmt = $this->prepare("
 			SELECT
 				column_name,
@@ -76,7 +99,8 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 			WHERE
 				table_schema = :dbname AND
 				table_name = :tablename
-		")->execute(array(
+		");
+		$stmt->execute(array(
 			':dbname'		=> $this->dbname,
 			':tablename'	=> $name
 		));
@@ -84,34 +108,45 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 		// Create columns data structure :
 		$columns = array();
 		while ($row = $stmt->fetch()) {
-			$name		= trim(strtolower($row[0]));
-			$dbtype		= trim(strtolower($row[1]));
-			$phptype	= $this->dialect->phptype($dbtype);
-			$nullable	= (boolean) $row[2];
-			$default	= $row[3];
-			$max		= isset($row[4]) ? (float)   $row[4] : null;
-			$precision	= isset($row[5]) ? (integer) $row[5] : null;
-			$scale		= isset($row[6]) ? (integer) $row[6] : null;
-			$auto		= trim(strtolower($row[7])) === 'auto_increment' ? true : false;
 			$columns[] = array(
-				'name'		=> $name,		// Column name.
-				'dbtype'	=> $dbtype,		// Native database type.
-				'phptype'	=> $phptype,	// Appropriate PHP type to represent column values.
-				'nullable'	=> $nullable,	// Whether or not the column is nullable.
-				'max'		=> $max,		// Max length of a text column, or maximum value of a numeric column.
-				'precision' => $precision,	// Precision of the column.
-				'scale' 	=> $scale,		// Scale of the column.
-				'default'	=> $default,	// Default value of the column (stored as is from the database, not type casted).
-				'auto'		=> $auto,		// Whether or not the column auto-incrementing.
+				'dbcolumn'		=> trim(strtolower($row[0])),
+				'dbtype'		=> trim(strtolower($row[1])),
+				'dbnullable'	=> (boolean) $row[2],
+				'dbdefault'		=> $row[3],
+				'dbmaxlength'	=> isset($row[4]) ? (integer) $row[4] : null,
+				'dbprecision' 	=> isset($row[5]) ? (integer) $row[5] : null,
+				'dbscale' 		=> isset($row[6]) ? (integer) $row[6] : null,
+				'dbauto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,
 			);
 		}
 		sort($columns);
 
-		// Create indexes data structure :
-		// TODO
+		// Query information schema to get pk information :
+		$stmt = $this->prepare("
+			SELECT
+				column_name
+			FROM
+				information_schema.statistics
+			WHERE
+				table_schema = :dbname AND
+				table_name = :tablename AND
+				index_name = 'PRIMARY'
+			ORDER BY
+				seq_in_index
+		");
+		$stmt->execute(array(
+			':dbname'		=> $this->dbname,
+			':tablename'	=> $name
+		));
+
+		// Create columns data structure :
+		$pk = array();
+		while ($row = $stmt->fetch())
+			$pk[] = $row[0];
 
 		return array(
-				'columns' => $columns
+				'columns'	=> $columns,
+				'pk'		=> $pk,
 			);
 	}
 
@@ -123,7 +158,7 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 *
 	 * @return array Array of table names, numerically indexed, alphabetically ordered.
 	 */
-	public function tables() {
+	public function real_tables() {
 		$stmt = $this->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = :dbname");
 		$stmt->execute(array(':dbname' => $this->dbname));
 		$tables = array();

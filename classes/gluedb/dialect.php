@@ -37,7 +37,7 @@ abstract class GlueDB_Dialect {
 	 *
 	 * @return string
 	 */
-	abstract public function phptype($dbtype);
+	abstract public function get_phptype($dbtype);
 
 	/**
 	 * Compiles a datastructure representing an SQL query into an SQL string
