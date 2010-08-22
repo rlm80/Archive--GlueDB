@@ -14,6 +14,11 @@
 
 abstract class GlueDB_Database extends PDO {
 	/**
+	 * @var string Name of the default database.
+	 */
+	const DEFAULTDB = 'Primary';
+	
+	/**
 	 * @var array Database instances cache.
 	 */
 	static protected $instances = array();
@@ -42,11 +47,6 @@ abstract class GlueDB_Database extends PDO {
 	 * @var string Connection charset.
 	 */
 	protected $charset = 'utf8';
-
-	/**
-	 * @var boolean Whether or not the connection is persistent.
-	 */
-	protected $persistent = FALSE;
 
 	/**
 	 * @var GlueDB_Dialect The dialect suitable for communication with current database.
@@ -79,8 +79,8 @@ abstract class GlueDB_Database extends PDO {
 		$this->dialect = $this->create_dialect();
 
 		// Set PDO options :
-		$this->options[PDO::ATTR_ERRMODE]		= PDO::ERRMODE_EXCEPTION;
-		$this->options[PDO::ATTR_PERSISTENT]	= $this->persistent;
+		$this->options[PDO::ATTR_ERRMODE]			= PDO::ERRMODE_EXCEPTION;
+		$this->options[PDO::ATTR_STATEMENT_CLASS]	= array('GlueDB_Statement', array($this));
 
 		// Call parent constructor to establish connection :
 		parent::__construct($this->dsn(), $this->username, $this->password, $this->options);
@@ -176,20 +176,20 @@ abstract class GlueDB_Database extends PDO {
 	 * array(
 	 * 		'columns' => array(
 	 * 			0 => array (
-	 * 				'dbcolumn'		=> < Column name >
-	 *				'dbtype'		=> < Native database type >
-	 *				'dbnullable'	=> < Whether or not the column is nullable >
-	 *				'dbmaxlength'	=> < Maximum length of a text column >
-	 *				'dbprecision' 	=> < Precision of the column >
-	 *				'dbscale' 		=> < Scale of the column >
-	 *				'dbdefault'		=> < Default value of the column (stored as is from the database, not type casted) >
-	 *				'dbauto'		=> <Whether or not the column auto-incrementing >
+	 * 				'column'	=> < Column name >
+	 *				'type'		=> < Native database type >
+	 *				'nullable'	=> < Whether or not the column is nullable >
+	 *				'maxlength'	=> < Maximum length of a text column >
+	 *				'precision' => < Precision of the column >
+	 *				'scale' 	=> < Scale of the column >
+	 *				'default'	=> < Default value of the column (stored as is from the database, not type casted) >
+	 *				'auto'		=> <Whether or not the column auto-incrementing >
 	 *			)
 	 *			1 => ...
 	 *			...
 	 * 		)
 	 * 		'pk' => array(
-	 * 			0 => < columns 1>
+	 * 			0 => < columns 0>
 	 * 			1 => < columns 1>
 	 * 			...
 	 * 		)
@@ -201,7 +201,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return array
 	 */
-	public abstract function real_table($name);
+	public abstract function table_info($name);
 
 	/**
 	 * Returns all tables present in current database as an array of table names.

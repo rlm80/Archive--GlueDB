@@ -3,8 +3,6 @@
 /**
  * Column class.
  *
- * Non computed columns map to a real column in a real database table and you can insert data into them.
- *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
@@ -12,17 +10,22 @@
 
 class GlueDB_Column extends GlueDB_Column_Base {
 	/**
-	 * @var string	Real database table in which this virtual column is stored.
+	 * @var GlueDB_Formatter Formatter object to format values coming from and going to this column.
 	 */
-	protected $dbtable;
+	protected $formatter;	
 
 	/**
-	 * @var string	Real database column in which this virtual column is stored.
+	 * @var string Underlying database table this virtual column is stored into.
+	 */
+	protected $dbtable;	
+	
+	/**
+	 * @var string Underlying database column this virtual column is stored into.
 	 */
 	protected $dbcolumn;
 
 	/**
-	 * @var string	Native database type of this column.
+	 * @var string Native database type of this column.
 	 */
 	protected $dbtype;
 
@@ -56,19 +59,12 @@ class GlueDB_Column extends GlueDB_Column_Base {
 	 */
 	protected $dbauto;
 
-	/**
-	 * @var GlueDB_Formatter Formatter object to format values coming from and going to this column.
-	 */
-	protected $formatter;
-
-	public function __construct(GlueDB_Table_Base $table, $name, $dbtable, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
-		// Compute PHP type :
-		$type = $table->db()->get_phptype($dbtype);
-
-		// Parent constructor :
-		parent::__construct($table, $name, $type);
-
+	public function __construct(GlueDB_Table $table, $name, $formatter, $dbtable, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
+		// Call parent constructor :
+		parent::__construct($table, $name);
+		
 		// Init properties :
+		$this->formatter	= $formatter;
 		$this->dbtable		= $dbtable;
 		$this->dbcolumn		= $dbcolumn;
 		$this->dbtype		= $dbtype;
@@ -76,23 +72,90 @@ class GlueDB_Column extends GlueDB_Column_Base {
 		$this->dbmaxlength	= $dbmaxlength;
 		$this->dbprecision	= $dbprecision;
 		$this->dbscale		= $dbscale;
+		$this->dbdefault	= $dbdefault;
 		$this->dbauto		= $dbauto;
-
-		// Init formatter :
-		switch ($this->type) {
-			case 'integer'; case 'int';
-				$this->formatter = new GlueDB_Formatter_Integer;
-				break;
-			case 'float';
-				$this->formatter = new GlueDB_Formatter_Float;
-				break;
-			case 'boolean';
-				$this->formatter = new GlueDB_Formatter_Boolean;
-				break;
-			default;
-				$this->formatter = new GlueDB_Formatter_String;
-		}
 	}
+	
+	/**
+	 * Returns the PHP type of the values returned by this column, after they have been formatted.  
+	 * 
+	 * @return array
+	 */
+	public function type() {
+		return $this->formatter->type();
+	}	
+	
+	/**
+	 * Returns the underlying database table and column this virtual column is stored into.  
+	 * 
+	 * @return array
+	 */
+	public function dblocation() {
+		return array(0 => array('table' => $this->dbtable, 'column' => $this->dbcolumn));
+	}
+	
+	/**
+	 * Returns the underlying column database type.
+	 * 
+	 * @return string
+	 */
+	public function dbtype() {
+		
+	}
+	
+	/**
+	 * Returns whether or not the underlying column can accept null values. 
+	 * 
+	 * @return boolean
+	 */
+	public function dbnullable() {
+		
+	}
+	
+	/**
+	 * Returns the maximum length that underlying column accepts. 
+	 * 
+	 * @return integer
+	 */
+	public function dbmaxlength() {
+		
+	}
+	
+	/**
+	 * Returns the total number of significant digits of the underlying column. 
+	 * 
+	 * @return integer
+	 */
+	public function dbprecision() {
+		
+	}
+	
+	/**
+	 * Returns the number of significant digits in the decimal part af the underlying column. 
+	 * 
+	 * @return integer
+	 */
+	public function dbscale() {
+		
+	}
+	
+	/**
+	 * Returns the default value of the underlying column (raw from the database, not type casted !). 
+	 * 
+	 * @return string
+	 */
+	public function dbdefault() {
+		
+	}
+	
+	/**
+	 * Whether or not the underlying column is auto-incrementing. 
+	 * 
+	 * @return string
+	 */
+	public function dbauto() {
+		
+	}	
 }
 
 

@@ -38,7 +38,7 @@ class GlueDB_Dialect_ANSI extends GlueDB_Dialect {
 	 *
 	 * @return string
 	 */
-	public function phptype($dbtype) {
+	public function get_phptype($dbtype) {
 		return 'string'; // TODO But is this really necessary ? It will be redefined entirely
 						 // in every children classes anyway.
 	}

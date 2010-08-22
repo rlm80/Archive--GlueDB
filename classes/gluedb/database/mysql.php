@@ -57,20 +57,20 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 * array(
 	 * 		'columns' => array(
 	 * 			0 => array (
-	 * 				'dbcolumn'		=> < Column name >
-	 *				'dbtype'		=> < Native database type >
-	 *				'dbnullable'	=> < Whether or not the column is nullable >
-	 *				'dbmaxlength'	=> < Maximum length of a text column >
-	 *				'dbprecision' 	=> < Precision of the column >
-	 *				'dbscale' 		=> < Scale of the column >
-	 *				'dbdefault'		=> < Default value of the column (stored as is from the database, not type casted) >
-	 *				'dbauto'		=> <Whether or not the column auto-incrementing >
+	 * 				'column'	=> < Column name >
+	 *				'type'		=> < Native database type >
+	 *				'nullable'	=> < Whether or not the column is nullable >
+	 *				'maxlength'	=> < Maximum length of a text column >
+	 *				'precision' => < Precision of the column >
+	 *				'scale' 	=> < Scale of the column >
+	 *				'default'	=> < Default value of the column (stored as is from the database, not type casted) >
+	 *				'auto'		=> <Whether or not the column auto-incrementing >
 	 *			)
 	 *			1 => ...
 	 *			...
 	 * 		)
 	 * 		'pk' => array(
-	 * 			0 => < columns 1>
+	 * 			0 => < columns 0>
 	 * 			1 => < columns 1>
 	 * 			...
 	 * 		)
@@ -82,7 +82,7 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 *
 	 * @return array
 	 */
-	public function real_table($name) {
+	public function table_info($name) {
 		// Query information schema to get columns information :
 		$stmt = $this->prepare("
 			SELECT
@@ -109,14 +109,14 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 		$columns = array();
 		while ($row = $stmt->fetch()) {
 			$columns[] = array(
-				'dbcolumn'		=> trim(strtolower($row[0])),
-				'dbtype'		=> trim(strtolower($row[1])),
-				'dbnullable'	=> (boolean) $row[2],
-				'dbdefault'		=> $row[3],
-				'dbmaxlength'	=> isset($row[4]) ? (integer) $row[4] : null,
-				'dbprecision' 	=> isset($row[5]) ? (integer) $row[5] : null,
-				'dbscale' 		=> isset($row[6]) ? (integer) $row[6] : null,
-				'dbauto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,
+				'column'	=> trim(strtolower($row[0])),
+				'type'		=> trim(strtolower($row[1])),
+				'nullable'	=> (boolean) $row[2],
+				'default'	=> $row[3],
+				'maxlength'	=> isset($row[4]) ? (integer) $row[4] : null,
+				'precision' => isset($row[5]) ? (integer) $row[5] : null,
+				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,
+				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,
 			);
 		}
 		sort($columns);

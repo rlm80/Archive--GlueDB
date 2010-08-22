@@ -9,7 +9,6 @@
  */
 
 abstract class GlueDB_Formatter_String extends GlueDB_Formatter {
-
 	/**
 	 * Formats data coming from the database into a format suitable for PHP.
 	 *

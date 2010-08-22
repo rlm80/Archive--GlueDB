@@ -6,7 +6,7 @@
 * always be your entry point.
 *
 * @package GlueDB
-* @author Régis Lemaigre
+* @author Rï¿½gis Lemaigre
 * @license MIT
 */
 
@@ -22,7 +22,7 @@ class GlueDB {
 	 *
 	 * @return GlueDB_Database
 	 */
-	public static function db($name = 'main') {
+	public static function db($name = GlueDB_Database::DEFAULTDB) {
 		return GlueDB_Database::get($name);
 	}
 }
