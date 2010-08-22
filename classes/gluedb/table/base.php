@@ -11,13 +11,13 @@
  *
  * But you may define your own virtual tables. You do so by creating a class called
  * GlueDB_Table_<virtual table name> that extends GlueDB_Table.
- * 
+ *
  * You may want to do that if you want to :
  * - have a virtual table point to a real table that has a different name,
  * - have a virtual table column point to a real column that has a different name,
  * - set up a GlueDB_Formatter for a column, other than the default one that simply
  *   type cast the values according to the underlying database column type.
- *   
+ *
  * There are plans to support virual tables that map to a join of real tables in future
  * versions. Those will be called composite virtual tables.
  *
@@ -31,11 +31,11 @@ abstract class GlueDB_Table_Base {
 	 * @var array Tables instances cache.
 	 */
 	static protected $instances = array();
-	
+
 	/**
 	 * @var string Name of this virtual table, as it will be refered to in the query builder.
 	 */
-	protected $name;	
+	protected $name;
 
 	/**
 	 * @var array Columns of this table.
@@ -58,20 +58,20 @@ abstract class GlueDB_Table_Base {
 	 * @return GlueDB_Database
 	 */
 	abstract public function db();
-	
+
 	/**
 	 * Returns the primary key columns of this table.
 	 *
 	 * @return array
 	 */
 	abstract public function pk();
-	
+
 	/**
 	 * Underlying database table names.
 	 *
 	 * @return array
 	 */
-	abstract public function dbtables();	
+	abstract public function dbtables();
 
 	/**
 	 * Returns a table helper for this table.
@@ -86,33 +86,6 @@ abstract class GlueDB_Table_Base {
 	}
 
 	/**
-	 * Returns an update query object for current table.
-	 *
-	 * @return GlueDB_Query_Update
-	 */
-	public function update() {
-		return new GlueDB_Query_Update($this);
-	}
-
-	/**
-	 * Returns a delete query object for current table.
-	 *
-	 * @return GlueDB_Query_Delete
-	 */
-	public function delete() {
-		return new GlueDB_Query_Delete($this);
-	}
-
-	/**
-	 * Returns a insert query object for current table.
-	 *
-	 * @return GlueDB_Query_Insert
-	 */
-	public function insert() {
-		return new GlueDB_Query_Insert($this);
-	}
-
-	/**
 	 * Returns the columns of this table.
 	 *
 	 * @return array
@@ -120,7 +93,7 @@ abstract class GlueDB_Table_Base {
 	public function columns() {
 		return $this->columns;
 	}
-	
+
 	/**
 	 * Returns a column.
 	 *

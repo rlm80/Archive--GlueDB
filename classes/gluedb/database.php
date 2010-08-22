@@ -17,7 +17,7 @@ abstract class GlueDB_Database extends PDO {
 	 * @var string Name of the default database.
 	 */
 	const DEFAULTDB = 'Primary';
-	
+
 	/**
 	 * @var array Database instances cache.
 	 */
@@ -157,15 +157,6 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	public function compile($statement) {
 		return $this->dialect->compile($statement);
-	}
-
-	/**
-	 * Returns a select query data structure meant to query this database.
-	 *
-	 * @return GlueDB_Query_Select
-	 */
-	public function select() {
-		return new GlueDB_Query_Select($this);
 	}
 
 	/**
