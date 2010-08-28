@@ -18,6 +18,11 @@
 
 abstract class GlueDB_Builder {
 	/**
+	 * @var array Components of current expression.
+	 */
+	protected $parts;
+		
+	/**
 	 * @var GlueDB_Builder Parent builder that gave birth to this builder.
 	 */
 	protected $parent;
@@ -29,6 +34,7 @@ abstract class GlueDB_Builder {
 	 */
 	public function __construct(GlueDB_Builder $parent = null) {
 		$this->parent = $parent;
+		$this->parts = array();
 	}
 	
 	/**
@@ -40,6 +46,53 @@ abstract class GlueDB_Builder {
 	public function end() {
 		return $this->parent;
 	}
+	
+	/**
+	 * Removes all expression components added so far.
+	 * 
+	 * @return GlueDB_Builder
+	 */
+	public function reset() {
+		$this->parts = array();
+		return $this;
+	}
+	
+	/**
+	 * Whether or not current expression is empty.
+	 * 
+	 * @return boolean
+	 */
+	public function isempty() {
+		return count($this->parts) === 0;
+	}	
+	
+	/**
+	 * Returns expression components.
+	 * 
+	 * @return array
+	 */
+	public function parts() {
+		return $this->parts;
+	}	
+
+	/**
+	 * Adds parts to the expression, surrounding them with parenthesis, and connecting
+	 * them to the expression with given connector. Connector is ignored if expression
+	 * is empty.
+	 * 
+	 * @param array $parts
+	 * @param string $connector 
+	 */
+	protected function add($parts, $connector = null) {
+		// Add connector :
+		if (isset($connector) && ! $this->isempty())
+			$this->parts[] = ' ' . $connector . ' ';
+			
+		// Add parts :
+		$this->parts[] = '(';
+		array_merge($this->parts, $args);
+		$this->parts[] = ')';
+	}	
 	
 	/**
 	 * A call to an unkown function ends the current expression and the call
