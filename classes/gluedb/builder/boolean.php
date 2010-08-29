@@ -10,6 +10,25 @@
 
 class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	/**
+	 * Adds parts to the expression, surrounding them with parenthesis, and connecting
+	 * them to the expression with given connector. Connector is ignored if expression
+	 * is empty.
+	 * 
+	 * @param array $parts
+	 * @param string $connector 
+	 */
+	protected function add($parts, $connector = null) {
+		// Add connector :
+		if (isset($connector) && ! $this->isempty())
+			$this->parts[] = ' ' . $connector . ' ';
+			
+		// Add parts :
+		$this->parts[] = '(';
+		$this->parts = array_merge($this->parts, $parts);
+		$this->parts[] = ')';
+	}	
+		
+	/**
 	 * Use ->or() instead of this. Adds arguments to the expression, surrounding them
 	 * with parenthesis, and connecting them to the expression with 'OR' if the expression
 	 * isn't empty.
@@ -50,7 +69,7 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 		$builder->add($args);
 		
 		// Add builder :
-		$this->add($builder, 'OR');
+		$this->add(array($builder), 'OR');
 		
 		return $builder;		
 	}	

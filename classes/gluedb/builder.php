@@ -3,13 +3,14 @@
 /**
  * Base builder class.
  * 
- * A builder is an object that provides a fluent interface to build an expression
- * represented by the internal state of the builder.
+ * A builder is an object that provides a fluent interface to build an expression.
  * 
- * The elements that make up the expression can be atomic elements or expressions
- * themselves. Functions that allow the user to add atomic elements return the
- * current builder, but functions that mark the start of a new expression will
- * return a new builder with the current builder as its parent. 
+ * An expression is a sequence of components. Components can be atomic or they can be
+ * nested expressions. Functions that allow the user to add atomic components return the
+ * current builder. Functions that mark the start of a nested expression return a
+ * child builder that may be of a different class from its parent, with its own set
+ * of methods and rules. When the child builder has finished its work, it returns the
+ * parent builder.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -73,25 +74,6 @@ abstract class GlueDB_Builder {
 	 */
 	public function parts() {
 		return $this->parts;
-	}	
-
-	/**
-	 * Adds parts to the expression, surrounding them with parenthesis, and connecting
-	 * them to the expression with given connector. Connector is ignored if expression
-	 * is empty.
-	 * 
-	 * @param array $parts
-	 * @param string $connector 
-	 */
-	protected function add($parts, $connector = null) {
-		// Add connector :
-		if (isset($connector) && ! $this->isempty())
-			$this->parts[] = ' ' . $connector . ' ';
-			
-		// Add parts :
-		$this->parts[] = '(';
-		array_merge($this->parts, $args);
-		$this->parts[] = ')';
 	}	
 	
 	/**
