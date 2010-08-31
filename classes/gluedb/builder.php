@@ -4,55 +4,37 @@
  * Base builder class.
  *
  * A builder is an object that provides a fluent interface to build an expression. An expression is
- * represented internally as an array of components. Components will be run one by one through the
- * compiler and concatenated to produce the resulting SQL expression.
+ * represented internally as an array of components. Components can be atomic or builders themselves.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-/*
- Note :
- 	Using a "nested" fluent API (builders that may return children builders, not always $this) seems the most natural
- 	way to go about this, since boolean and joins expressions are nested in nature. But as tempting as it may be, it is
- 	NOT the right way to go about this. It is too confusing when the query has to be built in several steps, instead of
- 	just one long "sentence" :
-
-		// suppose addthis() returns a child builder :
- 		$query1->addthis()->addthat();
-
-		// You might think this is the same as the above :
-		$query2->addthis();
-		$query2->addthat(); // But it does NOT work !
-
-		// It shoud be :
-		$childbuilder = $query2->addthis();
-		$childbuilder->addthat();
-
-	Just too confusing...and that's only the tip of the pile of problems that arise from it when things get more complex.
- */
-
 abstract class GlueDB_Builder {
 	/**
-	 * @var GlueDB_Query The query that is the context of this builder.
+	 * @var GlueDB_Builder Expression builder that gave birth to this one (called "context" instead of "parent" to
+	 * 					   avoid confusion with parent in class hierarchy).
 	 */
-	protected $query;
+	protected $context;
 
 	/**
 	 * @var array Components of current expression.
 	 */
-	protected $parts;
+	protected $parts = array();
+
+	/**
+	 * @var string Compiled SQL expression.
+	 */
+	protected $sql;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Query $query
+	 * @param GlueDB_Builder $context
 	 */
-	public function __construct(GlueDB_Query $query, $forward = false) {
-		$this->parts = array();
-		$this->query = $query;
-		$this->forward = $forward;
+	public function __construct(GlueDB_Builder $context) {
+		$this->context = $context;
 	}
 
 	/**
@@ -62,47 +44,66 @@ abstract class GlueDB_Builder {
 	 */
 	public function reset() {
 		$this->parts = array();
+		$this->invalidate();
 		return $this;
 	}
 
 	/**
-	 * Whether or not current expression is empty.
+	 * Whether or not current expression is empty (i.e. no components).
 	 *
 	 * @return boolean
 	 */
-	public function isempty() {
+	public function is_empty() {
 		return count($this->parts) === 0;
 	}
 
 	/**
-	 * Returns expression components.
+	 * Returns compiled SQL string.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public function parts() {
-		return $this->parts;
+	public function get_sql() {
+		if ( ! isset($this->sql))
+			$this->sql = $this->create_sql();
+		return $this->sql;
 	}
 
 	/**
-	 * Any call to an unkown function is forwarded to the query.
+	 * Returns compiled SQL string.
 	 *
-	 * @param string $name
-	 * @param array $arguments
-	 *
-	 * @return mixed|NULL
+	 * @return string
 	 */
-	public function __call($name, $arguments) {
-		if ($this->forward)
-			return call_user_func_array(array($this->end(), $name), $arguments);
-		else {
-			$trace = debug_backtrace();
-	        trigger_error(
-				'Undefined method via __call(): ' . $name .
-				' in ' . $trace[0]['file'] .
-				' on line ' . $trace[0]['line'],
-				E_USER_NOTICE
-			);
-        	return null;
+	protected function create_sql() {
+		$sql = '';
+		foreach ($this->parts as $part) {
+			if (is_string($part))
+				$sql .= $part;
+			elseif ($part instanceof GlueDB_Builder)
+				$sql .= $part->get_sql();
+			else
+				$sql .= $this->get_dialect()->compile($part);
 		}
+		return $sql;
+	}
+
+	/**
+	 * Returns SQL dialect this expression must be compiled into.
+	 *
+	 * @return GlueDB_Dialect
+	 */
+	protected function get_dialect() {
+		return $this->context->get_dialect();
+	}
+
+	/**
+	 * Signals that a change has been made to the components of this expression that
+	 * invalidates its cached compiled form.
+	 */
+	protected function invalidate() {
+		// Reset SQL cache :
+		$this->sql = null;
+
+		// Forward call to context, because if a child is invalid, the context necessarily is, too.
+		$this->context->invalidate();
 	}
 }

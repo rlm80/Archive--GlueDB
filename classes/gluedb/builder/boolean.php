@@ -61,7 +61,7 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	 *
 	 * @return GlueDB_Builder_Boolean
 	 */
-	public function orexpr(GlueDB_Builder_Boolean &$builder) {
+	public function or_expr(GlueDB_Builder_Boolean &$builder) {
 		// Init builder :
 		$builder = new GlueDB_Builder_Boolean($this->query);
 
@@ -79,7 +79,7 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	 *
 	 * @return GlueDB_Builder_Boolean
 	 */
-	public function andexpr(GlueDB_Builder_Boolean &$builder) {
+	public function and_expr(GlueDB_Builder_Boolean &$builder) {
 		// Init builder :
 		$builder = new GlueDB_Builder_Boolean($this->query);
 
@@ -98,7 +98,5 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 			return call_user_func_array(array($this, '_or'), $args);
 		elseif ($name === 'and')
 			return call_user_func_array(array($this, '_and'), $args);
-		else
-			return parent::__call($name, $args);
 	}
 }
