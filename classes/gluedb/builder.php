@@ -38,22 +38,11 @@ abstract class GlueDB_Builder {
 	}
 
 	/**
-	 * Removes all expression components added so far.
-	 *
-	 * @return GlueDB_Builder
-	 */
-	public function reset() {
-		$this->parts = array();
-		$this->invalidate();
-		return $this;
-	}
-
-	/**
 	 * Whether or not current expression is empty (i.e. no components).
 	 *
 	 * @return boolean
 	 */
-	public function is_empty() {
+	public function isempty() {
 		return count($this->parts) === 0;
 	}
 
@@ -62,9 +51,9 @@ abstract class GlueDB_Builder {
 	 *
 	 * @return string
 	 */
-	public function get_sql() {
+	public function sql() {
 		if ( ! isset($this->sql))
-			$this->sql = $this->create_sql();
+			$this->sql = $this->compile();
 		return $this->sql;
 	}
 
@@ -73,15 +62,15 @@ abstract class GlueDB_Builder {
 	 *
 	 * @return string
 	 */
-	protected function create_sql() {
+	protected function compile() {
 		$sql = '';
 		foreach ($this->parts as $part) {
 			if (is_string($part))
 				$sql .= $part;
 			elseif ($part instanceof GlueDB_Builder)
-				$sql .= $part->get_sql();
+				$sql .= $part->sql();
 			else
-				$sql .= $this->get_dialect()->compile($part);
+				$sql .= $this->dialect()->compile($part);
 		}
 		return $sql;
 	}
@@ -91,8 +80,8 @@ abstract class GlueDB_Builder {
 	 *
 	 * @return GlueDB_Dialect
 	 */
-	protected function get_dialect() {
-		return $this->context->get_dialect();
+	protected function dialect() {
+		return $this->context->dialect();
 	}
 
 	/**

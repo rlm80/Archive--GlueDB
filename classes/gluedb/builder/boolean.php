@@ -10,22 +10,19 @@
 
 class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	/**
-	 * Adds parts to the expression, surrounding them with parenthesis, and connecting
-	 * them to the expression with given connector. Connector is ignored if expression
-	 * is empty.
+	 * Initializes the expression with the given arguments surrounded with parenthesis.
 	 *
-	 * @param array $parts
-	 * @param string $connector
+	 * @return GlueDB_Builder_Boolean
 	 */
-	protected function add($parts, $connector = null) {
-		// Add connector :
-		if (isset($connector) && ! $this->isempty())
-			$this->parts[] = ' ' . $connector . ' ';
+	public function init() { // TODO add initx pour commencer par une expression
+		// Reset content :
+		$this->parts = array();
 
-		// Add parts :
-		$this->parts[] = '(';
-		$this->parts = array_merge($this->parts, $parts);
-		$this->parts[] = ')';
+		// Add arguments :
+		$args = func_get_args();
+		$this->add($args);
+
+		return $this;
 	}
 
 	/**
@@ -61,9 +58,9 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	 *
 	 * @return GlueDB_Builder_Boolean
 	 */
-	public function or_expr(GlueDB_Builder_Boolean &$builder) {
+	public function orx(GlueDB_Builder_Boolean &$builder) {
 		// Init builder :
-		$builder = new GlueDB_Builder_Boolean($this->query);
+		$builder = new GlueDB_Builder_Boolean($this);
 
 		// Add builder :
 		$this->add(array($builder), 'OR');
@@ -72,21 +69,42 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	}
 
 	/**
-	 * Starts a new boolean expression and initializes it with given arguments. The new
-	 * expression will be surrounded by with parenthesis, and connected to the expression
-	 * with 'OR' if the expression isn't empty. Returns the builder object for the
-	 * new expression.
+	 * Inserts a nested expression into the current expression. The parameter is initialized
+	 * with a builder that can be used at a later time to define the content of the nested
+	 * expression.
 	 *
 	 * @return GlueDB_Builder_Boolean
 	 */
-	public function and_expr(GlueDB_Builder_Boolean &$builder) {
+	public function andx(GlueDB_Builder_Boolean &$builder) {
 		// Init builder :
-		$builder = new GlueDB_Builder_Boolean($this->query);
+		$builder = new GlueDB_Builder_Boolean($this);
 
 		// Add builder :
 		$this->add(array($builder), 'AND');
 
 		return $this;
+	}
+
+	/**
+	 * Adds parts to the expression, surrounding them with parenthesis, and connecting
+	 * them to the expression with given connector. Connector is ignored if expression
+	 * is empty.
+	 *
+	 * @param array $parts
+	 * @param string $connector
+	 */
+	protected function add($parts, $connector = null) {
+		// Add connector :
+		if (isset($connector) && ! $this->isempty())
+			$this->parts[] = ' ' . $connector . ' ';
+
+		// Add parts :
+		$this->parts[] = '(';
+		$this->parts = array_merge($this->parts, $parts);
+		$this->parts[] = ')';
+
+		// Invalidate :
+		$this->invalidate();
 	}
 
 	/*
