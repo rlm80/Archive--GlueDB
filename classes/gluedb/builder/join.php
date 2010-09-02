@@ -10,26 +10,27 @@
 
 class GlueDB_Builder_Join extends GlueDB_Builder {
 	/**
-	 * @var GlueDB_Builder_Boolean Boolean builder that is the current target for or, and, orx, andx calls.
+	 * @var GlueDB_Builder_Boolean Boolean builder that is the current target for on, or, and, orx, andx calls.
 	 */
 	protected $boolean_target;
 
 	/**
 	 * Initializes the expression with the given table.
 	 *
+	 * @param string $table Table name.
+	 * @param GlueDB_Helper_Table $helper Initialized with a table helper that may be used at a later time to
+	 *									  refer to the table columns.
+	 *
 	 * @return GlueDB_Builder_Join
 	 */
 	public function init($table, &$helper) {
 		// Create table helper :
-		$helper = gluedb::table($table)->helper(); // TODO passer this ! parce que on builder en a besoin (context)
+		$helper = gluedb::table($table)->helper(); // TODO passer query au constructeur ?
 
 		// Add helper :
 		$this->parts[] = $helper;
 		$this->parts[] = ' ';
 
-		// Set new boolean target :
-		$this->boolean_target = $helper->on();
-
 		// Invalidate :
 		$this->invalidate();
 
@@ -37,63 +38,84 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	}
 
 	/**
-	 * Adds an inner join table to current expression. The second parameter is filled with a table
-	 * helper that may be used at a later time to keep building on the ON clause of the table instance
-	 * in the query or to refer to its columns.
+	 * Adds an inner join to current expression.
+	 *
+	 * @param string $table Virtual table name.
+	 * @param GlueDB_Helper_Table $helper Initialized with a table helper that may be used at a later time to
+	 *									  refer to the table columns.
+	 * @param GlueDB_Builder_Boolean $builder Initialized with a boolean builder that may be used at a later time
+	 * 										  to keep working on the ON clause.
 	 *
 	 * @return GlueDB_Builder_Join
 	 */
-	public function inner($table, &$helper) {
-		return $this->join($table, $helper, 'INNER JOIN');
+	public function inner($table, &$helper, &$builder = null) {
+		$this->join($table, $helper, $builder, 'INNER JOIN');
+		return $this;
 	}
 
 	/**
-	 * Adds an left outer join table to current expression. The second parameter is filled with a table
-	 * helper that may be used at a later time to keep building on the ON clause of the table instance
-	 * in the query or to refer to its columns.
+	 * Adds an left outer join to current expression.
+	 *
+	 * @param string $table Virtual table name.
+	 * @param GlueDB_Helper_Table $helper Initialized with a table helper that may be used at a later time to
+	 *									  refer to the table columns.
+	 * @param GlueDB_Builder_Boolean $builder Initialized with a boolean builder that may be used at a later time
+	 * 										  to keep working on the ON clause.
 	 *
 	 * @return GlueDB_Builder_Join
 	 */
-	public function left($table, &$helper) {
-		return $this->join($table, $helper, 'LEFT OUTER JOIN');
+	public function left($table, &$helper, &$builder = null) {
+		$this->join($table, $helper, $builder, 'LEFT OUTER JOIN');
+		return $this;
 	}
 
 	/**
-	 * Adds an right outer join table to current expression. The second parameter is filled with a table
-	 * helper that may be used at a later time to keep building on the ON clause of the table instance
-	 * in the query or to refer to its columns.
+	 * Adds an right outer join to current expression.
+	 *
+	 * @param string $table Virtual table name.
+	 * @param GlueDB_Helper_Table $helper Initialized with a table helper that may be used at a later time to
+	 *									  refer to the table columns.
+	 * @param GlueDB_Builder_Boolean $builder Initialized with a boolean builder that may be used at a later time
+	 * 										  to keep working on the ON clause.
 	 *
 	 * @return GlueDB_Builder_Join
 	 */
-	public function right($table, &$helper) {
-		return $this->join($table, $helper, 'RIGHT OUTER JOIN');
+	public function right($table, &$helper, &$builder = null) {
+		$this->join($table, $helper, $builder, 'RIGHT OUTER JOIN');
+		return $this;
 	}
 
 	/**
-	 * Adds a join table to current expression with given connector. The second parameter is filled with a table
-	 * helper that may be used at a later time to keep building on the ON clause of the table instance
-	 * in the query or to refer to its columns.
+	 * Adds a join to current expression with given connector.
+	 *
+	 * @param string $table Virtual table name.
+	 * @param GlueDB_Helper_Table $helper Initialized with a table helper that may be used at a later time to
+	 *									  refer to the table columns.
+	 * @param GlueDB_Builder_Boolean $builder Initialized with a boolean builder that may be used at a later time
+	 * 										  to keep working on the ON clause.
+	 * @param string $connector
 	 *
 	 * @return GlueDB_Builder_Join
 	 */
-	protected function join($table, &$helper, $connector) {
+	protected function join($table, &$helper, &$builder, $connector) {
 		// Create table helper :
-		$helper = gluedb::table($table)->helper(); // TODO passer this ! parce que on builder en a besoin (context)
+		$helper = gluedb::table($table)->helper(); // TODO passer query au constructeur ?
+
+		// Create boolean builder :
+		$builder = new GlueDB_Builder_Boolean($this);
 
 		// Add join :
 		$this->parts[] = ' ' . $connector . ' ';
 		$this->parts[] = $helper;
 		$this->parts[] = ' ON (';
-		$this->parts[] = $helper->on();
+		$this->parts[] = $builder;
 		$this->parts[] = ') ';
 
 		// Set new boolean target :
-		$this->boolean_target = $helper->on();
+		$this->boolean_target = $builder;
 
 		// Invalidate :
 		$this->invalidate();
-
-		return $this;
 	}
 
 	/**
@@ -104,7 +126,8 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 * @return GlueDB_Builder_Join
 	 */
 	public function innerx(&$joinbuilder, &$onbuilder) {
-		return $this->joinx($joinbuilder, $onbuilder, 'INNER JOIN');
+		$this->joinx($joinbuilder, $onbuilder, 'INNER JOIN');
+		return $this;
 	}
 
 	/**
@@ -112,7 +135,8 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 * @return GlueDB_Builder_Join
 	 */
 	public function leftx(&$joinbuilder, &$onbuilder) {
-		return $this->joinx($joinbuilder, $onbuilder, 'LEFT OUTER JOIN');
+		$this->joinx($joinbuilder, $onbuilder, 'LEFT OUTER JOIN');
+		return $this;
 	}
 
 	/**
@@ -123,7 +147,8 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 * @return GlueDB_Builder_Join
 	 */
 	public function rightx(&$joinbuilder, &$onbuilder) {
-		return $this->joinx($joinbuilder, $onbuilder, 'RIGHT OUTER JOIN');
+		$this->joinx($joinbuilder, $onbuilder, 'RIGHT OUTER JOIN');
+		return $this;
 	}
 
 	/**
@@ -150,8 +175,6 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 
 		// Invalidate :
 		$this->invalidate();
-
-		return $this;
 	}
 
 	/**
@@ -161,8 +184,8 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 */
 	public function on() {
 		$args = func_get_args();
-		call_user_func_array(arra($this->boolean_target, 'init'), $args);
-		return this;
+		call_user_func_array(array($this->boolean_target, 'init'), $args);
+		return $this;
 	}
 
 	/**
@@ -172,7 +195,7 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 */
 	public function onx(&$builder) {
 		$this->boolean_target->initx($builder);
-		return this;
+		return $this;
 	}
 
 	/**
@@ -182,8 +205,8 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 */
 	public function _or() {
 		$args = func_get_args();
-		call_user_func_array(arra($this->boolean_target, '_or'), $args);
-		return this;
+		call_user_func_array(array($this->boolean_target, '_or'), $args);
+		return $this;
 	}
 
 	/**
@@ -193,8 +216,8 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 */
 	public function _and() {
 		$args = func_get_args();
-		call_user_func_array(arra($this->boolean_target, '_and'), $args);
-		return this;
+		call_user_func_array(array($this->boolean_target, '_and'), $args);
+		return $this;
 	}
 
 	/**
@@ -204,7 +227,7 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 */
 	public function orx(&$builder) {
 		$this->boolean_target->orx($builder);
-		return this;
+		return $this;
 	}
 
 	/**
@@ -214,7 +237,7 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 	 */
 	public function andx(&$builder) {
 		$this->boolean_target->andx($builder);
-		return this;
+		return $this;
 	}
 
 	/*

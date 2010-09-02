@@ -14,7 +14,7 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	 *
 	 * @return GlueDB_Builder_Boolean
 	 */
-	public function init() { // TODO add initx pour commencer par une expression
+	public function init() {
 		// Reset content :
 		$this->parts = array();
 
@@ -52,13 +52,35 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	}
 
 	/**
-	 * Inserts a nested expression into the current expression. The parameter is initialized
-	 * with a builder that can be used at a later time to define the content of the nested
-	 * expression.
+	 * Initializes the expression with a nested expression.
+	 *
+	 * @param GlueDB_Builder_Boolean $builder Initialized with a builder that can be used at a later time
+	 * 										  to define the content of the nested expression.
 	 *
 	 * @return GlueDB_Builder_Boolean
 	 */
-	public function orx(GlueDB_Builder_Boolean &$builder) {
+	public function initx(&$builder) {
+		// Reset content :
+		$this->parts = array();
+
+		// Init builder :
+		$builder = new GlueDB_Builder_Boolean($this);
+
+		// Add builder :
+		$this->add(array($builder));
+
+		return $this;
+	}
+
+	/**
+	 * Inserts a nested expression into the current expression.
+	 *
+	 * @param GlueDB_Builder_Boolean $builder Initialized with a builder that can be used at a later time
+	 * 										  to define the content of the nested expression.
+	 *
+	 * @return GlueDB_Builder_Boolean
+	 */
+	public function orx(&$builder) {
 		// Init builder :
 		$builder = new GlueDB_Builder_Boolean($this);
 
@@ -69,13 +91,14 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	}
 
 	/**
-	 * Inserts a nested expression into the current expression. The parameter is initialized
-	 * with a builder that can be used at a later time to define the content of the nested
-	 * expression.
+	 * Inserts a nested expression into the current expression.
+	 *
+	 * @param GlueDB_Builder_Boolean $builder Initialized with a builder that can be used at a later time
+	 * 										  to define the content of the nested expression.
 	 *
 	 * @return GlueDB_Builder_Boolean
 	 */
-	public function andx(GlueDB_Builder_Boolean &$builder) {
+	public function andx(&$builder) {
 		// Init builder :
 		$builder = new GlueDB_Builder_Boolean($this);
 
@@ -108,7 +131,8 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	}
 
 	/*
-	 * Setup aliases for _or() and _and(). Required because keywords aren't valid function names in PHP.
+	 * Redefined to setup aliases for _or() and _and(). Required because
+	 * keywords aren't valid function names in PHP.
 	 */
 	public function __call($name, $args) {
 		if ($name === 'or')
