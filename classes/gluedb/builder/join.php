@@ -154,11 +154,76 @@ class GlueDB_Builder_Join extends GlueDB_Builder {
 		return $this;
 	}
 
-	// TODO
-	public function on() {} // avec arguments uniquement
-	public function onx() {}
-	public function _or() {}
-	public function _and() {}
-	public function orx() {}
-	public function andx() {}
+	/**
+	 * Forwards call to boolean builder of the last on clause.
+	 *
+	 * @return GlueDB_Builder_Join
+	 */
+	public function on() {
+		$args = func_get_args();
+		call_user_func_array(arra($this->boolean_target, 'init'), $args);
+		return this;
+	}
+
+	/**
+	 * Forwards call to boolean builder of the last on clause.
+	 *
+	 * @return GlueDB_Builder_Join
+	 */
+	public function onx(&$builder) {
+		$this->boolean_target->initx($builder);
+		return this;
+	}
+
+	/**
+	 * Forwards call to boolean builder of the last on clause.
+	 *
+	 * @return GlueDB_Builder_Join
+	 */
+	public function _or() {
+		$args = func_get_args();
+		call_user_func_array(arra($this->boolean_target, '_or'), $args);
+		return this;
+	}
+
+	/**
+	 * Forwards call to boolean builder of the last on clause.
+	 *
+	 * @return GlueDB_Builder_Join
+	 */
+	public function _and() {
+		$args = func_get_args();
+		call_user_func_array(arra($this->boolean_target, '_and'), $args);
+		return this;
+	}
+
+	/**
+	 * Forwards call to boolean builder of the last on clause.
+	 *
+	 * @return GlueDB_Builder_Join
+	 */
+	public function orx(&$builder) {
+		$this->boolean_target->orx($builder);
+		return this;
+	}
+
+	/**
+	 * Forwards call to boolean builder of the last on clause.
+	 *
+	 * @return GlueDB_Builder_Join
+	 */
+	public function andx(&$builder) {
+		$this->boolean_target->andx($builder);
+		return this;
+	}
+
+	/*
+	 * Setup aliases for _or() and _and(). Required because keywords aren't valid function names in PHP.
+	 */
+	public function __call($name, $args) {
+		if ($name === 'or')
+			return call_user_func_array(array($this, '_or'), $args);
+		elseif ($name === 'and')
+			return call_user_func_array(array($this, '_and'), $args);
+	}
 }

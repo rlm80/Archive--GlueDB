@@ -108,8 +108,7 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 	}
 
 	/*
-	 * Redefined to setup aliases for _or() and _and(). Required because
-	 * keywords aren't valid function names in PHP.
+	 * Setup aliases for _or() and _and(). Required because keywords aren't valid function names in PHP.
 	 */
 	public function __call($name, $args) {
 		if ($name === 'or')
