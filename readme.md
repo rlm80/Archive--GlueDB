@@ -1,6 +1,7 @@
 GlueDB is a database abstraction layer for PHP.
 
 Goals :
+
 - automatic type casting of strings coming from the database to the appropriate PHP types and more complex formatting operations such as serialization/unserialization,
 - framework for setting up application wide aliasing of database tables and columns identifiers,
 - query builder with support for nested boolean and join expressions,
