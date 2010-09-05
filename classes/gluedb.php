@@ -28,8 +28,8 @@ class GlueDB {
 	/**
 	 * Returns the virtual table identified by $table_name.
 	 *
-	 * Subsequent calls to this function with the same parameter will return the same virtual table
-	 * instance, not create a new one.
+	 * Subsequent calls to this function with the same parameter will return the same
+	 * virtual table instance, not create a new one.
 	 *
 	 * @param string $table_name
 	 *

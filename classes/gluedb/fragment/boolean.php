@@ -1,14 +1,19 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Boolean expression builder class.
+ * Fragment that represents a boolean expression.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class GlueDB_Builder_Boolean extends GlueDB_Builder {
+class GlueDB_Fragment_Boolean extends GlueDB_Fragment {
+	/**
+	 * @var array Components of current expression.
+	 */
+	protected $parts = array();	
+	
 	/**
 	 * Initializes the expression with the given arguments surrounded with parenthesis.
 	 *
@@ -128,6 +133,37 @@ class GlueDB_Builder_Boolean extends GlueDB_Builder {
 
 		// Invalidate :
 		$this->invalidate();
+	}
+	
+	/**
+	 * Compiles the data structure against given database and returns the
+	 * resulting SQL string.
+	 * 
+	 * @param string $dbname
+	 * 
+	 * @return string
+	 */
+	protected function compile($dbname) {
+		$sql = '';
+		foreach ($this->parts as $part) {
+			if ($part instanceof GlueDB_Fragment) {
+				// Children fragments :
+				$sql .= $part->sql($dbname);
+			}
+			elseif (is_object($part)) {
+				// Another object is an error :
+				$sql .= ''; // TODO
+			}			
+			elseif (is_array($part)) {
+				// Array elements are quoted and imploded :
+				$sql .= ''; // TODO
+			}
+			else {
+				// Basic data types (no, strings are NOT quoted) :
+				$sql .= $part;
+			}			
+		}
+		return $sql;
 	}
 
 	/*

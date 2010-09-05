@@ -40,14 +40,15 @@ abstract class GlueDB_Dialect {
 	abstract public function get_phptype($dbtype);
 
 	/**
-	 * Compiles a datastructure representing an SQL query into an SQL string
+	 * Compiles a data structure representing a fragment of SQL query into an SQL string
 	 * according to current SQL dialect conventions.
 	 *
-	 * @param mixed $statement
+	 * @param integer $type
+	 * @param mixed $data
 	 *
 	 * @return string
 	 */
-	public function compile($statement) {
-		throw new Kohana_Exception("Unable to compile data structure " . $statement);
+	public function compile($type, $data) {
+		throw new Kohana_Exception("Unable to compile data structure " . $statement);			
 	}
 }

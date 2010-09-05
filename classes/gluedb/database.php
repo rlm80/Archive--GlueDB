@@ -100,6 +100,15 @@ abstract class GlueDB_Database extends PDO {
 	 * @returns string
 	 */
 	abstract protected function dsn();
+	
+	/**
+	 * Getter for database name.
+	 *
+	 * @return string
+	 */
+	public function name() {
+		return $this->name;
+	}	
 
 	/**
 	 * Creates a dialect object suitable for communicating with current database.
@@ -146,9 +155,9 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Compiles a datastructure representing an SQL query into an SQL string
-	 * according to current SQL dialect conventions.
-	 *
+	 * Compiles a datastructure representing an SQL query, or a fragment of SQL query,
+	 * into an SQL string according to current SQL dialect conventions.
+	 * 
 	 * Forwards call to dialect object.
 	 *
 	 * @param mixed $statement
@@ -203,31 +212,6 @@ abstract class GlueDB_Database extends PDO {
 	 * @return array Array of table names, numerically indexed, alphabetically ordered.
 	 */
 	abstract public function real_tables();
-
-	/**
-	 * Returns the virtual table of given name for current database.
-	 * This should always be used internally instead of __get, because
-	 * table names may clash with protected properties of this class.
-	 *
-	 * @param string $table Table name.
-	 *
-	 * @return GlueDB_Table
-	 */
-	public function table($table) {
-		return GlueDB_Table::get($this->name, $table);
-	}
-
-	/**
-	 * Returns the table object of given name for current database.
-	 * Returned table may be simple or composite.
-	 *
-	 * @param string $table Table name.
-	 *
-	 * @return GlueDB_Table
-	 */
-	public function __get($table) {
-		return $this->table($table);
-	}
 
 	/**
 	 * Lazy loads a database object, stores it in cache, and returns it.
