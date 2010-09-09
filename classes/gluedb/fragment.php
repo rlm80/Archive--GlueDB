@@ -2,7 +2,7 @@
 
 /**
  * Base fragment class.
- * 
+ *
  * A fragment is a data structure that describes a piece of SQL query.
  *
  * @package    GlueDB
@@ -28,11 +28,11 @@ abstract class GlueDB_Fragment {
 	 */
 	public function __construct(GlueDB_Fragment $parent = null) {
 		$this->parent = $parent;
-	}	
+	}
 
 	/**
 	 * Returns compiled SQL string.
-	 * 
+	 *
 	 * Calling this function repeatedly won't trigger the compiling process everytime,
 	 * there is a cache that is only invalidated when the data structure is modified.
 	 *
@@ -43,13 +43,13 @@ abstract class GlueDB_Fragment {
 			$this->sql[$dbname] = $this->compile(gluedb::db($dbname));
 		return $this->sql[$dbname];
 	}
-	
+
 	/**
 	 * Compiles the data structure against given database and returns the
 	 * resulting SQL string.
-	 * 
+	 *
 	 * @param string $dbname
-	 * 
+	 *
 	 * @return string
 	 */
 	abstract protected function compile($dbname);
@@ -59,11 +59,14 @@ abstract class GlueDB_Fragment {
 	 * a change has been made to the data structure.
 	 */
 	protected function invalidate() {
-		// Reset SQL cache :
-		$this->sql = array();
+		// No need to do anything if fragment is already invalidated : (TODO make sure this is correct)
+		if (count($this->sql) > 0) {
+			// Reset SQL cache :
+			$this->sql = array();
 
-		// Cascade call to parent, because if a child is invalid, the parent necessarily is, too :
-		if (isset($this->parent))
-			$this->parent->invalidate();
+			// Cascade call to parent, because if a child is invalid, the parent necessarily is, too :
+			if (isset($this->parent))
+				$this->parent->invalidate();
+		}
 	}
 }
