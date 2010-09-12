@@ -1,8 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that is a sequence of other fragments. The resulting SQL string is simply
- * the concatenation of the resulting SQL strings of the children fragments.
+ * Provides basic functionality for fragments that have children fragments and
+ * that compile into an SQL string that is simply the concatenation of the SQL
+ * strings of each child fragment.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -11,21 +12,50 @@
 
 class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	/**
-	 * @var array Components of current expression.
+	 * @var array List of children fragments.
 	 */
 	protected $children = array();
 
 	/**
-	 * Adds a child at the end of the sequence.
+	 * Adds a child at the end of the children list. Protected, because children classes will probably
+	 * want to warp this in a function with a more meaningful name.
 	 *
-	 * @param array $child
+	 * @param GlueDB_Fragment $child
 	 */
 	protected function push($child) {
-		// Add child :
 		$this->children[] = $child;
-
-		// Invalidate :
 		$this->invalidate();
+	}
+
+	/**
+	 * Removes the last child at the end of the children list.
+	 *
+	 * @return GlueDB_Fragment_Composite
+	 */
+	public function pop() {
+		array_pop($this->children);
+		$this->invalidate();
+		return $this;
+	}
+
+	/**
+	 * Whether or not children list is empty.
+	 *
+	 * @return boolean
+	 */
+	public function is_empty() {
+		return count($this->children) === 0;
+	}
+
+	/**
+	 * Removes all children.
+	 *
+	 * @return GlueDB_Fragment_Composite
+	 */
+	public function reset() {
+		$this->children = array();
+		$this->invalidate();
+		return $this;
 	}
 
 	/**
@@ -33,14 +63,14 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	 * resulting SQL string. In this case, the resulting SQL string is simply
  	 * the concatenation of the resulting SQL strings of the children fragments.
 	 *
-	 * @param string $dbname
+	 * TODO add '(' . .... . ')' ???
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
+	protected function compile() {
 		$sql = '';
 		foreach ($this->children as $child)
-			$sql .= $child->sql($dbname);
+			$sql .= $child->sql();
 		return $sql;
 	}
 }

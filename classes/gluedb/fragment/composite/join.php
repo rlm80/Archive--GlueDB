@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Join extends GlueDB_Fragment {
+class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	/**
 	 * @var GlueDB_Builder_Boolean Boolean builder that is the current target for on, or, and, orx, andx calls.
 	 */

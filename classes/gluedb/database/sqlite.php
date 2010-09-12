@@ -84,4 +84,15 @@ class GlueDB_Database_Sqlite extends GlueDB_Database {
 	public function real_tables() {
 		throw new Kohana_Exception("The GlueDB_Database::real_tables function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
+
+	/**
+	 * Returns the appropriate PHP type to represent given native database type.
+	 *
+	 * @param string $dbtype
+	 *
+	 * @return string TODO return formatter instead ?
+	 */
+	public function get_phptype($dbtype)  {
+		throw new Kohana_Exception("The GlueDB_Database::get_phptype function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it.");
+	}
 }

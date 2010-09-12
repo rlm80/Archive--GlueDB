@@ -3,38 +3,34 @@
 /**
  * Base class for query objects.
  *
- * A query is always bound to a specific database. That way, when for example with join a table,
- * we know in which database that table is stored and we can retrieve the table object to get
- * useful information about it, for example columns PHP types.
- *
  * @package GlueDB
- * @author Régis Lemaigre
+ * @author RÃ©gis Lemaigre
  * @license MIT
  */
 
-abstract class GlueDB_Query {
+abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	/**
 	 * @var GlueDB_Database The database object this query is meant to be used against.
 	 */
 	protected $db;
 
 	/**
-	 * Constructor.
+	 * Returns database object, determined from the tables this query manipulates.
 	 *
-	 * @param GlueDB_Database $db
+	 *  @return GlueDB_Database
 	 */
-	public function __construct(GlueDB_Database $db) {
-		$this->db = $db;
+	public function db() {
+		if ( ! isset($this->db))
+			$this->db = $this->find_db();
+		return $this->db;
 	}
 
 	/**
-	 * Compiles query against current database.
+	 * Determines database from the tables this query manipulates.
 	 *
-	 * @return string
+	 * @return GlueDB_Database
 	 */
-	public function compile() {
-		return $this->db->compile($this);
-	}
+	abstract public function find_db();
 
 	/*
 	 * Compiles this query into an SQL string and asks PDO to prepare it for execution. Returns
@@ -45,7 +41,16 @@ abstract class GlueDB_Query {
 	 * @see PDO::prepare()
 	 */
 	public function prepare($driver_options = null) {
-		return $this->db->prepare($this->compile(), $driver_options);
+		return $this->db()->prepare($this->sql(), $driver_options);
+	}
+
+	/**
+	 * Returns the query to which the current fragment belongs.
+	 *
+	 * @return GlueDB_Query
+	 */
+	protected function query() {
+		return $this;
 	}
 
 	/*

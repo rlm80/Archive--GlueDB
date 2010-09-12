@@ -29,7 +29,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	 * @param array $values
 	 *
 	 */
-	public function __construct(GlueDB_Fragment $parent, $template, array $values) {
+	public function __construct(GlueDB_Fragment $parent, $template, array $values = array()) {
 		$this->parent = $parent;
 		$this->template = $template;
 		$this->values = $values;
@@ -38,13 +38,22 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	/**
 	 * Compiles the data structure against given database and returns the
 	 * resulting SQL string. In this case, simply returns the template with
-	 * placeholders replace by their quoted values.
+	 * placeholders replaced by their quoted values.
 	 *
 	 * @param string $dbname
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
-		return 'todo'; // TODO use strtr
+	protected function compile() {
+		// Get query database :
+		$db = $this->query()->db();
+
+		// Quote values :
+		$quoted = array();
+		foreach($this->values as $ph => $value)
+			$quoted[$ph] = $this->query()->db()->quote($value);
+
+		// Return template with replaced placeholders : TODO changes this to '?'
+		return strtr($this->template, $quoted);
 	}
 }

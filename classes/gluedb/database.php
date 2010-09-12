@@ -49,11 +49,6 @@ abstract class GlueDB_Database extends PDO {
 	protected $charset = 'utf8';
 
 	/**
-	 * @var GlueDB_Dialect The dialect suitable for communication with current database.
-	 */
-	protected $dialect;
-
-	/**
 	 * @var boolean Locks constructor access from anywhere but self::create.
 	 * 				This ensures correct singleton behaviour even though constructor must
 	 * 				remain public because parent constructor is. The other solution was
@@ -100,7 +95,7 @@ abstract class GlueDB_Database extends PDO {
 	 * @returns string
 	 */
 	abstract protected function dsn();
-	
+
 	/**
 	 * Getter for database name.
 	 *
@@ -108,15 +103,6 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	public function name() {
 		return $this->name;
-	}	
-
-	/**
-	 * Creates a dialect object suitable for communicating with current database.
-	 *
-	 * @return string
-	 */
-	protected function create_dialect() {
-		return new GlueDB_Dialect_ANSI;
 	}
 
 	/**
@@ -129,44 +115,125 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Quotes an identifier according to current SQL dialect conventions.
-	 *
-	 * Forwards call to dialect object.
+	 * Quotes an identifier according to current database conventions.
 	 *
 	 * @param string $identifier
 	 *
 	 * @return
 	 */
 	public function quote_identifier($identifier) {
-		return $this->dialect->quote_identifier($identifier);
+		return '"' . $identifier . '"';
+	}
+
+
+	/**
+	 * Quotes a value for inclusion into an SQL query.
+	 *
+	 * Extends PDO::quote to deal with any PHP types (especially arrays), not just strings. Don't
+	 * redefine this, instead redefine one of its factor methods (quote_array, quote_integer, etc.).
+	 *
+	 * @param mixed $value
+	 *
+	 * @return string
+	 */
+	public function quote($value) {
+		if (is_string($value))
+			return $this->quote_string($value);
+		elseif (is_array($value))
+			return $this->quote_array($value);
+		elseif (is_integer($value))
+			return $this->quote_integer($value);
+		elseif (is_float($value))
+			return $this->quote_float($value);
+		elseif (is_null($value))
+			return $this->quote_null();
+		else
+			return $this->quote_object($value);
 	}
 
 	/**
-	 * Returns the appropriate PHP type to represent given native database type.
+	 * Quotes a string for inclusion into an SQL query.
 	 *
-	 * Forwards call to dialect object.
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	protected function quote_string($value) {
+		return parent::quote($value);
+	}
+
+	/**
+	 * Quotes an array for inclusion into an SQL query.
+	 *
+	 * @param array $value
+	 *
+	 * @return string
+	 */
+	protected function quote_array(array $value) {
+		// Empty arrays are not valid :
+		if (count($value) === 0)
+			throw new Kohana_Exception("Cannot quote empty array.");
+
+		// Recursion :
+		foreach ($value as $val)
+			$arr[] = $this->quote($val);
+
+		return '(' . implode(',', $arr) . ')';
+	}
+
+	/**
+	 * Quotes an integer for inclusion into an SQL query.
+	 *
+	 * @param integer $value
+	 *
+	 * @return string
+	 */
+	protected function quote_integer($value) {
+		return (string) $value;
+	}
+
+	/**
+	 * Quotes a float for inclusion into an SQL query.
+	 *
+	 * @param float $value
+	 *
+	 * @return string
+	 */
+	protected function quote_float($value) {
+		return (string) $value;
+	}
+
+	/**
+	 * Returns SQL representation of null.
+	 *
+	 * @param null $value
+	 *
+	 * @return string
+	 */
+	protected function quote_null($value) {
+		return 'NULL';
+	}
+
+	/**
+	 * Quotes an object for inclusion into an SQL query.
+	 *
+	 * @param object $value
+	 *
+	 * @return string
+	 */
+	protected function quote_float($value) {
+		return (string) $value;
+	}
+
+
+	/**
+	 * Returns the appropriate PHP type to represent given native database type.
 	 *
 	 * @param string $dbtype
 	 *
 	 * @return string
 	 */
-	public function get_phptype($dbtype) {
-		return $this->dialect->get_phptype($dbtype);
-	}
-
-	/**
-	 * Compiles a datastructure representing an SQL query, or a fragment of SQL query,
-	 * into an SQL string according to current SQL dialect conventions.
-	 * 
-	 * Forwards call to dialect object.
-	 *
-	 * @param mixed $statement
-	 *
-	 * @return string
-	 */
-	public function compile($statement) {
-		return $this->dialect->compile($statement);
-	}
+	abstract public function get_phptype($dbtype);
 
 	/**
 	 * Returns structured information about the columns and primary key of a real database table.

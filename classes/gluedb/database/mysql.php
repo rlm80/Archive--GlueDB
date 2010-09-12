@@ -167,4 +167,73 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 		sort($tables);
 		return $tables;
 	}
+
+	/**
+	 * Returns the appropriate PHP type to represent given native database type.
+	 *
+	 * @param string $dbtype
+	 *
+	 * @return string TODO return formatter instead ?
+	 */
+	public function get_phptype($dbtype)  {
+		// Extract first word from type (MySQL may return things like "float unsigned" sometimes) :
+		if (preg_match('/^\S+/', $dbtype, $matches))
+			$dbtype = $matches[0];
+
+		// Convert type to upper case :
+		$dbtype = strtoupper($dbtype);
+
+		// Create appropriate formatter :
+		switch ($dbtype) {
+			// Integer types :
+			case 'TINYINT'; case 'SMALLINT'; case 'MEDIUMINT'; case 'INT'; case 'BIGINT';
+				$phptype = 'integer';
+				break;
+
+			// Real types :
+			case 'FLOAT'; case 'DOUBLE'; case 'DECIMAL';
+				$phptype = 'float';
+				break;
+
+			// Boolean types :
+			case 'BIT';
+				$phptype = 'boolean';
+				break;
+
+			// String types :
+			case 'CHAR'; case 'VARCHAR'; case 'TINYTEXT'; case 'TEXT';
+			case 'MEDIUMTEXT'; case 'LONGTEXT'; case 'ENUM'; case 'SET';
+				$phptype = 'string';
+				break;
+
+			// Binary types :
+			case 'BINARY'; case 'VARBINARY'; case 'TINYBLOB'; case 'BLOB';
+			case 'MEDIUMBLOB'; case 'LONGBLOB';
+				$phptype = 'string'; // TODO Is this the right thing to do ?
+				break;
+
+			// Date and time types :
+			case 'DATE'; case 'DATETIME'; case 'TIME'; case 'TIMESTAMP'; case 'YEAR';
+				$phptype = 'string'; // TODO Is this the right thing to do ?
+				break;
+
+			// Default :
+			default;
+				throw new Kohana_Exception("Unknown MySQL data type : " . $dbtype);
+		}
+
+		return $phptype;
+	}
+
+	/**
+	 * Quotes an identifier according to MySQL conventions. Mysql uses back-ticks for this
+	 * instead of the ANSI double quote standard character.
+	 *
+	 * @param string $identifier
+	 *
+	 * @return
+	 */
+	public function quote_identifier($identifier) {
+		return '`' . $identifier . '`';
+	}
 }
