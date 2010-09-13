@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that is made of an SQL template with placeholders and an array of replacement
+ * Fragment that is made of an SQL template with '?' placeholders and an array of replacement
  * values that need to be quoted.
  *
  * @package    GlueDB
@@ -16,8 +16,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	protected $template;
 
 	/**
-	 * @var array Replacements to be made in SQL template. The keys are placeholders and
-	 * 			  the values are what they must be replaced by after beeing quoted.
+	 * @var array Replacements to be made in SQL template.
 	 */
 	protected $values;
 
@@ -27,7 +26,6 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	 * @param GlueDB_Fragment $parent
 	 * @param string $template
 	 * @param array $values
-	 *
 	 */
 	public function __construct(GlueDB_Fragment $parent, $template, array $values = array()) {
 		$this->parent = $parent;
@@ -37,10 +35,8 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 
 	/**
 	 * Compiles the data structure against given database and returns the
-	 * resulting SQL string. In this case, simply returns the template with
-	 * placeholders replaced by their quoted values.
-	 *
-	 * @param string $dbname
+	 * resulting SQL string. In this case, returns the template with placeholders
+	 * replaced by their quoted values.
 	 *
 	 * @return string
 	 */
@@ -50,10 +46,22 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 
 		// Quote values :
 		$quoted = array();
-		foreach($this->values as $ph => $value)
-			$quoted[$ph] = $this->query()->db()->quote($value);
+		foreach($this->values as $value)
+			$quoted[] = $this->query()->db()->quote($value);
 
-		// Return template with replaced placeholders : TODO changes this to '?'
-		return strtr($this->template, $quoted);
+		// Break appart template :
+		$parts = explode('?', $this->template);
+		if (count($parts) !== count($quoted) + 1)
+			throw new Kohana_Exception("Number of placeholders different from number of replacement values for " . $this->template);
+
+		// Make replacements :
+		$max = count($quoted);
+		$sql = $parts[0];
+		for($i = 0; $i < $max; $i++) {
+			$sql .= $quoted[$i];
+			$sql .= $parts[$i + 1];
+		}
+
+		return $sql;
 	}
 }

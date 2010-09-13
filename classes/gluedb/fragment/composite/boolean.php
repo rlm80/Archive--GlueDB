@@ -3,6 +3,8 @@
 /**
  * Fragment that represents a boolean expression.
  *
+ * TODO DRYify the whole thing....
+ *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
@@ -11,37 +13,63 @@
 class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 	/**
 	 * Quotes values, inserts them into the template, surrounds the whole thing with parenthesis
-	 * and inserts it at the begining of the expression.
+	 * and inserts the result at the begining of the expression.
 	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function init($template, $values) {
+		// Remove children :
 		$this->reset();
-		$this->push(new GlueDB_Fragment_Template($this, $template, $values));
+
+		// Add new fragment (necessary to make this atomic so that pop() removes the whole thing in one go) :
+		$fragment = new GlueDB_Fragment_Composite($this);
+		$this->push($fragment);
+
+		// Build fragment :
+		$fragment->push(' ( ');
+		$fragment->push(new GlueDB_Fragment_Template($fragment, $template, $values));
+		$fragment->push(' ) ');
+
 		return $this;
 	}
 
 	/**
 	 * Use ->or() instead of this. Quotes values, inserts them into the template, surrounds the
-	 * whole thing with parenthesis, and inserts it at the end of the expression using the 'OR'
+	 * whole thing with parenthesis, and inserts the result at the end of the expression using the 'OR'
 	 * operator.
 	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function _or($template, $values) {
-		$this->push(new GlueDB_Fragment_Template($this, ' OR (' . $template . ') ', $values));
+		// Add new fragment (necessary to make this atomic so that pop() removes the whole thing in one go) :
+		$fragment = new GlueDB_Fragment_Composite($this);
+		$this->push($fragment);
+
+		// Build fragment :
+		$fragment->push(' OR (');
+		$fragment->push(new GlueDB_Fragment_Template($fragment, $template, $values));
+		$fragment->push(' ) ');
+
 		return $this;
 	}
 
 	/**
 	 * Use ->and() instead of this. Quotes values, inserts them into the template, surrounds the
-	 * whole thing with parenthesis, and inserts it at the end of the expression using the 'AND'
+	 * whole thing with parenthesis, and inserts the result at the end of the expression using the 'AND'
 	 * operator.
 	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function _and($template, $values) {
-		$this->push(new GlueDB_Fragment_Template($this, ' AND (' . $template . ') ', $values));
+		// Add new fragment (necessary to make this atomic so that pop() removes the whole thing in one go) :
+		$fragment = new GlueDB_Fragment_Composite($this);
+		$this->push($fragment);
+
+		// Build fragment :
+		$fragment->push(' AND (');
+		$fragment->push(new GlueDB_Fragment_Template($fragment, $template, $values));
+		$fragment->push(' ) ');
+
 		return $this;
 	}
 
@@ -54,14 +82,17 @@ class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function initx(&$builder) {
-		// Reset content :
-		$this->parts = array();
+		// Remove children :
+		$this->reset();
 
-		// Init builder :
-		$builder = new GlueDB_Fragment_Composite_Boolean($this);
+		// Add new fragment (necessary to make this atomic so that pop() removes the whole thing in one go) :
+		$fragment = new GlueDB_Fragment_Composite($this);
+		$this->push($fragment);
 
-		// Add builder :
-		$this->add(array($builder));
+		// Build fragment :
+		$fragment->push(' OR (');
+		$fragment->push($builder = new GlueDB_Fragment_Composite_Boolean($this));
+		$fragment->push(' ) ');
 
 		return $this;
 	}
@@ -75,11 +106,14 @@ class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function orx(&$builder) {
-		// Init builder :
-		$builder = new GlueDB_Fragment_Composite_Boolean($this);
+		// Add new fragment (necessary to make this atomic so that pop() removes the whole thing in one go) :
+		$fragment = new GlueDB_Fragment_Composite($this);
+		$this->push($fragment);
 
-		// Add builder :
-		$this->add(array($builder), 'OR');
+		// Build fragment :
+		$fragment->push(' OR (');
+		$fragment->push($builder = new GlueDB_Fragment_Composite_Boolean($this));
+		$fragment->push(' ) ');
 
 		return $this;
 	}
@@ -93,11 +127,14 @@ class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function andx(&$builder) {
-		// Init builder :
-		$builder = new GlueDB_Fragment_Composite_Boolean($this);
+		// Add new fragment (necessary to make this atomic so that pop() removes the whole thing in one go) :
+		$fragment = new GlueDB_Fragment_Composite($this);
+		$this->push($fragment);
 
-		// Add builder :
-		$this->add(array($builder), 'AND');
+		// Build fragment :
+		$fragment->push(' AND (');
+		$fragment->push($builder = new GlueDB_Fragment_Composite_Boolean($this));
+		$fragment->push(' ) ');
 
 		return $this;
 	}
