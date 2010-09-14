@@ -27,8 +27,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	 * @param string $template
 	 * @param array $values
 	 */
-	public function __construct(GlueDB_Fragment $parent, $template, array $values = array()) {
-		$this->parent = $parent;
+	public function __construct($template, array $values = array()) {
 		$this->template = $template;
 		$this->values = $values;
 	}

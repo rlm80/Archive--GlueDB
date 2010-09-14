@@ -30,15 +30,6 @@ abstract class GlueDB_Fragment {
 	protected $sql;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param GlueDB_Fragment $parent
-	 */
-	public function __construct(GlueDB_Fragment $parent = null) {
-		$this->parent = $parent;
-	}
-
-	/**
 	 * Returns compiled SQL string.
 	 *
 	 * Calling this function repeatedly won't trigger the compiling process everytime,
@@ -60,6 +51,15 @@ abstract class GlueDB_Fragment {
 	 * @return string
 	 */
 	abstract protected function compile();
+
+	/**
+	 * Sets parent of fragment.
+	 *
+	 * @param GlueDB_Fragment $parent
+	 */
+	protected function set_parent(GlueDB_Fragment $parent) {
+		$this->parent = $parent;
+	}
 
 	/**
 	 * Clears the SQL cache and forwards call to context. Must be called each time

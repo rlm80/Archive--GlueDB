@@ -17,13 +17,29 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	protected $children = array();
 
 	/**
-	 * Adds a child at the end of the children list. Protected, because children classes will probably
-	 * want to warp this in a function with a more meaningful name.
+	 * Adds a child, or an array of children, at the end of the children list.
 	 *
-	 * @param GlueDB_Fragment $child
+	 * If the parameter is an array of children, they will be added as a composite fragment that
+	 * can be removed with pop() in one call.
+	 *
+	 * @param mixed $fragments
 	 */
-	protected function push($child) {
-		$this->children[] = $child;
+	protected function push($fragments) {
+		// Add children :
+		if (is_array($fragments)) {
+			// Recursion (fragments is an array) :
+			$atomic = new GlueDB_Fragment_Composite();
+			foreach($fragments as $fragment)
+				$atomic->push($fragment);
+			$this->push($atomic);
+		}
+		else {
+			// Trivial case (fragments is a single element) :
+			$this->children[] = $fragments;
+			$fragments->set_parent($this);
+		}
+
+		// Invalidate :
 		$this->invalidate();
 	}
 
@@ -59,11 +75,10 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Compiles the data structure against given database and returns the
-	 * resulting SQL string. In this case, the resulting SQL string is simply
- 	 * the concatenation of the resulting SQL strings of the children fragments.
+	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * TODO add '(' . .... . ')' ???
+	 * In this case the resulting SQL string is simply the concatenation of the resulting
+	 * SQL strings of the children fragments.
 	 *
 	 * @return string
 	 */
