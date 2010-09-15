@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that represents a boolean expression.
+ * Fragment that provides a fluent interface to build a boolean expression.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -12,13 +12,10 @@ class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 	/**
 	 * Initializes the expression with a first boolean operand.
 	 *
-	 * Quotes values, inserts them into the template, surrounds the whole thing with parentheses
-	 * and inserts the result at the end of the expression. Calling pop() once will remove it all.
-	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function init() {
-		// Get template and replacement values :
+		// Get template, replacement values and create SQL string :
 		$values		= func_get_args();
 		$template	= array_shift($values);
 
@@ -26,11 +23,7 @@ class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 		$this->reset();
 
 		// Add boolean operand :
-		$this->push(array(
-			new GlueDB_Fragment_Template(' ( '),
-			new GlueDB_Fragment_Template($template, $values),
-			new GlueDB_Fragment_Template(' ) '),
-		));
+		$this->push(new GlueDB_Fragment_Template(' ( ' . $template . ' ) ', $values));
 
 		return $this;
 	}
@@ -39,22 +32,18 @@ class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 	 * Use ->or() instead of this. Adds a boolean operand at the end of the expression, connecting it with
 	 * the OR operator.
 	 *
-	 * Quotes values, inserts them into the template, surrounds the whole thing with parentheses
-	 * and inserts the result at the end of the expression. Calling pop() once will remove it all.
-	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function _or() {
-		// Get template and replacement values :
+		// Get template, replacement values and create SQL string :
 		$values		= func_get_args();
 		$template	= array_shift($values);
 
+		// Remove children :
+		$this->reset();
+
 		// Add boolean operand :
-		$this->push(array(
-			new GlueDB_Fragment_Template(' OR ( '),
-			new GlueDB_Fragment_Template($template, $values),
-			new GlueDB_Fragment_Template(' ) '),
-		));
+		$this->push(new GlueDB_Fragment_Template(' OR ( ' . $template . ' ) ', $values));
 
 		return $this;
 	}
@@ -63,84 +52,74 @@ class GlueDB_Fragment_Composite_Boolean extends GlueDB_Fragment_Composite {
 	 * Use ->and() instead of this. Adds a boolean operand at the end of the expression, connecting it with
 	 * the AND operator.
 	 *
-	 * Quotes values, inserts them into the template, surrounds the whole thing with parentheses
-	 * and inserts the result at the end of the expression. Calling pop() once will remove it all.
-	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public function _and() {
-		// Get template and replacement values :
+		// Get template, replacement values and create SQL string :
 		$values		= func_get_args();
 		$template	= array_shift($values);
 
-		// Add boolean operand :
-		$this->push(array(
-			new GlueDB_Fragment_Template(' AND ( '),
-			new GlueDB_Fragment_Template($template, $values),
-			new GlueDB_Fragment_Template(' ) '),
-		));
-
-		return $this;
-	}
-
-	/**
-	 * Initializes the expression with a nested expression.
-	 *
-	 * @param GlueDB_Fragment_Composite_Boolean $builder Initialized with a builder that can be used at a later time
-	 * 										  to define the content of the nested expression.
-	 *
-	 * @return GlueDB_Fragment_Composite_Boolean
-	 */
-	public function initx(&$builder) {
 		// Remove children :
 		$this->reset();
 
 		// Add boolean operand :
-		$this->push(array(
-			new GlueDB_Fragment_Template(' ( '),
-			$builder = new GlueDB_Fragment_Composite_Boolean(),
-			new GlueDB_Fragment_Template(' ) '),
-		));
+		$this->push(new GlueDB_Fragment_Template(' AND ( ' . $template . ' ) ', $values));
+
+		return $this;
+	}
+
+	/**
+	 * Initializes the expression with a nested expression. Parameter is initialized with a boolean
+	 * fragment that can be used at a later time to define the content of the nested expression.
+	 *
+	 * @param GlueDB_Fragment_Composite_Boolean $bool
+	 *
+	 * @return GlueDB_Fragment_Composite_Boolean
+	 */
+	public function initx(&$bool) {
+		// Remove children :
+		$this->reset();
+
+		// Add boolean operand :
+		$this->push(new GlueDB_Fragment_Template(' ( ? ) ', $bool = new GlueDB_Fragment_Composite_Boolean()));
 
 		return $this;
 	}
 
 	/**
 	 * Adds a nested expression at the end of the expression, connecting it with
-	 * the OR operator.
+	 * the OR operator. Parameter is initialized with a boolean fragment that can
+	 * be used at a later time to define the content of the nested expression.
 	 *
-	 * @param GlueDB_Fragment_Composite_Boolean $builder Initialized with a builder that can be used at a later time
-	 * 										  to define the content of the nested expression.
+	 * @param GlueDB_Fragment_Composite_Boolean $bool
 	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
-	public function orx(&$builder) {
+	public function orx(&$bool) {
+		// Remove children :
+		$this->reset();
+
 		// Add boolean operand :
-		$this->push(array(
-			new GlueDB_Fragment_Template(' OR ( '),
-			$builder = new GlueDB_Fragment_Composite_Boolean(),
-			new GlueDB_Fragment_Template(' ) '),
-		));
+		$this->push(new GlueDB_Fragment_Template(' OR ( ? ) ', $bool = new GlueDB_Fragment_Composite_Boolean()));
 
 		return $this;
 	}
 
 	/**
 	 * Adds a nested expression at the end of the expression, connecting it with
-	 * the AND operator.
+	 * the AND operator. Parameter is initialized with a boolean fragment that can
+	 * be used at a later time to define the content of the nested expression.
 	 *
-	 * @param GlueDB_Fragment_Composite_Boolean $builder Initialized with a builder that can be used at a later time
-	 * 										  to define the content of the nested expression.
+	 * @param GlueDB_Fragment_Composite_Boolean $bool
 	 *
 	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
-	public function andx(&$builder) {
+	public function andx(&$bool) {
+		// Remove children :
+		$this->reset();
+
 		// Add boolean operand :
-		$this->push(array(
-			new GlueDB_Fragment_Template(' AND ( '),
-			$builder = new GlueDB_Fragment_Composite_Boolean(),
-			new GlueDB_Fragment_Template(' ) '),
-		));
+		$this->push(new GlueDB_Fragment_Template(' AND ( ? ) ', $bool = new GlueDB_Fragment_Composite_Boolean()));
 
 		return $this;
 	}

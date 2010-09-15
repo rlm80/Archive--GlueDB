@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Join expression builder class.
+ * Fragment that represents a join expression.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -10,7 +10,8 @@
 
 class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	/**
-	 * @var GlueDB_Builder_Boolean Boolean builder that is the current target for on, or, and, orx, andx calls.
+	 * @var GlueDB_Fragment_Composite_Boolean Boolean builder that is the current target for on, or, and, onx,
+	 * 										  orx, andx calls.
 	 */
 	protected $boolean_target;
 
@@ -25,7 +26,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 */
 	public function init($table, &$helper) {
 		// Create table helper :
-		$helper = gluedb::table($table)->helper(); // TODO passer query au constructeur ?
+		$helper = gluedb::table($table)->helper($this->root());
 
 		// Add helper :
 		$this->parts[] = $helper;

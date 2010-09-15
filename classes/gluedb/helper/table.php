@@ -41,16 +41,6 @@ class GlueDB_Helper_Table extends GlueDB_Helper {
 		$this->alias = $alias;
 	}
 
-
-	/**
-	 * Returns boolean builder for ON clause of the table.
-	 *
-	 * @return GlueDB_Builder_Boolean
-	 */
-	public function on() {
-		return $todo;
-	}
-
 	/**
 	 * Returns the column helper for given column.
 	 *

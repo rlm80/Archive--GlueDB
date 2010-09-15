@@ -42,7 +42,7 @@ class GlueDB {
 	/**
 	 * Returns a select query object.
 	 *
-	 * @param $table_name Name of the main table you're selecting from (= first table in the from clause).
+	 * @param string $table_name Name of the main table you're selecting from (= first table in the from clause).
 	 * @param $helper Table helper.
 	 *
 	 * @return GlueDB_Query_Select
@@ -54,7 +54,7 @@ class GlueDB {
 	/**
 	 * Returns an update query object.
 	 *
-	 * @param $table_name Name of the main table you're updating (= first table in the update clause).
+	 * @param string $table_name Name of the main table you're updating (= first table in the update clause).
 	 * @param $helper Table helper.
 	 *
 	 * @return GlueDB_Query_Update
@@ -66,7 +66,7 @@ class GlueDB {
 	/**
 	 * Returns a delete query object.
 	 *
-	 * @param $table_name Name of the main table you're deleting from (= first table in the from clause).
+	 * @param string $table_name Name of the main table you're deleting from (= first table in the from clause).
 	 * @param $helper Table helper.
 	 *
 	 * @return GlueDB_Query_Delete
@@ -78,12 +78,25 @@ class GlueDB {
 	/**
 	 * Returns a insert query object.
 	 *
-	 * @param $table_name Name of the table you're inserting data into.
+	 * @param string $table_name Name of the table you're inserting data into.
 	 * @param $helper Table helper.
 	 *
 	 * @return GlueDB_Query_Insert
 	 */
 	public static function insert($table_name, &$helper = null) {
 		return new GlueDB_Query_Insert(self::table($table_name), $helper);
+	}
+
+	/**
+	 * Returns a new value fragment.
+	 *
+	 * TODO do the same for other kinds of fragments ?
+	 *
+	 * @param mixed $value
+	 *
+	 * @return GlueDB_Fragment_Value
+	 */
+	public static function value($value) {
+		return new GlueDB_Fragment_Value($value);
 	}
 }

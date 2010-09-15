@@ -25,7 +25,7 @@ abstract class GlueDB_Fragment {
 	protected $parent;
 
 	/**
-	 * @var array Cached compiled SQL.
+	 * @var string Cached compiled SQL.
 	 */
 	protected $sql;
 
@@ -45,8 +45,6 @@ abstract class GlueDB_Fragment {
 
 	/**
 	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param string $dbname
 	 *
 	 * @return string
 	 */
@@ -78,11 +76,28 @@ abstract class GlueDB_Fragment {
 	}
 
 	/**
-	 * Returns the query to which the current fragment belongs.
+	 * Returns the query at the root of the fragment tree.
 	 *
-	 * @return GlueDB_Query
+	 * @return GlueDB_Fragment_Query
 	 */
-	protected function query() {
-		return $this->parent->query();
+	protected function root() {
+		if (isset($this->parent))
+			return $this->parent->root();
+		else
+			return $this;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
