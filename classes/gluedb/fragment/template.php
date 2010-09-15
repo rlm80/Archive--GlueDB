@@ -29,12 +29,17 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 		// Init template :
 		$this->template = $template;
 
-		// Turn replacements that aren't fragments into value fragments (SQL = quoted value) :
+		// Init replacements :
 		foreach($replacements as $replacement) {
-			if ($replacement instanceof GlueDB_Fragment)
-				$this->replacements[] = $replacement;
-			else
-				$this->replacements[] = new GlueDB_Fragment_Value($replacement);
+			// Turn replacements that aren't fragments into value fragments (SQL = quoted value) :
+			if ( ! $replacement instanceof GlueDB_Fragment)
+				$replacement = new GlueDB_Fragment_Value($replacement);
+
+			// Set parent :
+			$replacement->set_parent($this);
+
+			// Add replacement :
+			$this->replacements[] = $replacement;
 		}
 	}
 
