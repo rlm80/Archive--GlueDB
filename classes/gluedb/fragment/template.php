@@ -36,7 +36,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 				$replacement = new GlueDB_Fragment_Value($replacement);
 
 			// Set parent :
-			$replacement->set_parent($this);
+			$replacement->register_user($this);
 
 			// Add replacement :
 			$this->replacements[] = $replacement;
@@ -48,9 +48,11 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	 * resulting SQL string. In this case, returns the template with placeholders
 	 * replaced by their SQL representations.
 	 *
+	 * @param string $dbname
+	 *
 	 * @return string
 	 */
-	protected function compile() {
+	protected function compile($dbname) {
 		// Break appart template :
 		$parts = explode('?', $this->template);
 		if (count($parts) !== count($this->replacements) + 1)
@@ -60,7 +62,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 		$max = count($this->replacements);
 		$sql = $parts[0];
 		for($i = 0; $i < $max; $i++) {
-			$sql .= $this->replacements[$i]->sql();
+			$sql .= $this->replacements[$i]->sql($dbname);
 			$sql .= $parts[$i + 1];
 		}
 

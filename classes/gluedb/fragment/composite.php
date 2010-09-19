@@ -17,29 +17,13 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	protected $children = array();
 
 	/**
-	 * Adds a child, or an array of children, at the end of the children list.
+	 * Adds a child at the end of the children list.
 	 *
-	 * If the parameter is an array of children, they will be added as a composite fragment that
-	 * can be removed with pop() in one call.
-	 *
-	 * @param mixed $fragments
+	 * @param GlueDB_Fragment $fragment
 	 */
-	protected function push($fragments) {
-		// Add children :
-		if (is_array($fragments)) {
-			// Recursion (fragments is an array) :
-			$atomic = new GlueDB_Fragment_Composite();
-			foreach($fragments as $fragment)
-				$atomic->push($fragment);
-			$this->push($atomic);
-		}
-		else {
-			// Trivial case (fragments is a single element) :
-			$this->children[] = $fragments;
-			$fragments->set_parent($this);
-		}
-
-		// Invalidate :
+	protected function push(GlueDB_Fragment $fragment) {
+		$this->children[] = $fragment;
+		$fragment->register_user($this);
 		$this->invalidate();
 	}
 
@@ -49,7 +33,8 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	 * @return GlueDB_Fragment_Composite
 	 */
 	public function pop() {
-		array_pop($this->children);
+		$fragment = array_pop($this->children);
+		$fragment->unregister_user($this);
 		$this->invalidate();
 		return $this;
 	}
@@ -69,7 +54,8 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	 * @return GlueDB_Fragment_Composite
 	 */
 	public function reset() {
-		$this->children = array();
+		while ($fragment = array_pop($this->children))
+			$fragment->unregister_user($this);
 		$this->invalidate();
 		return $this;
 	}
@@ -82,10 +68,10 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	 *
 	 * @return string
 	 */
-	protected function compile() {
+	protected function compile($dbname) {
 		$sql = '';
 		foreach ($this->children as $child)
-			$sql .= $child->sql();
+			$sql .= $child->sql($dbname);
 		return $sql;
 	}
 }

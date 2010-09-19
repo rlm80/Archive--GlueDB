@@ -90,13 +90,38 @@ class GlueDB {
 	/**
 	 * Returns a new value fragment.
 	 *
-	 * TODO do the same for other kinds of fragments ?
+	 * @param mixed $value
+	 *
+	 * @return GlueDB_Fragment_Value
+	 */
+	public static function value($value = null) {
+		return new GlueDB_Fragment_Value($value);
+	}
+	
+	/**
+	 * Returns a new template fragment.
+	 *
+	 * @return GlueDB_Fragment_Template
+	 */
+	public static function template() {
+		$values		= func_get_args();
+		$template	= array_shift($values);
+		return new GlueDB_Fragment_Template($template, $values);
+	}	
+	
+	/**
+	 * Returns a new value fragment.
 	 *
 	 * @param mixed $value
 	 *
 	 * @return GlueDB_Fragment_Value
 	 */
-	public static function value($value) {
-		return new GlueDB_Fragment_Value($value);
-	}
+	public static function boolean() {
+		$f = new GlueDB_Fragment_Composite_Boolean();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			call_user_func_array(array($f, 'init'), $args);
+		}
+		return $f;	
+	}	
 }

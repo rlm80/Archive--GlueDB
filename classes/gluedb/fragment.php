@@ -6,13 +6,6 @@
  * A fragment is a data structure that describes a piece of SQL query and generates
  * the corresponding SQL string.
  *
- * Fragments are arranged as a tree, each fragment belonging to a parent fragment. At the top of
- * this tree is the query. Each fragment in the tree compiles into a string that is the SQL
- * representation of that fragment and the whole subtree that lives under it.
- *
- * Fragments cache their compiled SQL representations. When a change occurs to a fragment, these
- * caches are invalidated from child to parent all the way up to the root of the tree.
- *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
@@ -20,71 +13,84 @@
 
 abstract class GlueDB_Fragment {
 	/**
-	 * @var GlueDB_Fragment Fragment of which the current fragment is a piece of.
+	 * @var array List of fragments that make direct use of this fragment to create their own SQL representation.
 	 */
-	protected $parent;
+	protected $users;
 
 	/**
-	 * @var string Cached compiled SQL.
+	 * @var array Cached compiled SQL strings. One entry for each database.
 	 */
-	protected $sql;
+	protected $sql = array();
 
 	/**
-	 * Returns compiled SQL string.
+	 * Returns compiled SQL string for given database.
 	 *
 	 * Calling this function repeatedly won't trigger the compiling process everytime,
 	 * there is a cache that is only invalidated when the data structure is modified.
 	 *
+	 * @param string $dbname
+	 *
 	 * @return string
 	 */
-	public function sql() {
-		if ( ! isset($this->sql))
-			$this->sql = $this->compile();
-		return $this->sql;
+	public function sql($dbname = GlueDB_Database::DEFAULTDB) {
+		if ( ! isset($this->sql[$dbname]))
+			$this->sql[$dbname] = $this->compile($dbname);
+		return $this->sql[$dbname];
 	}
 
 	/**
 	 * Compiles the data structure and returns the resulting SQL string.
 	 *
+	 * @param string $dbname
+	 * 
 	 * @return string
 	 */
-	abstract protected function compile();
+	abstract protected function compile($dbname);
 
 	/**
-	 * Sets parent of fragment.
+	 * Adds a fragment to the list of fragments that make direct use of this
+	 * fragment to create their own SQL representation (a bit more complicated than
+	 * it seems because a user may be added more than once and we have to keep
+	 * track of that to remove it properly).
 	 *
-	 * @param GlueDB_Fragment $parent
+	 * @param GlueDB_Fragment $user
 	 */
-	protected function set_parent(GlueDB_Fragment $parent) {
-		$this->parent = $parent;
+	protected function register_user(GlueDB_Fragment $user) {
+		$hash = spl_object_hash($user);
+		if ( ! isset($this->users[$hash]))
+			$this->users[$hash] = array('object' => $user, 'count' => 1);
+		else
+			$this->users[$hash]['count'] ++;			
 	}
+	
+	/**
+	 * Removes a fragment from the list of fragments that make direct use of this
+	 * fragment to create their own SQL representation (a bit more complicated than
+	 * it seems because a user may be removed more than once).
+	 *
+	 * @param GlueDB_Fragment $user
+	 */
+	protected function unregister_user(GlueDB_Fragment $user) {
+		$hash = spl_object_hash($user);
+		$this->users[$hash]['count'] --;
+		if ($this->users[$hash]['count'] === 0)
+			unset($this->users[$hash]);			
+	}	
 
 	/**
-	 * Clears the SQL cache and forwards call to context. Must be called each time
+	 * Clears the SQL cache and forwards call to users. Must be called each time
 	 * a change has been made to the data structure.
 	 */
 	protected function invalidate() {
 		// No need to do anything if fragment is already invalidated :
-		if (isset($this->sql)) {
+		if (count($this->sql) !== 0) {
 			// Reset SQL cache :
-			$this->sql = null;
+			$this->sql = array();
 
 			// Cascade call to parent, because if a child is invalid, the parent is necessarily invalid too :
-			if (isset($this->parent))
-				$this->parent->invalidate();
+			foreach($this->users as $user)
+				$user['object']->invalidate();
 		}
-	}
-
-	/**
-	 * Returns the query at the root of the fragment tree.
-	 *
-	 * @return GlueDB_Fragment_Query
-	 */
-	protected function root() {
-		if (isset($this->parent))
-			return $this->parent->root();
-		else
-			return $this;
 	}
 }
 

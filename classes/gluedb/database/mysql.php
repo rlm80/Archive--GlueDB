@@ -41,15 +41,6 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	}
 
 	/**
-	 * Creates a dialect object suitable for communicating with MySQL.
-	 *
-	 * @return string
-	 */
-	protected function create_dialect() {
-		return new GlueDB_Dialect_MySQL;
-	}
-
-	/**
 	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered.
 	 *

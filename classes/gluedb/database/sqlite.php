@@ -31,15 +31,6 @@ class GlueDB_Database_Sqlite extends GlueDB_Database {
 	}
 
 	/**
-	 * Creates a dialect object suitable for communicating with PostgreSQL.
-	 *
-	 * @return string
-	 */
-	protected function create_dialect() {
-		return new GlueDB_Dialect_Sqlite;
-	}
-
-	/**
 	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered.
 	 *

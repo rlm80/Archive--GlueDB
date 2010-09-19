@@ -70,9 +70,6 @@ abstract class GlueDB_Database extends PDO {
 		// Set identifier :
 		$this->name = $name;
 
-		// Set SQL dialect :
-		$this->dialect = $this->create_dialect();
-
 		// Set PDO options :
 		$this->options[PDO::ATTR_ERRMODE]			= PDO::ERRMODE_EXCEPTION;
 		$this->options[PDO::ATTR_STATEMENT_CLASS]	= array('GlueDB_Statement', array($this));
@@ -136,19 +133,21 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	public function quote($value) {
+	public function quote_value($value) {
 		if (is_string($value))
 			return $this->quote_string($value);
 		elseif (is_array($value))
 			return $this->quote_array($value);
+		elseif (is_bool($value))
+			return $this->quote_bool($value);			
 		elseif (is_integer($value))
 			return $this->quote_integer($value);
 		elseif (is_float($value))
 			return $this->quote_float($value);
 		elseif (is_null($value))
-			return $this->quote_null();
+			return $this->quote_null($value);
 		else
-			return $this->quote_object($value);
+			throw new Kohana_Exception("Cannot quote objects.");
 	}
 
 	/**
@@ -176,7 +175,7 @@ abstract class GlueDB_Database extends PDO {
 
 		// Recursion :
 		foreach ($value as $val)
-			$arr[] = $this->quote($val);
+			$arr[] = $this->quote_value($val);
 
 		return '(' . implode(',', $arr) . ')';
 	}
@@ -191,6 +190,17 @@ abstract class GlueDB_Database extends PDO {
 	protected function quote_integer($value) {
 		return (string) $value;
 	}
+	
+	/**
+	 * Quotes an boolean for inclusion into an SQL query.
+	 *
+	 * @param integer $value
+	 *
+	 * @return string
+	 */
+	protected function quote_bool($value) {
+		return $value ? 'TRUE' : 'FALSE';
+	}	
 
 	/**
 	 * Quotes a float for inclusion into an SQL query.
@@ -213,18 +223,6 @@ abstract class GlueDB_Database extends PDO {
 	protected function quote_null($value) {
 		return 'NULL';
 	}
-
-	/**
-	 * Quotes an object for inclusion into an SQL query.
-	 *
-	 * @param object $value
-	 *
-	 * @return string
-	 */
-	protected function quote_float($value) {
-		return (string) $value;
-	}
-
 
 	/**
 	 * Returns the appropriate PHP type to represent given native database type.
