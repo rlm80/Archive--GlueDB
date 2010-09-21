@@ -12,7 +12,7 @@
  * @license    MIT
  */
 
-class GlueDB_Helper_Table extends GlueDB_Helper {
+class GlueDB_Fragment_Helper_Table extends GlueDB_Fragment_Helper {
 	/**
 	 * @var GlueDB_Table The table that this helper is about.
 	 */
@@ -31,14 +31,21 @@ class GlueDB_Helper_Table extends GlueDB_Helper {
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Query $query
 	 * @param GlueDB_Table $table
-	 * @param string $alias
 	 */
-	public function __construct(GlueDB_Query $query, GlueDB_Table $table, $alias) {
-		parent::__construct($query);
+	public function __construct(GlueDB_Table $table) {
 		$this->table = $table;
-		$this->alias = $alias;
+		$this->alias = 'test'; // TODO
+	}
+
+	/**
+	 * TODO use database + this is not be the right place to generate this
+	 *
+	 * @param GlueDB_Table $table
+	 */
+	protected function compile($dbname) {
+		$tables = $this->table->dbtables();
+		return $tables[0] . ' AS TODO';
 	}
 
 	/**

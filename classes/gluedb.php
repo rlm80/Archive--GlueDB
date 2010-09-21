@@ -97,7 +97,7 @@ class GlueDB {
 	public static function value($value = null) {
 		return new GlueDB_Fragment_Value($value);
 	}
-	
+
 	/**
 	 * Returns a new template fragment.
 	 *
@@ -107,14 +107,12 @@ class GlueDB {
 		$values		= func_get_args();
 		$template	= array_shift($values);
 		return new GlueDB_Fragment_Template($template, $values);
-	}	
-	
+	}
+
 	/**
-	 * Returns a new value fragment.
+	 * Returns a new boolean fragment.
 	 *
-	 * @param mixed $value
-	 *
-	 * @return GlueDB_Fragment_Value
+	 * @return GlueDB_Fragment_Composite_Boolean
 	 */
 	public static function boolean() {
 		$f = new GlueDB_Fragment_Composite_Boolean();
@@ -122,6 +120,17 @@ class GlueDB {
 			$args = func_get_args();
 			call_user_func_array(array($f, 'init'), $args);
 		}
-		return $f;	
-	}	
+		return $f;
+	}
+
+	/**
+	 * Returns a new join fragment.
+	 *
+	 * @return GlueDB_Fragment_Composite_Join
+	 */
+	public static function join($table, &$helper = null) {
+		$f = new GlueDB_Fragment_Composite_Join();
+		$f->init($table, $helper);
+		return $f;
+	}
 }

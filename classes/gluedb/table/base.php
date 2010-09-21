@@ -81,8 +81,8 @@ abstract class GlueDB_Table_Base {
 	 *
 	 * @return GlueDB_Helper_Table
 	 */
-	public function helper(GlueDB_Query $query, $alias) {
-		return new GlueDB_Helper_Table($query, $this, $alias);
+	public function helper() {
+		return new GlueDB_Fragment_Helper_Table($this);
 	}
 
 	/**

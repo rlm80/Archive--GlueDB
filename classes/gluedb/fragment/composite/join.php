@@ -27,8 +27,8 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 		// Create fragment :
 		if (is_string($table))
 			$fragment = $helper = gluedb::table($table)->helper();
-		else 
-			$fragment = $table;
+		else
+			$fragment = gluedb::template(' ( ? ) ', $table);
 
 		// Remove children :
 		$this->reset();
@@ -85,17 +85,16 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * Adds a join to current expression with given connector.
 	 *
 	 * @param mixed $table Table name or join fragment.
+	 * @param string $connector 'OR' or 'AND'.
 	 * @param GlueDB_Helper_Table $helper Initialized with a table helper that may be used at a later time to
 	 *									  refer to the table columns.
-	 * @param string $connector
 	 *
 	 * @return GlueDB_Fragment_Composite_Join
 	 */
-	protected function join($table, $connector, &$helper = null) {
+	protected function join($table, $connector, &$helper) {
 		// Update boolean target :
-		$this->boolean_target = new GlueDB_Fragment_Composite_Boolean($this);
-		$this->boolean_target->init("1=1");
-		
+		$this->boolean_target = new GlueDB_Fragment_Composite_Boolean();
+
 		// Create fragment :
 		if (is_string($table)) {
 			$fragment = $helper = gluedb::table($table)->helper();

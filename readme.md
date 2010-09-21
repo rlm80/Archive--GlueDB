@@ -6,8 +6,7 @@ Goals :
 - unified database introspection API,
 - framework for setting up application wide aliasing of database tables and columns identifiers,
 - query builder with support for nested boolean and join expressions,
-- PDO centric, in a way that fully exposes its interface,
-- true, not PHP emulated, prepared statements,
-- support for MySQL, PostgreSQL and SQLite out of the box, with possible extension to other RDBMS.
+- based on PDO with support for true, not PHP emulated, prepared statements,
+- out of the box support for MySQL only, but designed to make it easy to extend to other RDBMS.
 
 Under development.

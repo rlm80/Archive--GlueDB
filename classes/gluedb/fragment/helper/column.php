@@ -12,7 +12,7 @@
  * @license    MIT
  */
 
-class GlueDB_Helper_Column extends GlueDB_Helper {
+class GlueDB_Fragment_Helper_Column extends GlueDB_Fragment_Helper {
 	/**
 	 * @var GlueDB_Table The table this helper is about.
 	 */
