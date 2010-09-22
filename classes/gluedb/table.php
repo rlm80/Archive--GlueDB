@@ -1,25 +1,48 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Virtual table class.
+ * Base virtual table class.
+ *
+ * The tables you are referring to when you work with the query builder or with the
+ * introspection API are not real database tables. They are PHP objects called virtual
+ * tables. Just like real tables, virtual tables have names and columns. By default,
+ * all virtual tables map to the corresponding table in the underlying database and
+ * have the same columns so you actually don't notice that this system even exists at all.
+ *
+ * But you may define your own virtual tables. You do so by creating a class called
+ * GlueDB_Table_<virtual table name> that extends GlueDB_Table.
+ *
+ * You may want to do that if you want to :
+ * - have a virtual table point to a real table that has a different name,
+ * - have a virtual table column point to a real column that has a different name,
+ * - set up a GlueDB_Formatter for a column, other than the default one that simply
+ *   type cast the values coming from the database according to the underlying column type.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class GlueDB_Table extends GlueDB_Table_Base {
+class GlueDB_Table {
 	/**
-	 * @var string	Name of the database that owns the real tables that are part of
-	 * 				this virtual table definition.
+	 * @var array Virtual tables instances cache.
 	 */
-	protected $db;
+	static protected $instances = array();
 
 	/**
-	 * @var string	Name of the database that owns the real tables that are part of
-	 * 				this virtual table definition.
+	 * @var string Name of this virtual table, as it will be refered to in the query builder.
 	 */
-	protected $dbtable;
+	protected $name;
+
+	/**
+	 * @var string	Name of the database that owns the real underlying table.
+	 */
+	protected $dbname;
+
+	/**
+	 * @var string	Real underlying table name.
+	 */
+	protected $table;
 
 	/**
 	 * @var array Primary key columns of this table.
@@ -27,92 +50,56 @@ class GlueDB_Table extends GlueDB_Table_Base {
 	protected $pk;
 
 	/**
+	 * @var array Columns of this table.
+	 */
+	protected $columns;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $name Table name.
 	 */
 	protected function __construct($name) {
-		// Call parent constructor :
-		parent::__construct($name);
+		// Init name :
+		$this->name = $name;
 
 		// Init properties :
-		if ( ! isset($this->dbtable))	$this->dbtable = $this->init_dbtable();
-		if ( ! isset($this->db))		$this->db = $this->init_db();
+		if ( ! isset($this->table))		$this->table	= $this->init_table();
+		if ( ! isset($this->dbname))	$this->dbname	= $this->init_dbname();
 
 		// Create columns :
 		$this->columns = $this->init_columns();
 
 		// Create pk :
-		// $this->pk = $this->init_pk(); TODO
+		$this->pk = $this->init_pk();
 	}
 
 	/**
-	 * Returns the real name of the underlying table.
+	 * Returns the name of the real underlying table.
 	 *
 	 * @return array
 	 */
-	protected function init_dbtable() {
+	protected function init_table() {
 		return $this->name;
 	}
 
 	/**
-	 * Returns the name of the database that owns the underlying table.
+	 * Returns the name of the database that owns the real underlying table.
 	 *
 	 * @return string
 	 */
-	protected function init_db() {
+	protected function init_dbname() {
 		return GlueDB_Database::DEFAULTDB; // TODO Do something better than this. We should look into each
-										   // available database and search for one that owns all the real tables.
+										   // available database and search for one that owns the real table.
 	}
 
 	/**
-	 * Returns the alias under which a real column will be known in PHP-land.
-	 *
-	 * This alias defines how you may refer to the column in the query builder. You
-	 * may redefine this if, for example, you wish to change the name of a real column
-	 * without impacting the PHP application, or the other way around.
-	 *
-	 * @param string $column_real_name
+	 * TODO
 	 *
 	 * @return string
 	 */
-	protected function get_column_alias($column_real_name) {
-		$column_alias = $column_real_name;
-		return $column_alias;
-	}
-
-	/**
-	 * Returns the appropriate formatter for given column.
-	 *
-	 * You may want to redefine this if, for example, it's not possible for GlueDB to
-	 * guess the right PHP type from the db type (sqlite ?) or because you want some
-	 * funky formatting like serialization.
-	 *
-	 * @param string $column_alias
-	 * @param string $dbtype
-	 *
-	 * @return GlueDB_Formatter
-	 */
-	protected function get_column_formatter($column_alias, $dbtype) {
-		// Get PHP type :
-		$phptype = $this->db()->get_phptype($dbtype);
-
-		// Choose formatter depending on type :
-		switch ($phptype) {
-			case 'integer'; case 'int';
-				$formatter = new GlueDB_Formatter_Integer;
-				break;
-			case 'float';
-				$formatter = new GlueDB_Formatter_Float;
-				break;
-			case 'boolean';
-				$formatter = new GlueDB_Formatter_Boolean;
-				break;
-			default;
-				$formatter = new GlueDB_Formatter_String;
-		}
-
-		return $formatter;
+	protected function init_pk() {
+		return array();
 	}
 
 	/**
@@ -124,21 +111,17 @@ class GlueDB_Table extends GlueDB_Table_Base {
 	 *
 	 * @return array
 	 */
-	protected function init_columns() {
+	private function init_columns() {
 		$columns = array();
 		$info_table = $this->db()->table_info($this->dbtable);
 		foreach ($info_table['columns'] as $info_column) {
 			// Get column alias :
 			$alias = $this->get_column_alias($info_column['column']);
 
-			// Get column formatter :
-			$formatter = $this->get_column_formatter($alias, $dbtype);
-
 			// Create column :
 			$columns[$alias] = new GlueDB_Column(
 					$this,
 					$alias,
-					$formatter,
 					$this->dbtable,
 					$info_column['column'],
 					$info_column['type'],
@@ -154,12 +137,42 @@ class GlueDB_Table extends GlueDB_Table_Base {
 	}
 
 	/**
+	 * Returns the alias under which a real column will be known in PHP-land.
+	 *
+	 * This alias defines how you may refer to the column in the query builder. You
+	 * may redefine this if, for example, you wish to change the name of a real column
+	 * without impacting the PHP application, or the other way around.
+	 *
+	 * @param string $column_real_name
+	 *
+	 * @return string
+	 */
+	protected function get_column_alias($column_real_name) {
+		return $column_real_name;
+	}
+
+	/**
+	 * Returns the appropriate formatter for given column.
+	 *
+	 * You may want to redefine this if, for example, it's not possible for GlueDB to
+	 * guess the right PHP type from the db type (sqlite ?) or because you want some
+	 * funky formatting like serialization.
+	 *
+	 * @param GlueDB_Column $column
+	 *
+	 * @return GlueDB_Formatter
+	 */
+	protected function get_column_formatter($column) {
+		return $this->db()->get_formatter($column);
+	}
+
+	/**
 	 * Returns the database object this virtual table is stored into.
 	 *
 	 * @return GlueDB_Database
 	 */
 	public function db() {
-		return gluedb::db($this->db);
+		return gluedb::db($this->dbname);
 	}
 
 	/**
@@ -172,11 +185,63 @@ class GlueDB_Table extends GlueDB_Table_Base {
 	}
 
 	/**
-	 * Underlying database table names.
+	 * Returns a table helper for this table.
+	 *
+	 * @param GlueDB_Query	$query	Query in the context of which the table helper is required.
+	 * @param string		$alias	Alias of current table in that query.
+	 *
+	 * @return GlueDB_Helper_Table
+	 */
+	public function helper() {
+		return new GlueDB_Fragment_Helper_Table($this);
+	}
+
+	/**
+	 * Returns the columns of this table.
 	 *
 	 * @return array
 	 */
-	public function dbtables() {
-		return array($this->dbtable);
+	public function columns() {
+		return $this->columns;
+	}
+
+	/**
+	 * Returns a column.
+	 *
+	 * @param string $name
+	 *
+	 * @return GlueDB_Column_Base
+	 */
+	public function column($name) {
+		return $this->columns[$name];
+	}
+
+	/**
+	 * Loads a virtual table, stores it in cache, and returns it.
+	 *
+	 * @param string $name Virtual table name.
+	 *
+	 * @return GlueDB_Table
+	 */
+	static public function get($name) {
+		$name = strtolower($name);
+		if( ! isset(self::$instances[$name]))
+			self::$instances[$name] = self::create($name);
+		return self::$instances[$name];
+	}
+
+	/**
+	 * Returns a new virtual table instance.
+	 *
+	 * @param string $name
+	 *
+	 * @return GlueDB_Table
+	 */
+	static protected function create($name) {
+		$class = 'GlueDB_Table_' . ucfirst($name);
+		if (class_exists($class))
+			return new $class($name);
+		else
+			return new GlueDB_Table($name);
 	}
 }

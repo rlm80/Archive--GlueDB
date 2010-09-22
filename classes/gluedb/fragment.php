@@ -6,6 +6,14 @@
  * A fragment is a data structure that describes a piece of SQL query and generates
  * the corresponding SQL string.
  *
+ * Fragments may rely on other fragments to build their SQL representations. Such dependencies
+ * between fragments constitute an acyclic directed graph. Fragments that depend on a specific
+ * fragment in such a way are called the users of that fragment.
+ *
+ * Fragments cache their SQL representations. When the data structure that makes up a fragment
+ * changes, the cache is invalidated. This cache invalidation process is cascaded recursively
+ * from the fragment to its users and the users of its users and so on.
+ *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
@@ -42,7 +50,7 @@ abstract class GlueDB_Fragment {
 	 * Compiles the data structure and returns the resulting SQL string.
 	 *
 	 * @param string $dbname
-	 * 
+	 *
 	 * @return string
 	 */
 	abstract protected function compile($dbname);
@@ -60,9 +68,9 @@ abstract class GlueDB_Fragment {
 		if ( ! isset($this->users[$hash]))
 			$this->users[$hash] = array('object' => $user, 'count' => 1);
 		else
-			$this->users[$hash]['count'] ++;			
+			$this->users[$hash]['count'] ++;
 	}
-	
+
 	/**
 	 * Removes a fragment from the list of fragments that make direct use of this
 	 * fragment to create their own SQL representation (a bit more complicated than
@@ -74,8 +82,8 @@ abstract class GlueDB_Fragment {
 		$hash = spl_object_hash($user);
 		$this->users[$hash]['count'] --;
 		if ($this->users[$hash]['count'] === 0)
-			unset($this->users[$hash]);			
-	}	
+			unset($this->users[$hash]);
+	}
 
 	/**
 	 * Clears the SQL cache and forwards call to users. Must be called each time

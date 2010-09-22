@@ -3,22 +3,34 @@
 /**
  * Column class.
  *
+ * TODO : describe this
+ *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class GlueDB_Column extends GlueDB_Column_Base {
+abstract class GlueDB_Column {
+	/**
+	 * @var GlueDB_Table_Base Virtual table object this column belongs to.
+	 */
+	protected $table;
+
+	/**
+	 * @var string Name of this column, as you would refer to it in queries.
+	 */
+	protected $name;
+
 	/**
 	 * @var GlueDB_Formatter Formatter object to format values coming from and going to this column.
 	 */
-	protected $formatter;	
+	protected $formatter;
 
 	/**
 	 * @var string Underlying database table this virtual column is stored into.
 	 */
-	protected $dbtable;	
-	
+	protected $dbtable;
+
 	/**
 	 * @var string Underlying database column this virtual column is stored into.
 	 */
@@ -59,12 +71,12 @@ class GlueDB_Column extends GlueDB_Column_Base {
 	 */
 	protected $dbauto;
 
-	public function __construct(GlueDB_Table $table, $name, $formatter, $dbtable, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
-		// Call parent constructor :
-		parent::__construct($table, $name);
-		
-		// Init properties :
-		$this->formatter	= $formatter;
+	/**
+	 * Constructor.
+	 */
+	public function __construct(GlueDB_Table $table, $name, $dbtable, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
+		$this->table		= $table;
+		$this->name			= $name;
 		$this->dbtable		= $dbtable;
 		$this->dbcolumn		= $dbcolumn;
 		$this->dbtype		= $dbtype;
@@ -74,88 +86,107 @@ class GlueDB_Column extends GlueDB_Column_Base {
 		$this->dbscale		= $dbscale;
 		$this->dbdefault	= $dbdefault;
 		$this->dbauto		= $dbauto;
+		$this->formatter	= $table->get_column_formatter($this);
 	}
-	
+
 	/**
-	 * Returns the PHP type of the values returned by this column, after they have been formatted.  
-	 * 
+	 * Returns the virtual table object this column belongs to.
+	 *
+	 * @return array
+	 */
+	public function table() {
+		return $this->table;
+	}
+
+	/**
+	 * Returns the database that owns the virtual table object this column belongs to.
+	 *
+	 * @return array
+	 */
+	public function db() {
+		return $this->table->db();
+	}
+
+	/**
+	 * Returns the PHP type of the values returned by this column, after they have been formatted.
+	 *
 	 * @return array
 	 */
 	public function type() {
 		return $this->formatter->type();
-	}	
-	
+	}
+
 	/**
-	 * Returns the underlying database table and column this virtual column is stored into.  
-	 * 
+	 * Returns the underlying database table and column this virtual column is stored into.
+	 *
 	 * @return array
 	 */
 	public function dblocation() {
 		return array(0 => array('table' => $this->dbtable, 'column' => $this->dbcolumn));
 	}
-	
+
 	/**
 	 * Returns the underlying column database type.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function dbtype() {
-		
+
 	}
-	
+
 	/**
-	 * Returns whether or not the underlying column can accept null values. 
-	 * 
+	 * Returns whether or not the underlying column can accept null values.
+	 *
 	 * @return boolean
 	 */
 	public function dbnullable() {
-		
+
 	}
-	
+
 	/**
-	 * Returns the maximum length that underlying column accepts. 
-	 * 
+	 * Returns the maximum length that underlying column accepts.
+	 *
 	 * @return integer
 	 */
 	public function dbmaxlength() {
-		
+
 	}
-	
+
 	/**
-	 * Returns the total number of significant digits of the underlying column. 
-	 * 
+	 * Returns the total number of significant digits of the underlying column.
+	 *
 	 * @return integer
 	 */
 	public function dbprecision() {
-		
+
 	}
-	
+
 	/**
-	 * Returns the number of significant digits in the decimal part af the underlying column. 
-	 * 
+	 * Returns the number of significant digits in the decimal part af the underlying column.
+	 *
 	 * @return integer
 	 */
 	public function dbscale() {
-		
+
 	}
-	
+
 	/**
-	 * Returns the default value of the underlying column (raw from the database, not type casted !). 
-	 * 
+	 * Returns the default value of the underlying column (raw from the database, not type casted !).
+	 *
 	 * @return string
 	 */
 	public function dbdefault() {
-		
+
 	}
-	
+
 	/**
-	 * Whether or not the underlying column is auto-incrementing. 
-	 * 
+	 * Whether or not the underlying column is auto-incrementing.
+	 *
 	 * @return string
 	 */
 	public function dbauto() {
-		
-	}	
+
+	}
 }
 
 

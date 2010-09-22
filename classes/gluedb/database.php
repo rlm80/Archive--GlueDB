@@ -139,7 +139,7 @@ abstract class GlueDB_Database extends PDO {
 		elseif (is_array($value))
 			return $this->quote_array($value);
 		elseif (is_bool($value))
-			return $this->quote_bool($value);			
+			return $this->quote_bool($value);
 		elseif (is_integer($value))
 			return $this->quote_integer($value);
 		elseif (is_float($value))
@@ -190,7 +190,7 @@ abstract class GlueDB_Database extends PDO {
 	protected function quote_integer($value) {
 		return (string) $value;
 	}
-	
+
 	/**
 	 * Quotes an boolean for inclusion into an SQL query.
 	 *
@@ -200,7 +200,7 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function quote_bool($value) {
 		return $value ? 'TRUE' : 'FALSE';
-	}	
+	}
 
 	/**
 	 * Quotes a float for inclusion into an SQL query.
@@ -225,13 +225,13 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Returns the appropriate PHP type to represent given native database type.
+	 * Returns the appropriate formatter for given column.
 	 *
-	 * @param string $dbtype
+	 * @param GlueDB_Column $column
 	 *
-	 * @return string
+	 * @return GlueDB_Formatter
 	 */
-	abstract public function get_phptype($dbtype);
+	abstract public function get_formatter(GlueDB_Column $column);
 
 	/**
 	 * Returns structured information about the columns and primary key of a real database table.

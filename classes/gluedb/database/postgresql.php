@@ -89,13 +89,13 @@ class GlueDB_Database_PostgreSQL extends GlueDB_Database {
 	}
 
 	/**
-	 * Returns the appropriate PHP type to represent given native database type.
+	 * Returns the appropriate formatter for given column.
 	 *
-	 * @param string $dbtype
+	 * @param GlueDB_Column $column
 	 *
-	 * @return string TODO return formatter instead ?
+	 * @return GlueDB_Formatter
 	 */
-	public function get_phptype($dbtype)  {
+	public function get_formatter(GlueDB_Column $column)  {
 		throw new Kohana_Exception("The GlueDB_Database::get_phptype function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it.");
 	}
 }
