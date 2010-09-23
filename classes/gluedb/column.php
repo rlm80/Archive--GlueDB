@@ -10,9 +10,9 @@
  * @license    MIT
  */
 
-abstract class GlueDB_Column {
+class GlueDB_Column {
 	/**
-	 * @var GlueDB_Table_Base Virtual table object this column belongs to.
+	 * @var GlueDB_Table Virtual table this column belongs to.
 	 */
 	protected $table;
 
@@ -27,57 +27,51 @@ abstract class GlueDB_Column {
 	protected $formatter;
 
 	/**
-	 * @var string Underlying database table this virtual column is stored into.
-	 */
-	protected $dbtable;
-
-	/**
-	 * @var string Underlying database column this virtual column is stored into.
+	 * @var string Underlying database column.
 	 */
 	protected $dbcolumn;
 
 	/**
-	 * @var string Native database type of this column.
+	 * @var string Native database type.
 	 */
 	protected $dbtype;
 
 	/**
-	 * @var string	Whether or not the underlying database column is nullable.
+	 * @var string Whether or not the underlying database column is nullable.
 	 */
 	protected $dbnullable;
 
 	/**
-	 * @var string	Maximum length of the underlying database column (for text).
+	 * @var string Maximum length of the underlying database column (for text).
 	 */
 	protected $dbmaxlength;
 
 	/**
-	 * @var string	Precision of the underlying database column (total number of significant digits).
+	 * @var string Precision of the underlying database column (total number of significant digits).
 	 */
 	protected $dbprecision;
 
 	/**
-	 * @var string	Scale of the underlying database column (number of significant digits in the decimal part).
+	 * @var string Scale of the underlying database column (number of significant digits in the decimal part).
 	 */
 	protected $dbscale;
 
 	/**
-	 * @var string	Default value of the underlying database column (stored as is from the database, not type casted).
+	 * @var string Default value of the underlying database column (stored as is from the database, not type casted).
 	 */
 	protected $dbdefault;
 
 	/**
-	 * @var string	Whether or not the underlying database column auto-incrementing.
+	 * @var boolean Whether or not the underlying database column auto-incrementing.
 	 */
 	protected $dbauto;
 
 	/**
 	 * Constructor.
 	 */
-	public function __construct(GlueDB_Table $table, $name, $dbtable, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
+	public function __construct(GlueDB_Table $table, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
+		// Init properties :
 		$this->table		= $table;
-		$this->name			= $name;
-		$this->dbtable		= $dbtable;
 		$this->dbcolumn		= $dbcolumn;
 		$this->dbtype		= $dbtype;
 		$this->dbnullable	= $dbnullable;
@@ -86,43 +80,37 @@ abstract class GlueDB_Column {
 		$this->dbscale		= $dbscale;
 		$this->dbdefault	= $dbdefault;
 		$this->dbauto		= $dbauto;
+		
+		// Get from table object (because there the method can be redefined) :
 		$this->formatter	= $table->get_column_formatter($this);
+		$this->name			= $table->get_column_alias($this);
 	}
 
 	/**
-	 * Returns the virtual table object this column belongs to.
+	 * Returns the virtual table of this column.
 	 *
-	 * @return array
+	 * @return GlueDB_Table
 	 */
 	public function table() {
 		return $this->table;
 	}
 
 	/**
-	 * Returns the database that owns the virtual table object this column belongs to.
+	 * Returns formatter.
 	 *
-	 * @return array
+	 * @return GlueDB_Formatter
 	 */
-	public function db() {
-		return $this->table->db();
+	public function formatter() {
+		return $this->formatter;
 	}
 
 	/**
-	 * Returns the PHP type of the values returned by this column, after they have been formatted.
+	 * Returns the underlying database column for this virtual column.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public function type() {
-		return $this->formatter->type();
-	}
-
-	/**
-	 * Returns the underlying database table and column this virtual column is stored into.
-	 *
-	 * @return array
-	 */
-	public function dblocation() {
-		return array(0 => array('table' => $this->dbtable, 'column' => $this->dbcolumn));
+	public function dbcolumn() {
+		return $this->dbcolumn;
 	}
 
 	/**
@@ -131,7 +119,7 @@ abstract class GlueDB_Column {
 	 * @return string
 	 */
 	public function dbtype() {
-
+		return $this->dbtype;
 	}
 
 	/**
@@ -140,7 +128,7 @@ abstract class GlueDB_Column {
 	 * @return boolean
 	 */
 	public function dbnullable() {
-
+		return $this->dbnullable;
 	}
 
 	/**
@@ -149,7 +137,7 @@ abstract class GlueDB_Column {
 	 * @return integer
 	 */
 	public function dbmaxlength() {
-
+		return $this->dbmaxlength;
 	}
 
 	/**
@@ -158,7 +146,7 @@ abstract class GlueDB_Column {
 	 * @return integer
 	 */
 	public function dbprecision() {
-
+		return $this->dbprecision;
 	}
 
 	/**
@@ -167,7 +155,7 @@ abstract class GlueDB_Column {
 	 * @return integer
 	 */
 	public function dbscale() {
-
+		return $this->dbscale;
 	}
 
 	/**
@@ -176,16 +164,16 @@ abstract class GlueDB_Column {
 	 * @return string
 	 */
 	public function dbdefault() {
-
+		return $this->dbdefault;
 	}
 
 	/**
 	 * Whether or not the underlying column is auto-incrementing.
 	 *
-	 * @return string
+	 * @return boolean
 	 */
 	public function dbauto() {
-
+		return $this->dbauto;
 	}
 }
 

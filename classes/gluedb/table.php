@@ -115,14 +115,8 @@ class GlueDB_Table {
 		$columns = array();
 		$info_table = $this->db()->table_info($this->dbtable);
 		foreach ($info_table['columns'] as $info_column) {
-			// Get column alias :
-			$alias = $this->get_column_alias($info_column['column']);
-
-			// Create column :
 			$columns[$alias] = new GlueDB_Column(
 					$this,
-					$alias,
-					$this->dbtable,
 					$info_column['column'],
 					$info_column['type'],
 					$info_column['nullable'],
@@ -147,8 +141,8 @@ class GlueDB_Table {
 	 *
 	 * @return string
 	 */
-	protected function get_column_alias($column_real_name) {
-		return $column_real_name;
+	public function get_column_alias(GlueDB_Column $column) {
+		return $column->dbcolumn();
 	}
 
 	/**
