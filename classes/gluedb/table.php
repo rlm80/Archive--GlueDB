@@ -42,7 +42,7 @@ class GlueDB_Table {
 	/**
 	 * @var string	Real underlying table name.
 	 */
-	protected $table;
+	protected $dbtable;
 
 	/**
 	 * @var array Primary key columns of this table.
@@ -64,7 +64,7 @@ class GlueDB_Table {
 		$this->name = $name;
 
 		// Init properties :
-		if ( ! isset($this->table))		$this->table	= $this->init_table();
+		if ( ! isset($this->dbtable))	$this->dbtable	= $this->init_dbtable();
 		if ( ! isset($this->dbname))	$this->dbname	= $this->init_dbname();
 
 		// Create columns :
@@ -79,7 +79,7 @@ class GlueDB_Table {
 	 *
 	 * @return array
 	 */
-	protected function init_table() {
+	protected function init_dbtable() {
 		return $this->name;
 	}
 
@@ -137,7 +137,7 @@ class GlueDB_Table {
 	 * may redefine this if, for example, you wish to change the name of a real column
 	 * without impacting the PHP application, or the other way around.
 	 *
-	 * @param string $column_real_name
+	 * @param GlueDB_Column $column
 	 *
 	 * @return string
 	 */
@@ -156,7 +156,7 @@ class GlueDB_Table {
 	 *
 	 * @return GlueDB_Formatter
 	 */
-	protected function get_column_formatter($column) {
+	public function get_column_formatter(GlueDB_Column $column) {
 		return $this->db()->get_formatter($column);
 	}
 
@@ -176,6 +176,24 @@ class GlueDB_Table {
 	 */
 	public function pk() {
 		return $this->pk;
+	}
+
+	/**
+	 * Returns the database name this virtual table is stored into.
+	 *
+	 * @return string
+	 */
+	public function dbname() {
+		return $this->dbname;
+	}
+
+	/**
+	 * Returns the real underlying table name.
+	 *
+	 * @return string
+	 */
+	public function dbtable() {
+		return $this->dbtable;
 	}
 
 	/**

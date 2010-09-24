@@ -1,7 +1,13 @@
 <?php
 
+class test {function __toString() {return "iiiii";}}
+
 class Controller_GlueDB extends Controller {
 	public function action_test() {
+		$t = new test;
+		echo "qsdf $t eeee";
+		die;
+
 		echo ("<pre>");
 		$this->test_fragments();
 	}
