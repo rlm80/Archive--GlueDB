@@ -116,7 +116,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @param string $identifier
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function quote_identifier($identifier) {
 		return '"' . $identifier . '"';
@@ -283,7 +283,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @param string $name
 	 *
-	 * @return object
+	 * @return GlueDB_Database
 	 */
 	static public function get($name) {
 		$name = strtolower($name);
@@ -298,7 +298,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @param string $name
 	 *
-	 * @return object
+	 * @return GlueDB_Database
 	 */
 	static protected function create($name) {
 		// Class name :

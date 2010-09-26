@@ -159,6 +159,15 @@ class GlueDB_Table {
 	public function get_column_formatter(GlueDB_Column $column) {
 		return $this->db()->get_formatter($column);
 	}
+	
+	/**
+	 * Returns the name of this virtual table.
+	 *
+	 * @return string
+	 */
+	public function name() {
+		return $this->name;
+	}	
 
 	/**
 	 * Returns the database object this virtual table is stored into.
@@ -222,7 +231,7 @@ class GlueDB_Table {
 	 *
 	 * @param string $name
 	 *
-	 * @return GlueDB_Column_Base
+	 * @return GlueDB_Column
 	 */
 	public function column($name) {
 		return $this->columns[$name];

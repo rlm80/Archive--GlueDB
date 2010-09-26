@@ -33,10 +33,10 @@ class GlueDB {
 	 *
 	 * @param string $table_name
 	 *
-	 * @return GlueDB_Table_Base
+	 * @return GlueDB_Table
 	 */
 	public static function table($table_name) {
-		return GlueDB_Table_Base::get($table_name);
+		return GlueDB_Table::get($table_name);
 	}
 
 	/**
