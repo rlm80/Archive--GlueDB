@@ -4,6 +4,7 @@ class Controller_GlueDB extends Controller {
 	public function action_test() {
 		echo ("<pre>");
 		$this->test_fragments();
+		$this->test_columns();
 	}
 
 	private function test_fragments() {
@@ -71,5 +72,10 @@ class Controller_GlueDB extends Controller {
 		}
 
 		return true;
+	}
+
+	private function test_columns() {
+		$j = gluedb::join('users', $u);
+		echo $u['login'];
 	}
 }

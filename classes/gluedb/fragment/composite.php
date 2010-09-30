@@ -28,6 +28,18 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	}
 
 	/**
+	 * Returns last fragment pushed, or null if there is no such fragment.
+	 *
+	 * @return GlueDB_Fragment
+	 */
+	protected function last() {
+		if ($count = count($this->children))
+			return $this->children[$count - 1];
+		else
+			return null;
+	}
+
+	/**
 	 * Removes the last child at the end of the children list.
 	 *
 	 * @return GlueDB_Fragment_Composite

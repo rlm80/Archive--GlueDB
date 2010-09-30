@@ -225,6 +225,18 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
+	 * Returns SQL string for column definition in a select list.
+	 *
+	 * @param unknown_type $defsql SQL of column definition.
+	 * @param unknown_type $aliassql SQL of alias.
+	 *
+	 * @return string
+	 */
+	protected function compile_column($defsql, $aliassql) {
+		return $defsql . ' AS ' .  $aliassql;
+	}
+
+	/**
 	 * Returns the appropriate formatter for given column.
 	 *
 	 * @param GlueDB_Column $column

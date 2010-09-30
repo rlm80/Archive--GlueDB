@@ -115,7 +115,8 @@ class GlueDB_Table {
 		$columns = array();
 		$info_table = $this->db()->table_info($this->dbtable);
 		foreach ($info_table['columns'] as $info_column) {
-			$columns[$alias] = new GlueDB_Column(
+			// Create column object :
+			$column = new GlueDB_Column(
 					$this,
 					$info_column['column'],
 					$info_column['type'],
@@ -126,6 +127,9 @@ class GlueDB_Table {
 					$info_column['default'],
 					$info_column['auto']
 				);
+
+			// Add columns :
+			$columns[$column->name()] = $column;
 		}
 		return $columns;
 	}
@@ -159,7 +163,7 @@ class GlueDB_Table {
 	public function get_column_formatter(GlueDB_Column $column) {
 		return $this->db()->get_formatter($column);
 	}
-	
+
 	/**
 	 * Returns the name of this virtual table.
 	 *
@@ -167,7 +171,7 @@ class GlueDB_Table {
 	 */
 	public function name() {
 		return $this->name;
-	}	
+	}
 
 	/**
 	 * Returns the database object this virtual table is stored into.
@@ -234,7 +238,20 @@ class GlueDB_Table {
 	 * @return GlueDB_Column
 	 */
 	public function column($name) {
+		if ( ! isset($this->columns[$name]))
+			throw new Kohana_Exception("There is no column " . $name . " in table " . $this->name . ".");
 		return $this->columns[$name];
+	}
+
+	/**
+	 * Whether or not the column is defined.
+	 *
+	 * @param string $name
+	 *
+	 * @return boolean
+	 */
+	public function column_exists($name) {
+		return isset($this->columns[$name]);
 	}
 
 	/**

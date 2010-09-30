@@ -80,10 +80,19 @@ class GlueDB_Column {
 		$this->dbscale		= $dbscale;
 		$this->dbdefault	= $dbdefault;
 		$this->dbauto		= $dbauto;
-		
+
 		// Get from table object (because there the method can be redefined) :
 		$this->formatter	= $table->get_column_formatter($this);
 		$this->name			= $table->get_column_alias($this);
+	}
+
+	/**
+	 * Returns column name.
+	 *
+	 * @return string
+	 */
+	public function name() {
+		return $this->name;
 	}
 
 	/**

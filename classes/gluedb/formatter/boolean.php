@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-abstract class GlueDB_Formatter_Boolean extends GlueDB_Formatter {
+class GlueDB_Formatter_Boolean extends GlueDB_Formatter {
 
 	/**
 	 * Formats data coming from the database into a format suitable for PHP.
