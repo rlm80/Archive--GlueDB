@@ -28,7 +28,7 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 	 * invalidates the fragment.
 	 *
 	 * @param mixed $value
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Value
 	 */
 	public function value($value = null) {
@@ -45,11 +45,11 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 	 * Compiles the data structure and returns the resulting SQL string. In this case, simply
 	 * returns the quoted value according to current database conventions.
 	 *
-	 * @param string $dbname	 
+	 * @param string $dbname
 	 *
 	 * @return string
 	 */
 	protected function compile($dbname) {
-		return gluedb::db($dbname)->quote_value($this->value);
+		return gluedb::db($dbname)->compile_value($this->value);
 	}
 }

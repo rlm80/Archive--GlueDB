@@ -118,7 +118,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	public function quote_identifier($identifier) {
+	public function compile_identifier($identifier) {
 		return '"' . $identifier . '"';
 	}
 
@@ -127,25 +127,25 @@ abstract class GlueDB_Database extends PDO {
 	 * Quotes a value for inclusion into an SQL query.
 	 *
 	 * Extends PDO::quote to deal with any PHP types (especially arrays), not just strings. Don't
-	 * redefine this, instead redefine one of its factor methods (quote_array, quote_integer, etc.).
+	 * redefine this, instead redefine one of its factor methods (compile_array, compile_integer, etc.).
 	 *
 	 * @param mixed $value
 	 *
 	 * @return string
 	 */
-	public function quote_value($value) {
+	public function compile_value($value) {
 		if (is_string($value))
-			return $this->quote_string($value);
+			return $this->compile_string($value);
 		elseif (is_array($value))
-			return $this->quote_array($value);
+			return $this->compile_array($value);
 		elseif (is_bool($value))
-			return $this->quote_bool($value);
+			return $this->compile_bool($value);
 		elseif (is_integer($value))
-			return $this->quote_integer($value);
+			return $this->compile_integer($value);
 		elseif (is_float($value))
-			return $this->quote_float($value);
+			return $this->compile_float($value);
 		elseif (is_null($value))
-			return $this->quote_null($value);
+			return $this->compile_null($value);
 		else
 			throw new Kohana_Exception("Cannot quote objects.");
 	}
@@ -157,7 +157,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function quote_string($value) {
+	protected function compile_string($value) {
 		return parent::quote($value);
 	}
 
@@ -168,14 +168,14 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function quote_array(array $value) {
+	protected function compile_array(array $value) {
 		// Empty arrays are not valid :
 		if (count($value) === 0)
 			throw new Kohana_Exception("Cannot quote empty array.");
 
 		// Recursion :
 		foreach ($value as $val)
-			$arr[] = $this->quote_value($val);
+			$arr[] = $this->compile_value($val);
 
 		return '(' . implode(',', $arr) . ')';
 	}
@@ -187,7 +187,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function quote_integer($value) {
+	protected function compile_integer($value) {
 		return (string) $value;
 	}
 
@@ -198,7 +198,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function quote_bool($value) {
+	protected function compile_bool($value) {
 		return $value ? 'TRUE' : 'FALSE';
 	}
 
@@ -209,7 +209,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function quote_float($value) {
+	protected function compile_float($value) {
 		return (string) $value;
 	}
 
@@ -220,20 +220,20 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function quote_null($value) {
+	protected function compile_null($value) {
 		return 'NULL';
 	}
 
 	/**
-	 * Returns SQL string for column definition in a select list.
+	 * Returns SQL string for something that needs an alias.
 	 *
-	 * @param unknown_type $defsql SQL of column definition.
-	 * @param unknown_type $aliassql SQL of alias.
+	 * @param string $sql SQL of the thing that needs an alias.
+	 * @param string $alias Alias.
 	 *
 	 * @return string
 	 */
-	protected function compile_column($defsql, $aliassql) {
-		return $defsql . ' AS ' .  $aliassql;
+	protected function compile_alias($sql, $alias) {
+		return $sql . ' AS ' . $this->compile_identifier($alias);
 	}
 
 	/**

@@ -1,31 +1,35 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that represents a column definition in a select list.
+ * Fragment that represents a column of a specific table - alias pair and compiles into
+ * a "<table_alias>.<column_name>" SQL string.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-abstract class GlueDB_Fragment_Column extends GlueDB_Fragment {
+class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	/**
-	 * @var string Column alias.
+	 * @var GlueDB_Fragment_Alias_Table Table fragment.
 	 */
-	protected $alias;
+	protected $table_alias;
 
 	/**
-	 * Returns column alias.
+	 * @var GlueDB_Column Column.
 	 */
-	abstract protected function alias();
+	protected $column;
 
 	/**
-	 * Alias setter.
+	 * Constructor.
 	 *
-	 * @param string $alias
+	 * @param GlueDB_Fragment_Alias_Table $table_name
+	 * @param GlueDB_Column $alias
 	 */
-	protected function set_alias($alias) {
-		$this->alias = $alias;
+	public function __construct(GlueDB_Fragment_Alias_Table $table_alias, GlueDB_Column $column) {
+		$this->table_alias = $table_alias;
+		$this->column = $column;
+		$table_alias->register_user($this);
 	}
 
 	/**
@@ -38,17 +42,8 @@ abstract class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	 */
 	protected function compile($dbname) {
 		$db			= gluedb::db($dbname);
-		$def_sql	= $this->compile_definition($dbname);
-		$alias_sql	= $db->quote_identifier($this->alias());
-		return $db->compile_column($def_sql, $alias_sql);
+		$tablesql	= $db->compile_identifier($this->table_alias->alias());
+		$columnsql	= $db->compile_identifier($this->column->dbcolumn());
+		return $tablesql . '.' . $columnsql;
 	}
-
-	/**
-	 * Returns column definition SQL.
-	 *
-	 * @param string $dbname
-	 *
-	 * @return string
-	 */
-	abstract function compile_definition($dbname);
 }

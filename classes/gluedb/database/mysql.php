@@ -224,7 +224,7 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 *
 	 * @return
 	 */
-	public function quote_identifier($identifier) {
+	public function compile_identifier($identifier) {
 		return '`' . $identifier . '`';
 	}
 }

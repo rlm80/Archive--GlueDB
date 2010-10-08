@@ -99,6 +99,20 @@ class GlueDB {
 	}
 
 	/**
+	 * Returns a new table fragment.
+	 *
+	 * @param string $table_name
+	 * @param string $alias Null means you let the system choose a unique alias. If you don't want an alias at all, pass an empty string.
+	 *
+	 * @return GlueDB_Fragment_Table
+	 */
+	public static function alias($table_name, $alias = null) {
+		if ( ! isset($alias))
+			$alias = GlueDB_Fragment_Alias_Table::create_alias($table_name);
+		return new GlueDB_Fragment_Alias_Table($table_name, $alias);
+	}
+
+	/**
 	 * Returns a new template fragment.
 	 *
 	 * @return GlueDB_Fragment_Template

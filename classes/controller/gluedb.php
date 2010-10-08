@@ -4,7 +4,7 @@ class Controller_GlueDB extends Controller {
 	public function action_test() {
 		echo ("<pre>");
 		$this->test_fragments();
-		$this->test_columns();
+		//$this->test_columns();
 	}
 
 	private function test_fragments() {
@@ -49,14 +49,22 @@ class Controller_GlueDB extends Controller {
 					gluedb::boolean("'test' = 'test' OR ( ? )", gluedb::boolean("1 = 0")),
 					"/'test' = 'test' OR \\( 1 = 0 \\)/"
 				),
-			'join - simple' => array(
-					gluedb::join("mytable")->left("yourtable")->on("1=1")->and("2=2")->or("3=3")->right("histable")->on("4=4"),
-					"/ `mytable` AS `mytable0`  LEFT OUTER JOIN `yourtable` AS `yourtable0` ON \\( 1=1 AND 2=2 OR 3=3 \\)  RIGHT OUTER JOIN `histable` AS `histable0` ON \\( 4=4 \\)/" // TODO
+			'table' => array(
+					$t = gluedb::alias('users', 'myalias'),
+					"/`users` AS `myalias`/"
 				),
-			'join - nested' => array(
-					gluedb::join(gluedb::join("mytable")->left("yourtable")->on("1=1"))->right("histable")->on("2=2"),
-					"/ \\(  `mytable` AS `mytable1`  LEFT OUTER JOIN `yourtable` AS `yourtable1` ON \\( 1=1 \\)  \\)  RIGHT OUTER JOIN `histable` AS `histable1` ON \\( 2=2 \\) /" // TODO
+			'column' => array(
+					$t->login,
+					"/`myalias`.`login`/"
 				),
+//			'join - simple' => array(
+//					gluedb::join("mytable")->left("yourtable")->on("1=1")->and("2=2")->or("3=3")->right("histable")->on("4=4"),
+//					"/ `mytable` AS `mytable0`  LEFT OUTER JOIN `yourtable` AS `yourtable0` ON \\( 1=1 AND 2=2 OR 3=3 \\)  RIGHT OUTER JOIN `histable` AS `histable0` ON \\( 4=4 \\)/" // TODO
+//				),
+//			'join - nested' => array(
+//					gluedb::join(gluedb::join("mytable")->left("yourtable")->on("1=1"))->right("histable")->on("2=2"),
+//					"/ \\(  `mytable` AS `mytable1`  LEFT OUTER JOIN `yourtable` AS `yourtable1` ON \\( 1=1 \\)  \\)  RIGHT OUTER JOIN `histable` AS `histable1` ON \\( 2=2 \\) /" // TODO
+//				),
 		);
 
 		// Checks :

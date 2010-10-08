@@ -3,6 +3,8 @@
 /**
  * Fragment that is made of an SQL template with placeholders and an array of replacement fragments.
  *
+ * TODO : renommer en GlueDB_Fragment_Expression ?
+ *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
