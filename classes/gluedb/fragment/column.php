@@ -31,6 +31,15 @@ class GlueDB_Fragment_Column extends GlueDB_Fragment {
 		$this->column = $column;
 		$table_alias->register_user($this);
 	}
+	
+	/**
+	 * Column getter.
+	 * 
+	 * @return GlueDB_Column
+	 */
+	public function column() {
+		return $this->column;
+	}	
 
 	/**
 	 * Compiles the data structure against given database and returns the

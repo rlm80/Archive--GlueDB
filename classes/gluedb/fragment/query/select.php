@@ -4,11 +4,11 @@
  * Select query data structure.
  *
  * @package GlueDB
- * @author Régis Lemaigre
+ * @author Rï¿½gis Lemaigre
  * @license MIT
  */
 
-class GlueDB_Query_Select extends GlueDB_Query {
+class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	/*
 	 * Executes current query and returns a result set.
 	 *

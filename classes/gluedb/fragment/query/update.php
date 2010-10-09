@@ -4,11 +4,11 @@
  * Update query data structure.
  *
  * @package GlueDB
- * @author Régis Lemaigre
+ * @author Rï¿½gis Lemaigre
  * @license MIT
  */
 
-class GlueDB_Query_Update extends GlueDB_Query {
+class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 	/*
 	 * Executes current query and returns the number of affected rows.
 	 *

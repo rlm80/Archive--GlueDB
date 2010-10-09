@@ -1,10 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that represents an item - alias pair in a select list.
- *
- * As far as the SQL generation is concerned, the item can be any fragment, but only
- * GlueDB_Fragment_Column will give you additional functionality like type casting of results.
+ * Fragment that represents a column - alias pair in a select list.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -13,20 +10,29 @@
 
 class GlueDB_Fragment_Alias_Column extends GlueDB_Fragment_Alias {
 	/**
-	 * @var string Item.
+	 * @var GlueDB_Fragment_Column Column.
 	 */
-	protected $item;
+	protected $column;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Fragment $item
+	 * @param GlueDB_Fragment_Column $column
 	 * @param string $alias
 	 */
-	public function __construct(GlueDB_Fragment $item, $alias) {
+	public function __construct(GlueDB_Fragment_Column $column, $alias) {
 		parent::__construct($alias);
-		$this->item	= $item;
-		$this->item->register_user($this);
+		$this->column = $column;
+		$this->column->register_user($this);
+	}
+	
+	/**
+	 * Column fragment getter.
+	 * 
+	 * @return GlueDB_Fragment_Column
+	 */
+	public function column() {
+		return $this->column;
 	}
 
 	/**
@@ -37,7 +43,6 @@ class GlueDB_Fragment_Alias_Column extends GlueDB_Fragment_Alias {
 	 * @return string
 	 */
 	protected function compile_definition($dbname) {
-		$db	= gluedb::db($dbname);
-		return $this->item->sql($dbname);
+		return $this->column->sql($dbname);
 	}
 }

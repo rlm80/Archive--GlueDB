@@ -3,7 +3,7 @@
 /**
  * Provides basic functionality for fragments that have children fragments and
  * that compile into an SQL string that is simply the concatenation of the SQL
- * strings of each child fragment.
+ * strings of each child fragment, separated with a connector.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -15,6 +15,11 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	 * @var array List of children fragments.
 	 */
 	protected $children = array();
+	
+	/**
+	 * @var string Connector.
+	 */
+	protected $connector = '';
 
 	/**
 	 * Adds a child at the end of the children list.
@@ -81,9 +86,9 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	 * @return string
 	 */
 	protected function compile($dbname) {
-		$sql = '';
+		$sql = array();
 		foreach ($this->children as $child)
-			$sql .= $child->sql($dbname);
-		return $sql;
+			$sql[] = $child->sql($dbname);
+		return implode($this->connector, $sql);
 	}
 }
