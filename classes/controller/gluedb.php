@@ -66,18 +66,18 @@ class Controller_GlueDB extends Controller {
 //					"/ \\(  `mytable` AS `mytable1`  LEFT OUTER JOIN `yourtable` AS `yourtable1` ON \\( 1=1 \\)  \\)  RIGHT OUTER JOIN `histable` AS `histable1` ON \\( 2=2 \\) /" // TODO
 //				),
 		);
-		
-		$select = new GlueDB_Fragment_Composite_Select(null);
+
+		$select = new GlueDB_Fragment_Composite_List_Select(null);
 		$select
 			->init($t->login)
-			->and($t->password)
-			->and($t->login)->as('mylogin')
-			->and($t->login)
-			->and('?', 'test')
-			->and('?', 'test');
+			->then($t->password)
+			->then($t->login)->as('mylogin')
+			->then($t->login)
+			->then('?', 'test')
+			->then('?', 'test');
 		$tests['select'] = array(
 			$select,
-			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, 'test' AS `computed`, 'test' AS `computed1`"	
+			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, 'test' AS `computed`, 'test' AS `computed1`"
 		);
 
 		// Checks :

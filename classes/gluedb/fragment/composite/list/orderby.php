@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite_Orderby extends GlueDB_Fragment_Composite_List {
+class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_List {
 	/**
 	 * @var Query that owns this order by clause.
 	 */
