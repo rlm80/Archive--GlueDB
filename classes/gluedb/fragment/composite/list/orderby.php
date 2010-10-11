@@ -10,26 +10,46 @@
 
 class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_List {
 	/**
-	 * @var Query that owns this order by clause.
+	 * Adds fragment of appropriate type.
+	 *
+	 * @param array $params
 	 */
-	protected $query;
+	protected function add($params) {
+		// Split params :
+		$first = array_shift($params);
 
-	/**
-	 * @param GlueDB_Query $query
-	 */
-	public function __construct(GlueDB_Query $query) {
-		$this->query = $query;
+		// Add fragment :
+		if ($first instanceof GlueDB_Fragment_Column)
+			$this->push(new GlueDB_Fragment_Ordered_Column($first));
+		else
+			$this->push(new GlueDB_Fragment_Ordered_Computed($first, $params));
 	}
 
 	/**
-	 * Forwards unknown calls to query.
+	 * Sets order ASC for the last element of the list.
 	 *
-	 * @param unknown_type $name
-	 * @param unknown_type $args
-	 *
-	 * @return mixed
+	 * @return GlueDB_Fragment_Composite_List_Orderby
 	 */
-	public function __call($name, $args) {
-		return call_user_func_array(array($this->query, $name), $args);
+	public function asc() {
+		if ($last = $this->last())
+			$last->set_asc(true);
+		else
+			throw new Kohana_Exception("No column to set an order to.");
+
+		return $this;
+	}
+
+	/**
+	 * Sets order DESC for the last element of the list.
+	 *
+	 * @return GlueDB_Fragment_Composite_List_Orderby
+	 */
+	public function desc() {
+		if ($last = $this->last())
+			$last->set_asc(false);
+		else
+			throw new Kohana_Exception("No column to set an order to.");
+
+		return $this;
 	}
 }

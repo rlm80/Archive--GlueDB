@@ -80,6 +80,17 @@ class Controller_GlueDB extends Controller {
 			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, 'test' AS `computed`, 'test' AS `computed1`"
 		);
 
+		$select = new GlueDB_Fragment_Composite_List_Orderby(null);
+		$select
+			->init($t->login)
+			->then($t->password)
+			->then($t->login)->asc()
+			->then('?', 'test')->desc();
+		$tests['select'] = array(
+			$select,
+			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, 'test' DESC"
+		);
+
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($f, $target) = $data;
