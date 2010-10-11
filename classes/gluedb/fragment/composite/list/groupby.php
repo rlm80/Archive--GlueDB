@@ -22,6 +22,22 @@ class GlueDB_Fragment_Composite_List_Groupby extends GlueDB_Fragment_Composite_L
 	}
 
 	/**
+	 * Adds fragment of appropriate type.
+	 *
+	 * @param array $params
+	 */
+	protected function add($params) {
+		// Split params :
+		$first = array_shift($params);
+
+		// Add fragment :
+		if ($first instanceof GlueDB_Fragment_Column)
+			$this->push($first);
+		else
+			$this->push(new GlueDB_Fragment_Template($first, $params));
+	}
+
+	/**
 	 * Forwards unknown calls to query.
 	 *
 	 * @param unknown_type $name

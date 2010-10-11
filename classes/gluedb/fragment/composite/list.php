@@ -10,21 +10,9 @@
 
 abstract class GlueDB_Fragment_Composite_List extends GlueDB_Fragment_Composite {
 	/**
-	 * @var Query that owns this list.
-	 */
-	protected $query;
-
-	/**
 	 * @var string Connector redefined.
 	 */
 	protected $connector = ', ';
-
-	/**
-	 * @param GlueDB_Fragment_Query $query
-	 */
-	public function __construct(GlueDB_Fragment_Query $query = null) {
-		$this->query = $query;
-	}
 
 	/**
 	 * Initializes the list with a first item.

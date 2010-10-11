@@ -10,6 +10,18 @@
 
 class GlueDB_Fragment_Composite_List_Select extends GlueDB_Fragment_Composite_List {
 	/**
+	 * @var Query that owns this list.
+	 */
+	protected $query;
+
+	/**
+	 * @param GlueDB_Fragment_Query $query
+	 */
+	public function __construct(GlueDB_Fragment_Query $query = null) {
+		$this->query = $query;
+	}
+
+	/**
 	 * Adds fragment of appropriate type.
 	 *
 	 * @param array $params
