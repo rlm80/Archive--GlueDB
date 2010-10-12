@@ -10,7 +10,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Alias_Table extends GlueDB_Fragment_Alias {
+class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	/**
 	 * @var array Alias pool.
 	 */

@@ -36,14 +36,14 @@ class GlueDB_Fragment_Composite_List_Select extends GlueDB_Fragment_Composite_Li
 			$alias = $this->compute_alias_column($first->column()->name());
 
 			// Push fragment :
-			$this->push(new GlueDB_Fragment_Alias_Column($first, $alias));
+			$this->push(new GlueDB_Fragment_Aliased_Column($first, $alias));
 		}
 		else {
 			// Compute default alias :
 			$alias = $this->compute_alias_computed();
 
 			// Push fragment :
-			$this->push(new GlueDB_Fragment_Alias_Computed($first, $params, $alias));
+			$this->push(new GlueDB_Fragment_Aliased_Computed($first, $params, $alias));
 		}
 	}
 
@@ -56,7 +56,7 @@ class GlueDB_Fragment_Composite_List_Select extends GlueDB_Fragment_Composite_Li
 		// Count number of computed columns so far :
 		$i = 0;
 		foreach ($this->children as $child)
-			if ($child instanceof GlueDB_Fragment_Alias_Computed)
+			if ($child instanceof GlueDB_Fragment_Aliased_Computed)
 				$i++;
 
 		// Compute alias :
@@ -75,7 +75,7 @@ class GlueDB_Fragment_Composite_List_Select extends GlueDB_Fragment_Composite_Li
 		// Count number of columns with such a name so far :
 		$i = 0;
 		foreach ($this->children as $child)
-			if ($child instanceof GlueDB_Fragment_Alias_Column)
+			if ($child instanceof GlueDB_Fragment_Aliased_Column)
 				if ($child->column()->column()->name() === $column_name)
 					$i++;
 

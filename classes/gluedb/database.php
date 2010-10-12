@@ -252,6 +252,24 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
+	 * Assembles components of a join operand into an SQL string.
+	 *
+	 * @param string $operandsql SQL of the operand.
+	 * @param string $onsql SQL of the on clause.
+	 * @param integer $operator Operator.
+	 *
+	 * @return string
+	 */
+	protected function compile_joinop($operandsql, $onsql, $operator) {
+		switch ($operator) {
+			case GlueDB_Fragment_Joinop::INNER_JOIN :		$sql = 'INNER JOIN';		break;
+			case GlueDB_Fragment_Joinop::RIGHT_OUTER_JOIN :	$sql = 'RIGHT OUTER JOIN';	break;
+			case GlueDB_Fragment_Joinop::LEFT_OUTER_JOIN :	$sql = 'LEFT OUTER JOIN';	break;
+		}
+		return $sql . ' ' . $operandsql . ' ON (' . $onsql . ')';
+	}
+
+	/**
 	 * Returns the appropriate formatter for given column.
 	 *
 	 * @param GlueDB_Column $column

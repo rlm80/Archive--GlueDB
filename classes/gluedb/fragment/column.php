@@ -11,7 +11,7 @@
 
 class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	/**
-	 * @var GlueDB_Fragment_Alias_Table Table fragment.
+	 * @var GlueDB_Fragment_Aliased_Table Table fragment.
 	 */
 	protected $table_alias;
 
@@ -23,23 +23,23 @@ class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Fragment_Alias_Table $table_name
+	 * @param GlueDB_Fragment_Aliased_Table $table_name
 	 * @param GlueDB_Column $alias
 	 */
-	public function __construct(GlueDB_Fragment_Alias_Table $table_alias, GlueDB_Column $column) {
+	public function __construct(GlueDB_Fragment_Aliased_Table $table_alias, GlueDB_Column $column) {
 		$this->table_alias = $table_alias;
 		$this->column = $column;
 		$table_alias->register_user($this);
 	}
-	
+
 	/**
 	 * Column getter.
-	 * 
+	 *
 	 * @return GlueDB_Column
 	 */
 	public function column() {
 		return $this->column;
-	}	
+	}
 
 	/**
 	 * Compiles the data structure against given database and returns the

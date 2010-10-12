@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Alias_Column extends GlueDB_Fragment_Alias {
+class GlueDB_Fragment_Aliased_Column extends GlueDB_Fragment_Aliased {
 	/**
 	 * @var GlueDB_Fragment_Column Column.
 	 */
@@ -25,10 +25,10 @@ class GlueDB_Fragment_Alias_Column extends GlueDB_Fragment_Alias {
 		$this->column = $column;
 		$this->column->register_user($this);
 	}
-	
+
 	/**
 	 * Column fragment getter.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Column
 	 */
 	public function column() {

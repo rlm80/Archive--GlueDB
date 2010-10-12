@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-abstract class GlueDB_Fragment_Alias extends GlueDB_Fragment {
+abstract class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	/**
 	 * @var string.
 	 */
