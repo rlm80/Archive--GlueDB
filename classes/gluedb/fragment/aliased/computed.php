@@ -28,6 +28,15 @@ class GlueDB_Fragment_Aliased_Computed extends GlueDB_Fragment_Aliased {
 	}
 
 	/**
+	 * Generates unique alias.
+	 *
+	 * @return string
+	 */
+	protected function create_alias() {
+		throw new Kohana_Exception("Should never happen !!! We always set a default alias for this.");
+	}
+
+	/**
 	 * Returns SQL string for everything that must come before the "AS".
 	 *
 	 * @param string $dbname

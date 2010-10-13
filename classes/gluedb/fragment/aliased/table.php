@@ -32,19 +32,18 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	 * @param string $table_name
 	 * @param string $alias
 	 */
-	public function __construct($table_name, $alias) {
+	public function __construct($table_name, $alias = null) {
+		parent::__construct($alias);
 		$this->table = gluedb::table($table_name);
-		$this->alias = $alias;
 	}
 
 	/**
-	 * Generates unique alias for given table.
-	 *
-	 * @param string $table_name
+	 * Generates unique alias.
 	 *
 	 * @return string
 	 */
-	static public function create_alias($table_name) {
+	protected function create_alias() {
+		$table_name = $this->table->name();
 		if ( ! isset(self::$aliases[$table_name]))
 			self::$aliases[$table_name] = 0;
 		else

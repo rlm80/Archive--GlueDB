@@ -10,11 +10,6 @@
 
 class GlueDB_Fragment_Joinop_Simple extends GlueDB_Fragment_Joinop {
 	/**
-	 * @var GlueDB_Fragment_Aliased_Table Table - alias pair.
-	 */
-	protected $operand;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param GlueDB_Fragment_Aliased_Table $operand
@@ -26,15 +21,6 @@ class GlueDB_Fragment_Joinop_Simple extends GlueDB_Fragment_Joinop {
 	}
 
 	/**
-	 * Operand getter.
-	 *
-	 * @return GlueDB_Fragment_Aliased_Table
-	 */
-	public function operand() {
-		return $this->operand;
-	}
-
-	/**
 	 * Returns SQL string for everything that must come before the operator and the "ON".
 	 *
 	 * @param string $dbname
@@ -42,6 +28,6 @@ class GlueDB_Fragment_Joinop_Simple extends GlueDB_Fragment_Joinop {
 	 * @return string
 	 */
 	protected function compile_operand($dbname) {
-		return $operand->sql($dbname);
+		return $this->operand->sql($dbname);
 	}
 }

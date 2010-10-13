@@ -107,9 +107,7 @@ class GlueDB {
 	 * @return GlueDB_Fragment_Table
 	 */
 	public static function alias($table_name, $alias = null) {
-		if ( ! isset($alias))
-			$alias = GlueDB_Fragment_Alias_Table::create_alias($table_name);
-		return new GlueDB_Fragment_Alias_Table($table_name, $alias);
+		return new GlueDB_Fragment_Aliased_Table($table_name, $alias);
 	}
 
 	/**

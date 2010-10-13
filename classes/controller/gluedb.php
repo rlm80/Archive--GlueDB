@@ -91,6 +91,18 @@ class Controller_GlueDB extends Controller {
 			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, 'test' DESC"
 		);
 
+		$join = new GlueDB_Fragment_Composite_Join();
+		$join
+			->init('mytable')->as('t1')
+			->left('yourtable')->as('t2')->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
+			->right('histable')->as('t3')->on('1=1');
+		$tests['join simple'] = array(
+			$join,
+			"`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2' OR 2=2 AND 3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)"
+		);
+
+		// TODO join nested & join table alias
+
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($f, $target) = $data;

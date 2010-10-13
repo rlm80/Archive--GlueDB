@@ -25,6 +25,11 @@ abstract class GlueDB_Fragment_Joinop extends GlueDB_Fragment {
 	protected $operator;
 
 	/**
+	 * @var GlueDB_Fragment Operand.
+	 */
+	protected $operand;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param integer $operator Null means first operand of join expression => no on clause.
@@ -38,10 +43,19 @@ abstract class GlueDB_Fragment_Joinop extends GlueDB_Fragment {
 	}
 
 	/**
+	 * Operand getter.
+	 *
+	 * @return GlueDB_Fragment
+	 */
+	public function operand() {
+		return $this->operand;
+	}
+
+	/**
 	 * Forwards call to on clause.
 	 */
 	public function init() {
-		if (isset($operator)) {
+		if (isset($this->operator)) {
 			$args = func_get_args();
 			call_user_func_array(array($this->on, 'init'), $args);
 		}
@@ -53,7 +67,7 @@ abstract class GlueDB_Fragment_Joinop extends GlueDB_Fragment {
 	 * Forwards call to on clause.
 	 */
 	public function _or() {
-		if (isset($operator)) {
+		if (isset($this->operator)) {
 			$args = func_get_args();
 			call_user_func_array(array($this->on, '_or'), $args);
 		}
@@ -65,7 +79,7 @@ abstract class GlueDB_Fragment_Joinop extends GlueDB_Fragment {
 	 * Forwards call to on clause.
 	 */
 	public function _and() {
-		if (isset($operator)) {
+		if (isset($this->operator)) {
 			$args = func_get_args();
 			call_user_func_array(array($this->on, '_and'), $args);
 		}
@@ -84,7 +98,7 @@ abstract class GlueDB_Fragment_Joinop extends GlueDB_Fragment {
 	protected function compile($dbname) {
 		$db			= gluedb::db($dbname);
 		$operandsql	= $this->compile_operand($dbname);
-		if (isset($operator)) {
+		if (isset($this->operator)) {
 			$onsql = $this->on->sql($dbname);
 			return $db->compile_joinop($operandsql, $onsql, $this->operator);
 		}

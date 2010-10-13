@@ -27,6 +27,15 @@ class GlueDB_Fragment_Aliased_Column extends GlueDB_Fragment_Aliased {
 	}
 
 	/**
+	 * Generates unique alias.
+	 *
+	 * @return string
+	 */
+	protected function create_alias() {
+		throw new Kohana_Exception("Should never happen !!! We always set a default alias for this.");
+	}
+
+	/**
 	 * Column fragment getter.
 	 *
 	 * @return GlueDB_Fragment_Column
