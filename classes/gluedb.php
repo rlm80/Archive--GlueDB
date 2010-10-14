@@ -124,10 +124,10 @@ class GlueDB {
 	/**
 	 * Returns a new boolean fragment.
 	 *
-	 * @return GlueDB_Fragment_Composite_Boolean
+	 * @return GlueDB_Fragment_Composite_Bool
 	 */
-	public static function boolean() {
-		$f = new GlueDB_Fragment_Composite_Boolean();
+	public static function bool() {
+		$f = new GlueDB_Fragment_Composite_Bool();
 		if (func_num_args() > 0) {
 			$args = func_get_args();
 			call_user_func_array(array($f, 'init'), $args);
@@ -138,11 +138,14 @@ class GlueDB {
 	/**
 	 * Returns a new join fragment.
 	 *
+	 * @param string $table_name
+	 * @param string $alias
+	 *
 	 * @return GlueDB_Fragment_Composite_Join
 	 */
-	public static function join($table, &$helper = null) {
+	public static function join($table_name, &$alias = null) {
 		$f = new GlueDB_Fragment_Composite_Join();
-		$f->init($table, $helper);
+		$f->init($table_name, $alias);
 		return $f;
 	}
 }

@@ -8,47 +8,28 @@
  * @license    MIT
  */
 
-abstract class GlueDB_Fragment_Joinop extends GlueDB_Fragment {
+class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	// Join operators :
 	const LEFT_OUTER_JOIN	= 0;
 	const RIGHT_OUTER_JOIN	= 1;
 	const INNER_JOIN		= 2;
 
 	/**
-	 * @var GlueDB_Fragment_Composite_Boolean On clause.
+	 * @var GlueDB_Fragment_Composite_Bool On clause.
 	 */
 	protected $on;
-
-	/**
-	 * @var integer Join operator.
-	 */
-	protected $operator;
-
-	/**
-	 * @var GlueDB_Fragment Operand.
-	 */
-	protected $operand;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param integer $operator Null means first operand of join expression => no on clause.
 	 */
-	public function __construct($operator = null) {
+	public function __construct(GlueDB_Fragment $operand, $operator = null) {
+		parent::__construct($operand, $operator);
 		if (isset($operator)) {
-			$this->operator = $operator;
-			$this->on		= new GlueDB_Fragment_Composite_Boolean();
+			$this->on = new GlueDB_Fragment_Composite_Bool();
 			$this->on->register_user($this);
 		}
-	}
-
-	/**
-	 * Operand getter.
-	 *
-	 * @return GlueDB_Fragment
-	 */
-	public function operand() {
-		return $this->operand;
 	}
 
 	/**
@@ -97,21 +78,8 @@ abstract class GlueDB_Fragment_Joinop extends GlueDB_Fragment {
 	 */
 	protected function compile($dbname) {
 		$db			= gluedb::db($dbname);
-		$operandsql	= $this->compile_operand($dbname);
-		if (isset($this->operator)) {
-			$onsql = $this->on->sql($dbname);
-			return $db->compile_joinop($operandsql, $onsql, $this->operator);
-		}
-		else
-			return $operandsql;
+		$operandsql	= $this->operand->sql($dbname);
+		$onsql		= isset($this->on) ? $this->on->sql($dbname) : '';
+		return $db->compile_operand_join($this->operator, $operandsql, $onsql);
 	}
-
-	/**
-	 * Returns SQL string for everything that must come before the operator and the "ON".
-	 *
-	 * @param string $dbname
-	 *
-	 * @return string
-	 */
-	abstract protected function compile_operand($dbname);
 }

@@ -42,12 +42,12 @@ class Controller_GlueDB extends Controller {
 					"'test\'test' test 10 template"
 				),
 			'boolean - simple' => array(
-					gluedb::boolean("'test' = ?", "qsdf")->or("'test' IN ?", array('azer', 'qsdf')),
-					"'test' = 'qsdf' OR 'test' IN ('azer','qsdf')"
+					gluedb::bool("'test' = ?", "qsdf")->or("'test' IN ?", array('azer', 'qsdf')),
+					"('test' = 'qsdf') OR ('test' IN ('azer','qsdf'))"
 				),
 			'boolean - nested' => array(
-					gluedb::boolean("'test' = 'test' OR ( ? )", gluedb::boolean("1 = 0")),
-					"'test' = 'test' OR ( 1 = 0 )"
+					gluedb::bool(gluedb::bool("1=1")->or("2=2"))->and("3=3"),
+					"((1=1) OR (2=2)) AND (3=3)"
 				),
 			'table' => array(
 					$t = gluedb::alias('users', 'myalias'),
@@ -57,14 +57,6 @@ class Controller_GlueDB extends Controller {
 					$t->login,
 					"`myalias`.`login`"
 				),
-//			'join - simple' => array(
-//					gluedb::join("mytable")->left("yourtable")->on("1=1")->and("2=2")->or("3=3")->right("histable")->on("4=4"),
-//					"/ `mytable` AS `mytable0`  LEFT OUTER JOIN `yourtable` AS `yourtable0` ON \\( 1=1 AND 2=2 OR 3=3 \\)  RIGHT OUTER JOIN `histable` AS `histable0` ON \\( 4=4 \\)/" // TODO
-//				),
-//			'join - nested' => array(
-//					gluedb::join(gluedb::join("mytable")->left("yourtable")->on("1=1"))->right("histable")->on("2=2"),
-//					"/ \\(  `mytable` AS `mytable1`  LEFT OUTER JOIN `yourtable` AS `yourtable1` ON \\( 1=1 \\)  \\)  RIGHT OUTER JOIN `histable` AS `histable1` ON \\( 2=2 \\) /" // TODO
-//				),
 		);
 
 		$select = new GlueDB_Fragment_Composite_List_Select(null);
@@ -91,17 +83,28 @@ class Controller_GlueDB extends Controller {
 			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, 'test' DESC"
 		);
 
-		$join = new GlueDB_Fragment_Composite_Join();
-		$join
-			->init('mytable')->as('t1')
-			->left('yourtable')->as('t2')->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
-			->right('histable')->as('t3')->on('1=1');
+		$join = gluedb::join('mytable')->as('t1')
+					->left('yourtable')->as('t2')->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
+					->right('histable')->as('t3')->on('1=1');
 		$tests['join simple'] = array(
 			$join,
-			"`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2' OR 2=2 AND 3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)"
+			"(`mytable` AS `t1`) LEFT OUTER JOIN (`yourtable` AS `t2`) ON (('test1'='test2') OR (2=2) AND (3=3)) RIGHT OUTER JOIN (`histable` AS `t3`) ON ((1=1))"
 		);
 
-		// TODO join nested & join table alias
+		$join2 = gluedb::join('mytable')->as('t3')
+					->left($join)->on('5=5');
+		$tests['join nested'] = array(
+			$join2,
+			"(`mytable` AS `t3`) LEFT OUTER JOIN ((`mytable` AS `t1`) LEFT OUTER JOIN (`yourtable` AS `t2`) ON (('test1'='test2') OR (2=2) AND (3=3)) RIGHT OUTER JOIN (`histable` AS `t3`) ON ((1=1))) ON ((5=5))"
+		);
+
+		$alias = gluedb::alias('mytable','myalias');
+		$join3 = gluedb::join('mytable')->as('t3')
+					->left($alias)->on('1=1');
+		$tests['join alias'] = array(
+			$join3,
+			"(`mytable` AS `t3`) LEFT OUTER JOIN (`mytable` AS `myalias`) ON ((1=1))"
+		);
 
 		// Checks :
 		foreach($tests as $type => $data) {

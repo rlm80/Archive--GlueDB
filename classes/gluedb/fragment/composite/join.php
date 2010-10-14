@@ -24,7 +24,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 */
 	public function init($operand, &$alias = null) {
 		$this->reset();
-		$this->join($operand, null, $alias);
+		$this->add($operand, null, $alias);
 		return $this;
 	}
 
@@ -37,7 +37,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * @return GlueDB_Fragment_Composite_Join
 	 */
 	public function inner($operand, &$alias = null) {
-		$this->join($operand, GlueDB_Fragment_Joinop::INNER_JOIN, $alias);
+		$this->add($operand, GlueDB_Fragment_Operand_Join::INNER_JOIN, $alias);
 		return $this;
 	}
 
@@ -50,7 +50,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * @return GlueDB_Fragment_Composite_Join
 	 */
 	public function left($operand, &$alias = null) {
-		$this->join($operand, GlueDB_Fragment_Joinop::LEFT_OUTER_JOIN, $alias);
+		$this->add($operand, GlueDB_Fragment_Operand_Join::LEFT_OUTER_JOIN, $alias);
 		return $this;
 	}
 
@@ -63,31 +63,28 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * @return GlueDB_Fragment_Composite_Join
 	 */
 	public function right($operand, &$alias = null) {
-		$this->join($operand, GlueDB_Fragment_Joinop::RIGHT_OUTER_JOIN, $alias);
+		$this->add($operand, GlueDB_Fragment_Operand_Join::RIGHT_OUTER_JOIN, $alias);
 		return $this;
 	}
 
 	/**
 	 * Adds an operand to the expression.
 	 *
-	 * @param mixed $operand Table name, aliased table fragment or join fragment.
+	 * @param GlueDB_Fragment $operand Table name, aliased table fragment or join fragment.
 	 * @param integer $operator Operator.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 */
-	protected function join($operand, $operator, &$alias) {
-		// Operand is a table name ? Turn it into an aliased table fragment and set alias :
-		if (is_string($operand)) {
-			$operand	= new GlueDB_Fragment_Aliased_Table($operand);
-			$alias		= $operand;
-		}
+	protected function add($operand, $operator, &$alias) {
+		// Operand is a table name ? Turn it into an aliased table fragment :
+		if (is_string($operand))
+			$operand = new GlueDB_Fragment_Aliased_Table($operand);
+
+		// Assign operand to $alias parameter :
+		if ($operand instanceof GlueDB_Fragment_Aliased_Table)
+			$alias = $operand;
 
 		// Add operand :
-		if ($operand instanceof GlueDB_Fragment_Aliased_Table)
-			$this->push(new GlueDB_Fragment_Joinop_Simple($operand, $operator));
-		elseif ($operand instanceof GlueDB_Fragment_Composite_Join)
-			$this->push(new GlueDB_Fragment_Joinop_Nested($operand, $operator));
-		else
-			throw new Kohana_Exception("Given join operand is neither GlueDB_Fragment_Aliased_Table nor GlueDB_Fragment_Composite_Join.");
+		$this->push(new GlueDB_Fragment_Operand_Join($operand, $operator));
 	}
 
 	/**
@@ -97,7 +94,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 */
 	public function _as($alias) {
 		$last = $this->last();
-		if (isset($last) && $last instanceof GlueDB_Fragment_Joinop_Simple)
+		if (isset($last) && $last instanceof GlueDB_Fragment_Operand_Join)
 			$last->operand()->set_alias($alias);
 		else
 			throw new Kohana_Exception("Cannot set alias to a nested join.");

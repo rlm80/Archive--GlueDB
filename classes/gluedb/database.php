@@ -254,19 +254,44 @@ abstract class GlueDB_Database extends PDO {
 	/**
 	 * Assembles components of a join operand into an SQL string.
 	 *
+	 * @param integer $operator Operator.
 	 * @param string $operandsql SQL of the operand.
 	 * @param string $onsql SQL of the on clause.
-	 * @param integer $operator Operator.
 	 *
 	 * @return string
 	 */
-	protected function compile_joinop($operandsql, $onsql, $operator) {
-		switch ($operator) {
-			case GlueDB_Fragment_Joinop::INNER_JOIN :		$sql = 'INNER JOIN';		break;
-			case GlueDB_Fragment_Joinop::RIGHT_OUTER_JOIN :	$sql = 'RIGHT OUTER JOIN';	break;
-			case GlueDB_Fragment_Joinop::LEFT_OUTER_JOIN :	$sql = 'LEFT OUTER JOIN';	break;
+	protected function compile_operand_join($operator, $operandsql, $onsql) {
+		$sql = '';
+		if (isset($operator)) {
+			switch ($operator) {
+				case GlueDB_Fragment_Operand_Join::INNER_JOIN :			$sql .= 'INNER JOIN ';			break;
+				case GlueDB_Fragment_Operand_Join::RIGHT_OUTER_JOIN :	$sql .= 'RIGHT OUTER JOIN ';	break;
+				case GlueDB_Fragment_Operand_Join::LEFT_OUTER_JOIN :	$sql .= 'LEFT OUTER JOIN ';		break;
+			}
 		}
-		return $sql . ' ' . $operandsql . ' ON (' . $onsql . ')';
+		$sql .= '(' . $operandsql . ')';
+		if (isset($operator)) $sql .= ' ON (' . $onsql . ')';
+		return $sql;
+	}
+
+	/**
+	 * Assembles components of a boolean operand into an SQL string.
+	 *
+	 * @param integer $operator Operator.
+	 * @param string $operandsql SQL of the operand.
+	 *
+	 * @return string
+	 */
+	protected function compile_operand_bool($operator, $operandsql) {
+		$sql = '';
+		if (isset($operator)) {
+			switch ($operator) {
+				case GlueDB_Fragment_Operand_Bool::_AND :	$sql = 'AND ';	break;
+				case GlueDB_Fragment_Operand_Bool::_OR :	$sql = 'OR ';	break;
+			}
+		}
+		$sql .= '(' . $operandsql . ')';
+		return $sql;
 	}
 
 	/**
