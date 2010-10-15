@@ -10,8 +10,10 @@
 
 class GlueDB_Fragment_Operand_Bool extends GlueDB_Fragment_Operand {
 	// Boolean operators :
-	const _AND	= 0;
-	const _OR	= 1;
+	const _AND		= 0;
+	const _OR		= 1;
+	const ANDNOT	= 2;
+	const ORNOT		= 3;
 
 	/**
 	 * Compiles the data structure against given database and returns the

@@ -43,48 +43,56 @@ class GlueDB {
 	 * Returns a select query object.
 	 *
 	 * @param string $table_name Name of the main table you're selecting from (= first table in the from clause).
-	 * @param $helper Table helper.
+	 * @param $alias Table alias.
 	 *
-	 * @return GlueDB_Query_Select
+	 * @return GlueDB_Fragment_Query_Select
 	 */
-	public static function select($table_name, &$helper = null) {
-		return new GlueDB_Query_Select(self::table($table_name), $helper);
+	public static function select($table_name, &$alias = null) {
+		$query = new GlueDB_Fragment_Query_Select();
+		$query->from($table_name, $alias);
+		return $query->from();
 	}
 
 	/**
 	 * Returns an update query object.
 	 *
 	 * @param string $table_name Name of the main table you're updating (= first table in the update clause).
-	 * @param $helper Table helper.
+	 * @param $alias Table alias.
 	 *
-	 * @return GlueDB_Query_Update
+	 * @return GlueDB_Fragment_Query_Update
 	 */
-	public static function update($table_name, &$helper = null) {
-		return new GlueDB_Query_Update(self::table($table_name), $helper);
+	public static function update($table_name, &$alias = null) {
+		$query = new GlueDB_Fragment_Query_Update();
+		$query->from($table_name, $alias);
+		return $query->from();
 	}
 
 	/**
 	 * Returns a delete query object.
 	 *
 	 * @param string $table_name Name of the main table you're deleting from (= first table in the from clause).
-	 * @param $helper Table helper.
+	 * @param $alias Table alias.
 	 *
-	 * @return GlueDB_Query_Delete
+	 * @return GlueDB_Fragment_Query_Delete
 	 */
-	public static function delete($table_name, &$helper = null) {
-		return new GlueDB_Query_Delete(self::table($table_name), $helper);
+	public static function delete($table_name, &$alias = null) {
+		$query = new GlueDB_Fragment_Query_Delete();
+		$query->from($table_name, $alias);
+		return $query->from();
 	}
 
 	/**
 	 * Returns a insert query object.
 	 *
 	 * @param string $table_name Name of the table you're inserting data into.
-	 * @param $helper Table helper.
+	 * @param $alias Table alias.
 	 *
-	 * @return GlueDB_Query_Insert
+	 * @return GlueDB_Fragment_Query_Insert
 	 */
-	public static function insert($table_name, &$helper = null) {
-		return new GlueDB_Query_Insert(self::table($table_name), $helper);
+	public static function insert($table_name, &$alias = null) {
+		$query = new GlueDB_Fragment_Query_Insert();
+		$query->from($table_name, $alias);
+		return $query->from();
 	}
 
 	/**

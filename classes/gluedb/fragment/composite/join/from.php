@@ -10,14 +10,14 @@
 
 class GlueDB_Fragment_Composite_Join_From extends GlueDB_Fragment_Composite_Join {
 	/**
-	 * @var Query that owns this from clause.
+	 * @var GlueDB_Fragment_Query Query that owns this from clause.
 	 */
 	protected $query;
 
 	/**
-	 * @param GlueDB_Query $query
+	 * @param GlueDB_Fragment_Query $query
 	 */
-	public function __construct(GlueDB_Query $query) {
+	public function __construct(GlueDB_Fragment_Query $query) {
 		$this->query = $query;
 	}
 

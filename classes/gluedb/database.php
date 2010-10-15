@@ -232,7 +232,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_alias($sql, $alias) {
+	public function compile_alias($sql, $alias) {
 		return $sql . ' AS ' . $this->compile_identifier($alias);
 	}
 
@@ -244,7 +244,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_ordered($sql, $asc) {
+	public function compile_ordered($sql, $asc) {
 		if ( ! isset($asc))
 			return $sql;
 		else
@@ -260,7 +260,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_operand_join($operator, $operandsql, $onsql) {
+	public function compile_operand_join($operator, $operandsql, $onsql) {
 		$sql = '';
 		if (isset($operator)) {
 			switch ($operator) {
@@ -282,15 +282,42 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_operand_bool($operator, $operandsql) {
+	public function compile_operand_bool($operator, $operandsql) {
 		$sql = '';
 		if (isset($operator)) {
 			switch ($operator) {
-				case GlueDB_Fragment_Operand_Bool::_AND :	$sql = 'AND ';	break;
-				case GlueDB_Fragment_Operand_Bool::_OR :	$sql = 'OR ';	break;
+				case GlueDB_Fragment_Operand_Bool::_AND :	$sql = 'AND ';		break;
+				case GlueDB_Fragment_Operand_Bool::_OR :	$sql = 'OR ';		break;
+				case GlueDB_Fragment_Operand_Bool::ANDNOT :	$sql = 'AND NOT ';	break;
+				case GlueDB_Fragment_Operand_Bool::ORNOT :	$sql = 'OR NOT ';	break;
 			}
 		}
 		$sql .= '(' . $operandsql . ')';
+		return $sql;
+	}
+
+	/**
+	 * Assembles components of a select query into an SQL string.
+	 *
+	 * @param string $selectsql
+	 * @param string $fromsql
+	 * @param string $wheresql
+	 * @param string $groupbysql
+	 * @param string $havingsql
+	 * @param string $orderbysql
+	 *
+	 * @return string
+	 */
+	public function compile_query_select($selectsql, $fromsql, $wheresql, $groupbysql, $havingsql, $orderbysql) {
+		// Mandatory :
+		$sql = 'SELECT ' . (isset($selectsql) ? $selectsql : '*') . ' FROM ' . $fromsql;
+		
+		// Optional :
+		if (isset($wheresql))	$sql .= ' WHERE '		. $wheresql;
+		if (isset($groupbysql))	$sql .= ' GROUP BY '	. $groupbysql;
+		if (isset($havingsql))	$sql .= ' HAVING '		. $havingsql;
+		if (isset($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
+		
 		return $sql;
 	}
 

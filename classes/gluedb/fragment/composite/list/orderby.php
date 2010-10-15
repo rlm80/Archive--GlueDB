@@ -10,7 +10,7 @@
 
 class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_List {
 	/**
-	 * @var Query that owns this list.
+	 * @var GlueDB_Fragment_Query Query that owns this list.
 	 */
 	protected $query;
 

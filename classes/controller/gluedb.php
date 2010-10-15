@@ -105,6 +105,12 @@ class Controller_GlueDB extends Controller {
 			$join3,
 			"(`mytable` AS `t3`) LEFT OUTER JOIN (`mytable` AS `myalias`) ON ((1=1))"
 		);
+		
+		$select1 = gluedb::select('mytable')->as('test')->where("1=1")->and("2=2")->query();
+		$tests['query select'] = array(
+			$select1,
+			"SELECT * FROM (`mytable` AS `test`) WHERE (1=1) AND (2=2)"
+		);
 
 		// Checks :
 		foreach($tests as $type => $data) {

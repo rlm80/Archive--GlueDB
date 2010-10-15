@@ -49,6 +49,30 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 		$this->add($args, GlueDB_Fragment_Operand_Bool::_AND);
 		return $this;
 	}
+	
+	/**
+	 * Adds a boolean operand at the end of the expression, connecting it with
+	 * the OR NOT operator.
+	 *
+	 * @return GlueDB_Fragment_Composite_Bool
+	 */
+	public function ornot() {
+		$args = func_get_args();
+		$this->add($args, GlueDB_Fragment_Operand_Bool::_ORNOT);
+		return $this;
+	}
+
+	/**
+	 * Adds a boolean operand at the end of the expression, connecting it with
+	 * the AND NOT operator.
+	 *
+	 * @return GlueDB_Fragment_Composite_Bool
+	 */
+	public function andnot() {
+		$args = func_get_args();
+		$this->add($args, GlueDB_Fragment_Operand_Bool::_ANDNOT);
+		return $this;
+	}	
 
 	/**
 	 * Adds an operand to the expression.

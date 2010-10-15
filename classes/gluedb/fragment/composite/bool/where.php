@@ -10,14 +10,14 @@
 
 class GlueDB_Fragment_Composite_Bool_Where extends GlueDB_Fragment_Composite_Bool {
 	/**
-	 * @var Query that owns this where clause.
+	 * @var GlueDB_Fragment_Query Query that owns this where clause.
 	 */
 	protected $query;
 
 	/**
-	 * @param GlueDB_Query $query
+	 * @param GlueDB_Fragment_Query $query
 	 */
-	public function __construct(GlueDB_Query $query) {
+	public function __construct(GlueDB_Fragment_Query $query) {
 		$this->query = $query;
 	}
 

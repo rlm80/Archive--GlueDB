@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Base class for query objects.
+ * Base fragement class for queries.
  *
  * @package GlueDB
  * @author Régis Lemaigre
@@ -30,7 +30,20 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 *
 	 * @return GlueDB_Database
 	 */
-	abstract public function find_db();
+	abstract protected function find_db();
+	
+	
+	/**
+	 * Return current object. Useful to get the query from on of the children builders :
+	 * 
+	 * $sql = gluedb::select('mytable')->where('1=1')->sql(); // Doesn't work ! Returns only the SQL of the last builder accessed : the where clause.
+	 * $sql = gluedb::select('mytable')->where('1=1')->query()->sql(); // Works. Returns the SQL of the whole query.
+	 * 
+	 * @return GlueDB_Fragment_Query
+	 */
+	public function query() {
+		return $this;
+	}
 
 	/*
 	 * Compiles this query into an SQL string and asks PDO to prepare it for execution. Returns
@@ -41,16 +54,9 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 * @see PDO::prepare()
 	 */
 	public function prepare($driver_options = null) {
-		return $this->db()->prepare($this->sql(), $driver_options);
-	}
-
-	/**
-	 * Returns the query to which the current fragment belongs.
-	 *
-	 * @return GlueDB_Query
-	 */
-	protected function query() {
-		return $this;
+		$dbname	= $this->db()->name();
+		$sql	= $this->sql($dbname);
+		return $this->db()->prepare($sql, $driver_options);
 	}
 
 	/*
