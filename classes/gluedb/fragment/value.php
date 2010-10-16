@@ -42,14 +42,13 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Compiles the data structure and returns the resulting SQL string. In this case, simply
-	 * returns the quoted value according to current database conventions.
+	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
-		return gluedb::db($dbname)->compile_value($this->value);
+	protected function compile(GlueDB_Database $db) {
+		return $db->compile_value($this->value);
 	}
 }

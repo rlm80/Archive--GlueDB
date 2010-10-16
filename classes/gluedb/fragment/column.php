@@ -42,15 +42,13 @@ class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Compiles the data structure against given database and returns the
-	 * resulting SQL string.
+	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
-		$db			= gluedb::db($dbname);
+	protected function compile(GlueDB_Database $db) {
 		$tablesql	= $db->compile_identifier($this->table_alias->alias());
 		$columnsql	= $db->compile_identifier($this->column->dbcolumn());
 		return $tablesql . '.' . $columnsql;

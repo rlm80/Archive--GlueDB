@@ -39,11 +39,11 @@ class GlueDB_Fragment_Aliased_Computed extends GlueDB_Fragment_Aliased {
 	/**
 	 * Returns SQL string for everything that must come before the "AS".
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile_definition($dbname) {
-		return $this->template->sql($dbname);
+	protected function compile_definition(GlueDB_Database $db) {
+		return $this->template->sql($db->name());
 	}
 }

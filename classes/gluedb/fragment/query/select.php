@@ -133,18 +133,17 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	/**
 	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
-		$db = gluedb::db($dbname);
-		if ( ! $this->select->is_empty())	$selectsql	= $this->select->sql($dbname);	else $selectsql		= null; // TODO this should go in sql() ?
-		if ( ! $this->from->is_empty())		$fromsql	= $this->from->sql($dbname);	else $fromsql		= null;
-		if ( ! $this->where->is_empty())	$wheresql	= $this->where->sql($dbname);	else $wheresql		= null; 
-		if ( ! $this->groupby->is_empty())	$groupbysql	= $this->groupby->sql($dbname);	else $groupbysql	= null;
-		if ( ! $this->having->is_empty())	$havingsql	= $this->having->sql($dbname);	else $havingsql		= null;
-		if ( ! $this->orderby->is_empty())	$orderbysql	= $this->orderby->sql($dbname);	else $orderbysql	= null;
+	protected function compile(GlueDB_Database $db) {
+		if ( ! $this->select->is_empty())	$selectsql	= $this->select->sql($db->name());	else $selectsql		= null; // TODO this should go in sql() ?
+		if ( ! $this->from->is_empty())		$fromsql	= $this->from->sql($db->name());	else $fromsql		= null;
+		if ( ! $this->where->is_empty())	$wheresql	= $this->where->sql($db->name());	else $wheresql		= null; 
+		if ( ! $this->groupby->is_empty())	$groupbysql	= $this->groupby->sql($db->name());	else $groupbysql	= null;
+		if ( ! $this->having->is_empty())	$havingsql	= $this->having->sql($db->name());	else $havingsql		= null;
+		if ( ! $this->orderby->is_empty())	$orderbysql	= $this->orderby->sql($db->name());	else $orderbysql	= null;
 		return $db->compile_query_select($selectsql, $fromsql, $wheresql, $groupbysql, $havingsql, $orderbysql);
 	}
 	

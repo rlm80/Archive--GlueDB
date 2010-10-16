@@ -69,17 +69,15 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	}
 
 	/**
-	 * Compiles the data structure against given database and returns the
-	 * resulting SQL string.
+	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
-		$db			= gluedb::db($dbname);
-		$operandsql	= $this->operand->sql($dbname);
-		$onsql		= isset($this->on) ? $this->on->sql($dbname) : '';
+	protected function compile(GlueDB_Database $db) {
+		$operandsql	= $this->operand->sql($db->name());
+		$onsql		= isset($this->on) ? $this->on->sql($db->name()) : '';
 		return $db->compile_operand_join($this->operator, $operandsql, $onsql);
 	}
 }

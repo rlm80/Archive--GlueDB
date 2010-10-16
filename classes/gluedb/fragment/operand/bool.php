@@ -16,16 +16,14 @@ class GlueDB_Fragment_Operand_Bool extends GlueDB_Fragment_Operand {
 	const ORNOT		= 3;
 
 	/**
-	 * Compiles the data structure against given database and returns the
-	 * resulting SQL string.
+	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
-		$db			= gluedb::db($dbname);
-		$operandsql	= $this->operand->sql($dbname);
+	protected function compile(GlueDB_Database $db) {
+		$operandsql	= $this->operand->sql($db->name());
 		return $db->compile_operand_bool($this->operator, $operandsql);
 	}
 }

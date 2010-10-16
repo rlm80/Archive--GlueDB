@@ -67,12 +67,11 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	/**
 	 * Returns SQL string for everything that must come before the "AS".
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile_definition($dbname) {
-		$db	= gluedb::db($dbname);
+	protected function compile_definition(GlueDB_Database $db) {
 		return $db->compile_identifier($this->table->dbtable());
 	}
 }

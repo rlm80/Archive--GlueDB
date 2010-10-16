@@ -80,15 +80,14 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	/**
 	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * In this case the resulting SQL string is simply the concatenation of the resulting
-	 * SQL strings of the children fragments.
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
+	protected function compile(GlueDB_Database $db) {
 		$sql = array();
 		foreach ($this->children as $child)
-			$sql[] = $child->sql($dbname);
+			$sql[] = $child->sql($db->name());
 		return implode($this->connector, $sql);
 	}
 }

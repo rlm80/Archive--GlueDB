@@ -62,18 +62,15 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 		return $this->order;
 	}
 
-
 	/**
-	 * Compiles the data structure against given database and returns the
-	 * resulting SQL string.
+	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	protected function compile($dbname) {
-		$db		= gluedb::db($dbname);
-		$sqldef	= $this->fragment->sql($dbname);
+	protected function compile(GlueDB_Database $db) {
+		$sqldef	= $this->fragment->sql($db->name());
 		if ( ! $this->fragment instanceof GlueDB_Fragment_Column)
 			$sqldef	= '(' . $sqldef . ')';			
 		return $db->compile_ordered($sqldef, $this->order);

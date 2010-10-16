@@ -42,19 +42,21 @@ abstract class GlueDB_Fragment {
 	 * @return string
 	 */
 	public function sql($dbname = GlueDB_Database::DEFAULTDB) {
-		if ( ! isset($this->sql[$dbname]))
-			$this->sql[$dbname] = $this->compile($dbname);
+		if ( ! isset($this->sql[$dbname])) {
+			$db = gluedb::db($dbname);
+			$this->sql[$dbname] = $this->compile($db);
+		}
 		return $this->sql[$dbname];
 	}
 
 	/**
 	 * Compiles the data structure and returns the resulting SQL string.
 	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	abstract protected function compile($dbname);
+	abstract protected function compile(GlueDB_Database $db);
 
 	/**
 	 * Adds a fragment to the list of fragments that make direct use of this
