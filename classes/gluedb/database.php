@@ -237,18 +237,21 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Returns SQL string for something is ordered.
+	 * Returns SQL string for something that is ordered.
 	 *
 	 * @param string $sql SQL of the thing that needs to be ordered.
-	 * @param boolean $asc Ascending vs descending.
+	 * @param integer $order Ascending vs descending.
 	 *
 	 * @return string
 	 */
-	public function compile_ordered($sql, $asc) {
-		if ( ! isset($asc))
-			return $sql;
-		else
-			return $sql . ' ' . ($asc ? 'ASC' : 'DESC');
+	public function compile_ordered($sql, $order) {
+		if (isset($order)) {
+			switch ($order) {
+				case GlueDB_Fragment_Ordered::ASC :		$sql .= ' ASC';		break;
+				case GlueDB_Fragment_Ordered::DESC :	$sql .= ' DESC';	break;
+			}
+		}
+		return $sql;
 	}
 
 	/**

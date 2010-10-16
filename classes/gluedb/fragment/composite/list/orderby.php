@@ -31,10 +31,12 @@ class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_L
 		$first = array_shift($params);
 
 		// Add fragment :
-		if ($first instanceof GlueDB_Fragment_Column)
-			$this->push(new GlueDB_Fragment_Ordered_Column($first));
+		if (is_string($first))
+			$this->push(new GlueDB_Fragment_Ordered(
+				new GlueDB_Fragment_Template($first, $params)
+			));
 		else
-			$this->push(new GlueDB_Fragment_Ordered_Computed($first, $params));
+			$this->push(new GlueDB_Fragment_Ordered($first));
 	}
 
 	/**
@@ -44,7 +46,7 @@ class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_L
 	 */
 	public function asc() {
 		if ($last = $this->last())
-			$last->set_asc(true);
+			$last->set_order(GlueDB_Fragment_Ordered::ASC);
 		else
 			throw new Kohana_Exception("No column to set an order to.");
 
@@ -58,7 +60,7 @@ class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_L
 	 */
 	public function desc() {
 		if ($last = $this->last())
-			$last->set_asc(false);
+			$last->set_order(GlueDB_Fragment_Ordered::DESC);
 		else
 			throw new Kohana_Exception("No column to set an order to.");
 

@@ -8,29 +8,58 @@
  * @license    MIT
  */
 
-abstract class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
+class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
+	// Order constants :
+	const ASC	= 0;
+	const DESC	= 1;
+	
 	/**
-	 * @var boolean Whether or not order is ascending.
+	 * @var GlueDB_Fragment Fragment that needs to have an order set.
 	 */
-	protected $asc;
+	protected $fragment;
+	
+	/**
+	 * @var integer Ordering.
+	 */
+	protected $order;	
 
+	/**
+	 * Constructor.
+	 *
+	 * @param GlueDB_Fragment $fragment
+	 */
+	public function __construct(GlueDB_Fragment $fragment, $order = null) {
+		$this->order	= $order;
+		$this->fragment	= $fragment;
+		$this->fragment->register_user($this);
+	}
+	
+	/**
+	 * Returns fragment.
+	 *
+	 * @return integer
+	 */
+	public function fragment() {
+		return $this->fragment;
+	}	
+	
 	/**
 	 * Order setter.
 	 *
-	 * @param boolean $asc
+	 * @param integer $order
 	 */
-	public function set_asc($asc = true) {
-		$this->asc = $asc;
+	public function set_order($order) {
+		$this->order = $order;
 		$this->invalidate();
 	}
 
 	/**
 	 * Returns order.
 	 *
-	 * @return string
+	 * @return integer
 	 */
-	public function asc() {
-		return $this->asc;
+	public function order() {
+		return $this->order;
 	}
 
 
@@ -44,16 +73,9 @@ abstract class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	 */
 	protected function compile($dbname) {
 		$db		= gluedb::db($dbname);
-		$sqldef	= $this->compile_definition($dbname);
-		return $db->compile_ordered($sqldef, $this->asc());
+		$sqldef	= $this->fragment->sql($dbname);
+		if ( ! $this->fragment instanceof GlueDB_Fragment_Column)
+			$sqldef	= '(' . $sqldef . ')';			
+		return $db->compile_ordered($sqldef, $this->order);
 	}
-
-	/**
-	 * Returns SQL string for everything that must come before the " ASC"/" DESC".
-	 *
-	 * @param string $dbname
-	 *
-	 * @return string
-	 */
-	abstract protected function compile_definition($dbname);
 }

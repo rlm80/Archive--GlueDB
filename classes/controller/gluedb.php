@@ -80,7 +80,7 @@ class Controller_GlueDB extends Controller {
 			->then('?', 'test')->desc();
 		$tests['select'] = array(
 			$select,
-			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, 'test' DESC"
+			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, ('test') DESC"
 		);
 
 		$join = gluedb::join('mytable')->as('t1')
