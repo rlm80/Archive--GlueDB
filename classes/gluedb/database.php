@@ -232,7 +232,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	public function compile_alias($sql, $alias) {
+	public function compile_aliased($sql, $alias) {
 		return $sql . ' AS ' . $this->compile_identifier($alias);
 	}
 

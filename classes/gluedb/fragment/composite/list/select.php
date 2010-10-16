@@ -30,21 +30,23 @@ class GlueDB_Fragment_Composite_List_Select extends GlueDB_Fragment_Composite_Li
 		// Split params :
 		$first = array_shift($params);
 
-		// Add fragment :
-		if ($first instanceof GlueDB_Fragment_Column) {
-			// Compute default alias :
+		// Compute default alias :
+		if ($first instanceof GlueDB_Fragment_Column)
 			$alias = $this->compute_alias_column($first->column()->name());
-
-			// Push fragment :
-			$this->push(new GlueDB_Fragment_Aliased_Column($first, $alias));
-		}
-		else {
-			// Compute default alias :
+		else
 			$alias = $this->compute_alias_computed();
 
-			// Push fragment :
-			$this->push(new GlueDB_Fragment_Aliased_Computed($first, $params, $alias));
-		}
+		// Push fragment :
+		if ($first instanceof GlueDB_Fragment)	
+			$this->push(new GlueDB_Fragment_Aliased(
+				$first,
+				$alias
+			));
+		else
+			$this->push(new GlueDB_Fragment_Aliased(
+				new GlueDB_Fragment_Template($first, $params),
+				$alias
+			));
 	}
 
 	/**

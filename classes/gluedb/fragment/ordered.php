@@ -37,7 +37,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	/**
 	 * Returns fragment.
 	 *
-	 * @return integer
+	 * @return GlueDB_Fragment
 	 */
 	public function fragment() {
 		return $this->fragment;
@@ -73,6 +73,6 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 		$sqldef	= $this->fragment->sql($db->name());
 		if ( ! $this->fragment instanceof GlueDB_Fragment_Column)
 			$sqldef	= '(' . $sqldef . ')';			
-		return $db->compile_ordered($sqldef, $this->order);
+		return $db->compile_ordered($sqldef, $this->order());
 	}
 }

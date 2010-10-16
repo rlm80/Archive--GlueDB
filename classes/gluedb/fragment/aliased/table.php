@@ -17,11 +17,6 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	static protected $aliases = array();
 
 	/**
-	 * @var GlueDB_Table Table.
-	 */
-	protected $table;
-
-	/**
 	 * @var array Column fragments cache.
 	 */
 	protected $columns = array();
@@ -33,8 +28,27 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	 * @param string $alias
 	 */
 	public function __construct($table_name, $alias = null) {
-		parent::__construct($alias);
-		$this->table = gluedb::table($table_name);
+		parent::__construct(new GlueDB_Fragment_Table($table_name), $alias);
+	}
+	
+	/**
+	 * Returns the table object.
+	 * 
+	 * @return GlueDB_Table 
+	 */
+	public function table() {
+		return $this->fragment->table();
+	}
+	
+	/**
+	 * Returns alias.
+	 *
+	 * @return string
+	 */
+	public function alias() {
+		if ( ! isset($this->alias))
+			$this->alias = $this->create_alias();
+		return $this->alias;
 	}
 
 	/**
@@ -60,18 +74,7 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	 */
 	public function __get($column) {
 	    if ( ! isset($this->columns[$column]))
-			$this->columns[$column] = new GlueDB_Fragment_Column($this, $this->table->column($column));
+			$this->columns[$column] = new GlueDB_Fragment_Column($this, $column);
 		return $this->columns[$column];
-	}
-
-	/**
-	 * Returns SQL string for everything that must come before the "AS".
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	protected function compile_definition(GlueDB_Database $db) {
-		return $db->compile_identifier($this->table->dbtable());
 	}
 }
