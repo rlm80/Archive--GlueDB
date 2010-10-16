@@ -57,7 +57,7 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	 * @return string
 	 */
 	protected function create_alias() {
-		$table_name = $this->table->name();
+		$table_name = $this->table()->name();
 		if ( ! isset(self::$aliases[$table_name]))
 			self::$aliases[$table_name] = 0;
 		else

@@ -273,7 +273,7 @@ abstract class GlueDB_Database extends PDO {
 			}
 		}
 		$sql .= '(' . $operandsql . ')';
-		if (isset($operator)) $sql .= ' ON (' . $onsql . ')';
+		if (isset($operator)) $sql .= ' ON ' . $onsql;
 		return $sql;
 	}
 

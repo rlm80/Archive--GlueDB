@@ -32,7 +32,6 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 */
 	abstract protected function find_db();
 	
-	
 	/**
 	 * Return current object. Useful to get the query from on of the children builders :
 	 * 
@@ -63,4 +62,14 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 * @see PDO::exec() and PDO::query()
 	 */
 	abstract public function execute();
+	
+	/**
+	 * Handles ambiguous function calls.
+	 * 
+	 * @param string $name
+	 * @param array $args
+	 */
+	public function __call($name, array $args) { // TODO factor this to avoid __call ?
+		throw new Kohana_Exception("Call to function " . $name . " is ambiguous. It may refer to more than one expression builder, or none at all.");
+	}
 }

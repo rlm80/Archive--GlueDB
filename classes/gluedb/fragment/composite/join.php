@@ -94,7 +94,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 */
 	public function _as($alias) {
 		$last = $this->last();
-		if (isset($last) && $last instanceof GlueDB_Fragment_Operand_Join)
+		if (isset($last) && $last->operand() instanceof GlueDB_Fragment_Aliased)
 			$last->operand()->set_alias($alias);
 		else
 			throw new Kohana_Exception("Cannot set alias to a nested join.");

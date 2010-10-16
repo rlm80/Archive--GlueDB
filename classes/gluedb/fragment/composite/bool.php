@@ -58,7 +58,7 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 	 */
 	public function ornot() {
 		$args = func_get_args();
-		$this->add($args, GlueDB_Fragment_Operand_Bool::_ORNOT);
+		$this->add($args, GlueDB_Fragment_Operand_Bool::ORNOT);
 		return $this;
 	}
 
@@ -70,7 +70,7 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 	 */
 	public function andnot() {
 		$args = func_get_args();
-		$this->add($args, GlueDB_Fragment_Operand_Bool::_ANDNOT);
+		$this->add($args, GlueDB_Fragment_Operand_Bool::ANDNOT);
 		return $this;
 	}	
 
