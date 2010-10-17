@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
+class GlueDB_Fragment_Builder_Bool extends GlueDB_Fragment_Builder {
 	/**
 	 * @var string Connector redefined.
 	 */
@@ -17,7 +17,7 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 	/**
 	 * Initializes the expression with a first operand.
 	 *
-	 * @return GlueDB_Fragment_Composite_Bool
+	 * @return GlueDB_Fragment_Builder_Bool
 	 */
 	public function init() {
 		$this->reset();
@@ -30,7 +30,7 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 	 * Use ->or() instead of this. Adds a boolean operand at the end of the expression, connecting it with
 	 * the OR operator.
 	 *
-	 * @return GlueDB_Fragment_Composite_Bool
+	 * @return GlueDB_Fragment_Builder_Bool
 	 */
 	public function _or() {
 		$args = func_get_args();
@@ -42,7 +42,7 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 	 * Use ->and() instead of this. Adds a boolean operand at the end of the expression, connecting it with
 	 * the AND operator.
 	 *
-	 * @return GlueDB_Fragment_Composite_Bool
+	 * @return GlueDB_Fragment_Builder_Bool
 	 */
 	public function _and() {
 		$args = func_get_args();
@@ -54,7 +54,7 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 	 * Adds a boolean operand at the end of the expression, connecting it with
 	 * the OR NOT operator.
 	 *
-	 * @return GlueDB_Fragment_Composite_Bool
+	 * @return GlueDB_Fragment_Builder_Bool
 	 */
 	public function ornot() {
 		$args = func_get_args();
@@ -66,7 +66,7 @@ class GlueDB_Fragment_Composite_Bool extends GlueDB_Fragment_Composite {
 	 * Adds a boolean operand at the end of the expression, connecting it with
 	 * the AND NOT operator.
 	 *
-	 * @return GlueDB_Fragment_Composite_Bool
+	 * @return GlueDB_Fragment_Builder_Bool
 	 */
 	public function andnot() {
 		$args = func_get_args();

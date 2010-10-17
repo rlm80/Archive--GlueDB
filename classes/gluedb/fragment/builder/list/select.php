@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite_List_Select extends GlueDB_Fragment_Composite_List {
+class GlueDB_Fragment_Builder_List_Select extends GlueDB_Fragment_Builder_List {
 	/**
 	 * @var GlueDB_Fragment_Query Query that owns this list.
 	 */
@@ -91,7 +91,7 @@ class GlueDB_Fragment_Composite_List_Select extends GlueDB_Fragment_Composite_Li
 	/**
 	 * Sets alias of the last element of the list.
 	 *
-	 * @return GlueDB_Fragment_Composite_Select
+	 * @return GlueDB_Fragment_Builder_Select
 	 */
 	public function _as($alias) {
 		if ($last = $this->last())

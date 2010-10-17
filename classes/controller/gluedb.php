@@ -59,7 +59,7 @@ class Controller_GlueDB extends Controller {
 				),
 		);
 
-		$select = new GlueDB_Fragment_Composite_List_Select(null);
+		$select = new GlueDB_Fragment_Builder_List_Select(null);
 		$select
 			->init($t->login)
 			->then($t->password)
@@ -72,7 +72,7 @@ class Controller_GlueDB extends Controller {
 			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, 'test' AS `computed`, 'test' AS `computed1`"
 		);
 
-		$select = new GlueDB_Fragment_Composite_List_Orderby(null);
+		$select = new GlueDB_Fragment_Builder_List_Orderby(null);
 		$select
 			->init($t->login)
 			->then($t->password)
@@ -88,14 +88,14 @@ class Controller_GlueDB extends Controller {
 					->right('histable')->as('t3')->on('1=1');
 		$tests['join simple'] = array(
 			$join,
-			"(`mytable` AS `t1`) LEFT OUTER JOIN (`yourtable` AS `t2`) ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN (`histable` AS `t3`) ON (1=1)"
+			"`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)"
 		);
 
 		$join2 = gluedb::join('mytable')->as('t3')
 					->left($join)->on('5=5');
 		$tests['join nested'] = array(
 			$join2,
-			"(`mytable` AS `t3`) LEFT OUTER JOIN ((`mytable` AS `t1`) LEFT OUTER JOIN (`yourtable` AS `t2`) ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN (`histable` AS `t3`) ON (1=1)) ON (5=5)"
+			"`mytable` AS `t3` LEFT OUTER JOIN (`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)) ON (5=5)"
 		);
 
 		$alias = gluedb::alias('mytable','myalias');
@@ -103,25 +103,25 @@ class Controller_GlueDB extends Controller {
 					->left($alias)->on('1=1');
 		$tests['join alias'] = array(
 			$join3,
-			"(`mytable` AS `t3`) LEFT OUTER JOIN (`mytable` AS `myalias`) ON (1=1)"
+			"`mytable` AS `t3` LEFT OUTER JOIN `mytable` AS `myalias` ON (1=1)"
 		);
 		
 		$select1 = gluedb::select('mytable')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->query();
 		$tests['query select basic'] = array(
 			$select1,
-			"SELECT * FROM (`mytable` AS `test`) WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
+			"SELECT * FROM `mytable` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
 		);
 		
 		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'")->query();
 		$tests['query select alias'] = array(
 			$select2,
-			"SELECT * FROM (`users` AS `myusers`) WHERE (`myusers`.`login` = 'mylogin')"
+			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
 		);		
 		
 		$select3 = gluedb::select('users', $a)->left('users', $b)->on("$a->login = $b->login")->query();
 		$tests['query select default alias and join'] = array(
 			$select3,
-			"SELECT * FROM (`users` AS `users__0`) LEFT OUTER JOIN (`users` AS `users__1`) ON (`users__0`.`login` = `users__1`.`login`)"
+			"SELECT * FROM `users` AS `users__0` LEFT OUTER JOIN `users` AS `users__1` ON (`users__0`.`login` = `users__1`.`login`)"
 		);			
 
 		// Checks :

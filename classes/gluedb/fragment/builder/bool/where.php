@@ -1,16 +1,16 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that provides a fluent interface to build a having clause.
+ * Fragment that provides a fluent interface to build a where clause.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite_Bool_Having extends GlueDB_Fragment_Composite_Bool {
+class GlueDB_Fragment_Builder_Bool_Where extends GlueDB_Fragment_Builder_Bool {
 	/**
-	 * @var GlueDB_Fragment_Query Query that owns this having clause.
+	 * @var GlueDB_Fragment_Query Query that owns this where clause.
 	 */
 	protected $query;
 

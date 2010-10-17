@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
+class GlueDB_Fragment_Builder_Join extends GlueDB_Fragment_Builder {
 	/**
 	 * @var string Connector redefined.
 	 */
@@ -20,7 +20,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function init($operand, &$alias = null) {
 		$this->reset();
@@ -34,7 +34,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function inner($operand, &$alias = null) {
 		$this->add($operand, GlueDB_Fragment_Operand_Join::INNER_JOIN, $alias);
@@ -47,7 +47,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function left($operand, &$alias = null) {
 		$this->add($operand, GlueDB_Fragment_Operand_Join::LEFT_OUTER_JOIN, $alias);
@@ -60,7 +60,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function right($operand, &$alias = null) {
 		$this->add($operand, GlueDB_Fragment_Operand_Join::RIGHT_OUTER_JOIN, $alias);
@@ -90,7 +90,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	/**
 	 * Forwards call to last operand.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function _as($alias) {
 		$last = $this->last();
@@ -104,7 +104,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	/**
 	 * Forwards call to last operand.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function on() {
 		if ($last = $this->last()) {
@@ -119,7 +119,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	/**
 	 * Forwards call to last operand.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function _or() {
 		if ($last = $this->last()) {
@@ -134,7 +134,7 @@ class GlueDB_Fragment_Composite_Join extends GlueDB_Fragment_Composite {
 	/**
 	 * Forwards call to last operand.
 	 *
-	 * @return GlueDB_Fragment_Composite_Join
+	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function _and() {
 		if ($last = $this->last()) {

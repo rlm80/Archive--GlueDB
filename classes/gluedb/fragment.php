@@ -34,18 +34,24 @@ abstract class GlueDB_Fragment {
 	/**
 	 * Returns compiled SQL string for given database.
 	 *
-	 * Calling this function repeatedly won't trigger the compiling process everytime,
-	 * there is a cache that is only invalidated when the data structure is modified.
-	 *
-	 * @param string $dbname
+	 * @param GlueDB_Database $db
 	 *
 	 * @return string
 	 */
-	public function sql($dbname = GlueDB_Database::DEFAULTDB) {
+	public function sql(GlueDB_Database $db = null) {
+		// No database given ? Means default database :
+		if ( ! isset($db)) $db = gluedb::db(GlueDB_Database::DEFAULTDB);
+		
+		// Get database name :
+		$dbname = $db->name();
+		
+		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
 		if ( ! isset($this->sql[$dbname])) {
 			$db = gluedb::db($dbname);
 			$this->sql[$dbname] = $this->compile($db);
 		}
+		
+		// Return SQL :
 		return $this->sql[$dbname];
 	}
 

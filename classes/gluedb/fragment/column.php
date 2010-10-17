@@ -55,6 +55,6 @@ class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	}
 	
 	public function __toString() {
-		return $this->sql($this->column()->table()->dbname());
+		return $this->sql($this->column()->table()->db());
 	}
 }

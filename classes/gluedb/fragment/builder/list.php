@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-abstract class GlueDB_Fragment_Composite_List extends GlueDB_Fragment_Composite {
+abstract class GlueDB_Fragment_Builder_List extends GlueDB_Fragment_Builder {
 	/**
 	 * @var string Connector redefined.
 	 */
@@ -17,7 +17,7 @@ abstract class GlueDB_Fragment_Composite_List extends GlueDB_Fragment_Composite 
 	/**
 	 * Initializes the list with a first item.
 	 *
-	 * @return GlueDB_Fragment_Composite_List
+	 * @return GlueDB_Fragment_Builder_List
 	 */
 	public function init() {
 		// Get params :
@@ -35,7 +35,7 @@ abstract class GlueDB_Fragment_Composite_List extends GlueDB_Fragment_Composite 
 	/**
 	 * Adds an item at the end of the list.
 	 *
-	 * @return GlueDB_Fragment_Composite_List
+	 * @return GlueDB_Fragment_Builder_List
 	 */
 	public function then() {
 		// Get params :

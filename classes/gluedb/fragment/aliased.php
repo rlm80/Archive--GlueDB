@@ -66,10 +66,7 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	 *
 	 * @return string
 	 */
-	protected function compile(GlueDB_Database $db) {
-		$sqldef	= $this->fragment->sql($db->name());
-		if ( ! ($this->fragment instanceof GlueDB_Fragment_Column || $this->fragment instanceof GlueDB_Fragment_Table))
-			$sqldef	= '(' . $sqldef . ')';			
-		return $db->compile_aliased($sqldef, $this->alias());
+	protected function compile(GlueDB_Database $db) {	
+		return $db->compile_aliased($this);
 	}
 }

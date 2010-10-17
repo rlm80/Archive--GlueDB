@@ -23,7 +23,7 @@ class GlueDB_Fragment_Operand_Bool extends GlueDB_Fragment_Operand {
 	 * @return string
 	 */
 	protected function compile(GlueDB_Database $db) {
-		$operandsql	= $this->operand->sql($db->name());
+		$operandsql	= $this->operand->sql($db);
 		return $db->compile_operand_bool($this->operator, $operandsql);
 	}
 }

@@ -62,7 +62,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 		$max = count($this->replacements);
 		$sql = $parts[0];
 		for($i = 0; $i < $max; $i++) {
-			$sql .= $this->replacements[$i]->sql($db->name());
+			$sql .= $this->replacements[$i]->sql($db);
 			$sql .= $parts[$i + 1];
 		}
 

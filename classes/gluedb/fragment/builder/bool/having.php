@@ -1,16 +1,16 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that provides a fluent interface to build a from clause.
+ * Fragment that provides a fluent interface to build a having clause.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite_Join_From extends GlueDB_Fragment_Composite_Join {
+class GlueDB_Fragment_Builder_Bool_Having extends GlueDB_Fragment_Builder_Bool {
 	/**
-	 * @var GlueDB_Fragment_Query Query that owns this from clause.
+	 * @var GlueDB_Fragment_Query Query that owns this having clause.
 	 */
 	protected $query;
 

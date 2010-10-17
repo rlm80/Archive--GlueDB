@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_List {
+class GlueDB_Fragment_Builder_List_Orderby extends GlueDB_Fragment_Builder_List {
 	/**
 	 * @var GlueDB_Fragment_Query Query that owns this list.
 	 */
@@ -42,7 +42,7 @@ class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_L
 	/**
 	 * Sets order ASC for the last element of the list.
 	 *
-	 * @return GlueDB_Fragment_Composite_List_Orderby
+	 * @return GlueDB_Fragment_Builder_List_Orderby
 	 */
 	public function asc() {
 		if ($last = $this->last())
@@ -56,7 +56,7 @@ class GlueDB_Fragment_Composite_List_Orderby extends GlueDB_Fragment_Composite_L
 	/**
 	 * Sets order DESC for the last element of the list.
 	 *
-	 * @return GlueDB_Fragment_Composite_List_Orderby
+	 * @return GlueDB_Fragment_Builder_List_Orderby
 	 */
 	public function desc() {
 		if ($last = $this->last())

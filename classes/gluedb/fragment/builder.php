@@ -10,7 +10,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Composite extends GlueDB_Fragment {
+class GlueDB_Fragment_Builder extends GlueDB_Fragment {
 	/**
 	 * @var array List of children fragments.
 	 */
@@ -47,7 +47,7 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	/**
 	 * Removes the last child at the end of the children list.
 	 *
-	 * @return GlueDB_Fragment_Composite
+	 * @return GlueDB_Fragment_Builder
 	 */
 	public function pop() {
 		$fragment = array_pop($this->children);
@@ -68,7 +68,7 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	/**
 	 * Removes all children.
 	 *
-	 * @return GlueDB_Fragment_Composite
+	 * @return GlueDB_Fragment_Builder
 	 */
 	public function reset() {
 		while ($fragment = array_pop($this->children))
@@ -87,7 +87,7 @@ class GlueDB_Fragment_Composite extends GlueDB_Fragment {
 	protected function compile(GlueDB_Database $db) {
 		$sql = array();
 		foreach ($this->children as $child)
-			$sql[] = $child->sql($db->name());
+			$sql[] = $child->sql($db);
 		return implode($this->connector, $sql);
 	}
 }

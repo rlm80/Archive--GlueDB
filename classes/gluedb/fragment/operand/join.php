@@ -15,7 +15,7 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	const INNER_JOIN		= 2;
 
 	/**
-	 * @var GlueDB_Fragment_Composite_Bool On clause.
+	 * @var GlueDB_Fragment_Builder_Bool On clause.
 	 */
 	protected $on;
 
@@ -26,11 +26,27 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	 */
 	public function __construct(GlueDB_Fragment $operand, $operator = null) {
 		parent::__construct($operand, $operator);
-		if (isset($operator)) {
-			$this->on = new GlueDB_Fragment_Composite_Bool();
-			$this->on->register_user($this);
-		}
+		$this->on = new GlueDB_Fragment_Builder_Bool();
+		$this->on->register_user($this);
 	}
+	
+	/**
+	 * Returns on clause.
+	 * 
+	 * @return GlueDB_Fragment_Builder_Bool
+	 */
+	public function on() {
+		return $this->on;
+	}
+	
+	/**
+	 * Returns operator.
+	 * 
+	 * @return integer
+	 */
+	public function operator() {
+		return $this->operator;
+	}	
 
 	/**
 	 * Forwards call to on clause.
@@ -76,8 +92,6 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	 * @return string
 	 */
 	protected function compile(GlueDB_Database $db) {
-		$operandsql	= $this->operand->sql($db->name());
-		$onsql		= isset($this->on) ? $this->on->sql($db->name()) : '';
-		return $db->compile_operand_join($this->operator, $operandsql, $onsql);
+		return $db->compile_operand_join($this);
 	}
 }

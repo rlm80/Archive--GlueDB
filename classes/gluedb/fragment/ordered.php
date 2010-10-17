@@ -70,9 +70,6 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	 * @return string
 	 */
 	protected function compile(GlueDB_Database $db) {
-		$sqldef	= $this->fragment->sql($db->name());
-		if ( ! $this->fragment instanceof GlueDB_Fragment_Column)
-			$sqldef	= '(' . $sqldef . ')';			
-		return $db->compile_ordered($sqldef, $this->order());
+		return $db->compile_ordered($this);
 	}
 }
