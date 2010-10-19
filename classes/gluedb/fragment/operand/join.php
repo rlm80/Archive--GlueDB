@@ -29,24 +29,24 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 		$this->on = new GlueDB_Fragment_Builder_Bool();
 		$this->on->register_user($this);
 	}
-	
+
 	/**
 	 * Returns on clause.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Builder_Bool
 	 */
 	public function on() {
 		return $this->on;
 	}
-	
+
 	/**
 	 * Returns operator.
-	 * 
+	 *
 	 * @return integer
 	 */
 	public function operator() {
 		return $this->operator;
-	}	
+	}
 
 	/**
 	 * Forwards call to on clause.
@@ -82,16 +82,5 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 		}
 		else
 			throw new Kohana_Exception("Illegal call to and() : no ON clause on first operand of expression !");
-	}
-
-	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	protected function compile(GlueDB_Database $db) {
-		return $db->compile_operand_join($this);
 	}
 }

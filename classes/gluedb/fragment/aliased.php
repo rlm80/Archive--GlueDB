@@ -10,10 +10,10 @@
 
 class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	/**
-	 * @var GlueDB_Fragment Fragment. 
+	 * @var GlueDB_Fragment Fragment.
 	 */
 	protected $fragment;
-	
+
 	/**
 	 * @var string Alias.
 	 */
@@ -30,7 +30,7 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 		$this->fragment	= $fragment;
 		$this->fragment->register_user($this);
 	}
-	
+
 	/**
 	 * Returns fragment.
 	 *
@@ -57,16 +57,5 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	 */
 	public function alias() {
 		return $this->alias;
-	}
-
-	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	protected function compile(GlueDB_Database $db) {	
-		return $db->compile_aliased($this);
 	}
 }

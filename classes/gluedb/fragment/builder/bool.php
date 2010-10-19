@@ -10,11 +10,6 @@
 
 class GlueDB_Fragment_Builder_Bool extends GlueDB_Fragment_Builder {
 	/**
-	 * @var string Connector redefined.
-	 */
-	protected $connector = ' ';
-
-	/**
 	 * Initializes the expression with a first operand.
 	 *
 	 * @return GlueDB_Fragment_Builder_Bool
@@ -49,7 +44,7 @@ class GlueDB_Fragment_Builder_Bool extends GlueDB_Fragment_Builder {
 		$this->add($args, GlueDB_Fragment_Operand_Bool::_AND);
 		return $this;
 	}
-	
+
 	/**
 	 * Adds a boolean operand at the end of the expression, connecting it with
 	 * the OR NOT operator.
@@ -72,7 +67,7 @@ class GlueDB_Fragment_Builder_Bool extends GlueDB_Fragment_Builder {
 		$args = func_get_args();
 		$this->add($args, GlueDB_Fragment_Operand_Bool::ANDNOT);
 		return $this;
-	}	
+	}
 
 	/**
 	 * Adds an operand to the expression.

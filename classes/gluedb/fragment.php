@@ -40,29 +40,17 @@ abstract class GlueDB_Fragment {
 	 */
 	public function sql(GlueDB_Database $db = null) {
 		// No database given ? Means default database :
-		if ( ! isset($db)) $db = gluedb::db(GlueDB_Database::DEFAULTDB);
-		
-		// Get database name :
-		$dbname = $db->name();
-		
+		if ( ! isset($db))
+			$db = gluedb::db(GlueDB_Database::DEFAULTDB);
+
 		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
-		if ( ! isset($this->sql[$dbname])) {
-			$db = gluedb::db($dbname);
-			$this->sql[$dbname] = $this->compile($db);
-		}
-		
+		$dbname = $db->name();
+		if ( ! isset($this->sql[$dbname]))
+			$this->sql[$dbname] = $db->compile($this);
+
 		// Return SQL :
 		return $this->sql[$dbname];
 	}
-
-	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	abstract protected function compile(GlueDB_Database $db);
 
 	/**
 	 * Adds a fragment to the list of fragments that make direct use of this
@@ -96,7 +84,7 @@ abstract class GlueDB_Fragment {
 
 	/**
 	 * Clears the SQL cache and forwards call to users. Must be called each time
-	 * a change has been made to the data structure.
+	 * a change has been made to this fragment that may change its SQL.
 	 */
 	protected function invalidate() {
 		// No need to do anything if fragment is already invalidated :

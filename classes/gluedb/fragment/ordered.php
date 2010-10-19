@@ -12,16 +12,16 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	// Order constants :
 	const ASC	= 0;
 	const DESC	= 1;
-	
+
 	/**
 	 * @var GlueDB_Fragment Fragment that needs to have an order set.
 	 */
 	protected $fragment;
-	
+
 	/**
 	 * @var integer Ordering.
 	 */
-	protected $order;	
+	protected $order;
 
 	/**
 	 * Constructor.
@@ -33,7 +33,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 		$this->fragment	= $fragment;
 		$this->fragment->register_user($this);
 	}
-	
+
 	/**
 	 * Returns fragment.
 	 *
@@ -41,8 +41,8 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	 */
 	public function fragment() {
 		return $this->fragment;
-	}	
-	
+	}
+
 	/**
 	 * Order setter.
 	 *
@@ -60,16 +60,5 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	 */
 	public function order() {
 		return $this->order;
-	}
-
-	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	protected function compile(GlueDB_Database $db) {
-		return $db->compile_ordered($this);
 	}
 }

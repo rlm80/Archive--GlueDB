@@ -112,6 +112,190 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
+	 * Compiles fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment $fragment
+	 *
+	 * @return string
+	 */
+	public function compile(GlueDB_Fragment $fragment) {
+		if ($fragment instanceof GlueDB_Fragment_Operand_Bool)
+			return $this->compile_operand_bool($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Operand_Join)
+			return $this->compile_operand_join($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Aliased)
+			return $this->compile_aliased($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder)
+			return $this->compile_builder($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Ordered)
+			return $this->compile_ordered($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Column)
+			return $this->compile_column($fragment);
+
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Operand_Bool fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Operand_Bool $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_operand_bool(GlueDB_Fragment_Operand_Bool $fragment) {
+		// Get data from fragment :
+		$operator	= $fragment->operator();
+		$operand	= $fragment->operand();
+
+		// Initialize SQL with operator :
+		$sql = '';
+		if (isset($operator)) {
+			switch ($operator) {
+				case GlueDB_Fragment_Operand_Bool::_AND :	$sql = 'AND ';		break;
+				case GlueDB_Fragment_Operand_Bool::_OR :	$sql = 'OR ';		break;
+				case GlueDB_Fragment_Operand_Bool::ANDNOT :	$sql = 'AND NOT ';	break;
+				case GlueDB_Fragment_Operand_Bool::ORNOT :	$sql = 'OR NOT ';	break;
+			}
+		}
+
+		// Operand :
+		$sql .= '(' . $operand->sql($this) . ')';
+
+		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Operand_Join fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Operand_Join $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_operand_join(GlueDB_Fragment_Operand_Join $fragment) {
+		// Get data from fragment :
+		$operator	= $fragment->operator();
+		$operand	= $fragment->operand();
+		$on			= $fragment->on();
+
+		// Initialize SQL with operator :
+		$sql = '';
+		if (isset($operator)) {
+			switch ($operator) {
+				case GlueDB_Fragment_Operand_Join::INNER_JOIN :			$sql .= 'INNER JOIN ';			break;
+				case GlueDB_Fragment_Operand_Join::RIGHT_OUTER_JOIN :	$sql .= 'RIGHT OUTER JOIN ';	break;
+				case GlueDB_Fragment_Operand_Join::LEFT_OUTER_JOIN :	$sql .= 'LEFT OUTER JOIN ';		break;
+			}
+		}
+
+		// Add operand SQL :
+		$sqlop = $operand->sql($this);
+		if ( ! $operand instanceof GlueDB_Fragment_Aliased_Table)
+			$sqlop	= '(' . $sqlop . ')';
+		$sql .= $sqlop;
+
+		// Add on SQL :
+		if (isset($operator)) {
+			$sqlon = $on->sql($this);
+			$sql .= ' ON ' . $sqlon;
+		}
+
+		// Return SQL :
+		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Aliased fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Aliased $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_aliased(GlueDB_Fragment_Aliased $fragment) {
+		// Get data from fragment :
+		$toalias	= $fragment->fragment();
+		$alias		= $fragment->alias();
+
+		// Generate fragment SQL :
+		$sql = $toalias->sql($this);
+		if ( ! ($toalias instanceof GlueDB_Fragment_Column || $toalias instanceof GlueDB_Fragment_Table))
+			$sql	= '(' . $sql . ')';
+
+		// Add alias :
+		$sql .= ' AS ' . $this->compile_identifier($alias);
+
+		// Return SQL :
+		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder(GlueDB_Fragment_Builder $fragment) {
+		// Get data from fragment :
+		$children = $fragment->children();
+
+		// Guess connector from fragment type :
+		if ($fragment instanceof GlueDB_Fragment_Builder_List)
+			$connector = ', ';
+		else
+			$connector = ' ';
+
+		// Generate fragment SQL :
+		$sql = array();
+		foreach ($children() as $child)
+			$sql[] = $child->sql($this);
+		return implode($connector, $sql);
+
+		// Return SQL :
+		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Ordered fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Ordered $fragment
+	 *
+	 * @return string
+	 */
+	public function compile_ordered(GlueDB_Fragment_Ordered $fragment) {
+		// Get data from fragment :
+		$toorder	= $fragment->fragment();
+		$order		= $fragment->order();
+
+		// Generate fragment SQL :
+		$sql = $toorder->sql($this);
+		if ( ! $toorder instanceof GlueDB_Fragment_Column)
+			$sql	= '(' . $sql . ')';
+
+		// Add ordering :
+		if (isset($order)) {
+			switch ($order) {
+				case GlueDB_Fragment_Ordered::ASC :		$sql .= ' ASC';		break;
+				case GlueDB_Fragment_Ordered::DESC :	$sql .= ' DESC';	break;
+			}
+		}
+
+		// Return SQL :
+		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Column fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Column $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_column(GlueDB_Fragment_Column $fragment) {
+		$tablesql	= $this->compile_identifier($fragment->table_alias()->alias());
+		$columnsql	= $this->compile_identifier($fragment->column()->dbcolumn());
+		return $tablesql . '.' . $columnsql;
+	}
+
+	/**
 	 * Quotes an identifier according to current database conventions.
 	 *
 	 * @param string $identifier
@@ -224,119 +408,6 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Returns SQL string for something that needs an alias.
-	 *
-	 * @param GlueDB_Fragment_Aliased $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_aliased(GlueDB_Fragment_Aliased $fragment) {
-		// Get data from fragment :
-		$toalias	= $fragment->fragment();
-		$alias		= $fragment->alias();
-		
-		// Generate fragment SQL :
-		$sql = $toalias->sql($this);
-		if ( ! ($toalias instanceof GlueDB_Fragment_Column || $toalias instanceof GlueDB_Fragment_Table))
-			$sql	= '(' . $sql . ')';
-		
-		// Add alias :
-		$sql .= ' AS ' . $this->compile_identifier($alias);
-
-		// Return SQL :
-		return $sql;
-	}
-
-	/**
-	 * Returns SQL string for something that is ordered.
-	 *
-	 * @param GlueDB_Fragment_Ordered $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_ordered(GlueDB_Fragment_Ordered $fragment) {
-		// Get data from fragment :
-		$toorder	= $fragment->fragment();
-		$order		= $fragment->order();
-				
-		// Generate fragment SQL :
-		$sql = $toorder->sql($this);
-		if ( ! $toorder instanceof GlueDB_Fragment_Column)
-			$sql	= '(' . $sql . ')';
-		
-		// Add ordering :		
-		if (isset($order)) {
-			switch ($order) {
-				case GlueDB_Fragment_Ordered::ASC :		$sql .= ' ASC';		break;
-				case GlueDB_Fragment_Ordered::DESC :	$sql .= ' DESC';	break;
-			}
-		}
-		
-		// Return SQL :		
-		return $sql;
-	}
-
-	/**
-	 * Assembles components of a join operand into an SQL string.
-	 *
-	 * @param GlueDB_Fragment_Operand_Join $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_operand_join(GlueDB_Fragment_Operand_Join $fragment) {
-		// Get data from fragment :
-		$operator	= $fragment->operator();		
-		$operand	= $fragment->operand();
-		$on			= $fragment->on();
-		
-		// Add operator SQL :
-		$sql = '';
-		if (isset($operator)) {
-			switch ($operator) {
-				case GlueDB_Fragment_Operand_Join::INNER_JOIN :			$sql .= 'INNER JOIN ';			break;
-				case GlueDB_Fragment_Operand_Join::RIGHT_OUTER_JOIN :	$sql .= 'RIGHT OUTER JOIN ';	break;
-				case GlueDB_Fragment_Operand_Join::LEFT_OUTER_JOIN :	$sql .= 'LEFT OUTER JOIN ';		break;
-			}
-		}
-		
-		// Add operand SQL :
-		$sqlop = $operand->sql($this);
-		if ( ! $operand instanceof GlueDB_Fragment_Aliased_Table)
-			$sqlop	= '(' . $sqlop . ')';
-		$sql .= $sqlop;
-		
-		// Add on SQL :
-		if (isset($operator)) {
-			$sqlon = $on->sql($this);
-			$sql .= ' ON ' . $sqlon;
-		}
-		
-		// Return SQL :			
-		return $sql;
-	}
-
-	/**
-	 * Assembles components of a boolean operand into an SQL string.
-	 *
-	 * @param GlueDB_Fragment_Ordered $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_operand_bool($operator, $operandsql) {
-		$sql = '';
-		if (isset($operator)) {
-			switch ($operator) {
-				case GlueDB_Fragment_Operand_Bool::_AND :	$sql = 'AND ';		break;
-				case GlueDB_Fragment_Operand_Bool::_OR :	$sql = 'OR ';		break;
-				case GlueDB_Fragment_Operand_Bool::ANDNOT :	$sql = 'AND NOT ';	break;
-				case GlueDB_Fragment_Operand_Bool::ORNOT :	$sql = 'OR NOT ';	break;
-			}
-		}
-		$sql .= '(' . $operandsql . ')';
-		return $sql;
-	}
-
-	/**
 	 * Assembles components of a select query into an SQL string.
 	 *
 	 * @param string $selectsql
@@ -351,13 +422,13 @@ abstract class GlueDB_Database extends PDO {
 	public function compile_query_select($selectsql, $fromsql, $wheresql, $groupbysql, $havingsql, $orderbysql) {
 		// Mandatory :
 		$sql = 'SELECT ' . (isset($selectsql) ? $selectsql : '*') . ' FROM ' . $fromsql;
-		
+
 		// Optional :
 		if (isset($wheresql))	$sql .= ' WHERE '		. $wheresql;
 		if (isset($groupbysql))	$sql .= ' GROUP BY '	. $groupbysql;
 		if (isset($havingsql))	$sql .= ' HAVING '		. $havingsql;
 		if (isset($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
-		
+
 		return $sql;
 	}
 

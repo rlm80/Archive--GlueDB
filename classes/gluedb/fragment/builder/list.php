@@ -10,11 +10,6 @@
 
 abstract class GlueDB_Fragment_Builder_List extends GlueDB_Fragment_Builder {
 	/**
-	 * @var string Connector redefined.
-	 */
-	protected $connector = ', ';
-
-	/**
 	 * Initializes the list with a first item.
 	 *
 	 * @return GlueDB_Fragment_Builder_List

@@ -10,11 +10,6 @@
 
 class GlueDB_Fragment_Builder_Join extends GlueDB_Fragment_Builder {
 	/**
-	 * @var string Connector redefined.
-	 */
-	protected $connector = ' ';
-
-	/**
 	 * Initializes the expression with a first operand.
 	 *
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.

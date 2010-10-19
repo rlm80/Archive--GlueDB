@@ -42,18 +42,14 @@ class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Compiles the data structure and returns the resulting SQL string.
+	 * Table alias getter.
 	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
+	 * @return GlueDB_Fragment_Aliased_Table
 	 */
-	protected function compile(GlueDB_Database $db) {
-		$tablesql	= $db->compile_identifier($this->table_alias->alias());
-		$columnsql	= $db->compile_identifier($this->column()->dbcolumn());
-		return $tablesql . '.' . $columnsql;
+	public function table_alias() {
+		return $this->table_alias;
 	}
-	
+
 	public function __toString() {
 		return $this->sql($this->column()->table()->db());
 	}

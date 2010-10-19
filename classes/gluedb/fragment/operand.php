@@ -31,6 +31,15 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 	}
 
 	/**
+	 * Operator getter.
+	 *
+	 * @return integer
+	 */
+	public function operator() {
+		return $this->operator;
+	}
+
+	/**
 	 * Operand getter.
 	 *
 	 * @return GlueDB_Fragment

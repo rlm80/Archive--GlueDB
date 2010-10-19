@@ -15,11 +15,6 @@ class GlueDB_Fragment_Builder extends GlueDB_Fragment {
 	 * @var array List of children fragments.
 	 */
 	protected $children = array();
-	
-	/**
-	 * @var string Connector.
-	 */
-	protected $connector = '';
 
 	/**
 	 * Adds a child at the end of the children list.
@@ -57,15 +52,6 @@ class GlueDB_Fragment_Builder extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Whether or not children list is empty.
-	 *
-	 * @return boolean
-	 */
-	public function is_empty() {
-		return count($this->children) === 0;
-	}
-
-	/**
 	 * Removes all children.
 	 *
 	 * @return GlueDB_Fragment_Builder
@@ -78,16 +64,20 @@ class GlueDB_Fragment_Builder extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Compiles the data structure and returns the resulting SQL string.
+	 * Whether or not children list is empty.
 	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
+	 * @return boolean
 	 */
-	protected function compile(GlueDB_Database $db) {
-		$sql = array();
-		foreach ($this->children as $child)
-			$sql[] = $child->sql($db);
-		return implode($this->connector, $sql);
+	public function is_empty() { // TODO remove this. children() function is enough
+		return count($this->children) === 0;
+	}
+
+	/**
+	 * Returns children fragments.
+	 *
+ 	 * @return array
+	 */
+	public function children() {
+		return $this->children;
 	}
 }
