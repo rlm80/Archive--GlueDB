@@ -46,26 +46,20 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
+	 * Template getter.
 	 *
 	 * @return string
 	 */
-	protected function compile(GlueDB_Database $db) {
-		// Break appart template :
-		$parts = explode('?', $this->template);
-		if (count($parts) !== count($this->replacements) + 1)
-			throw new Kohana_Exception("Number of placeholders different from number of replacements for " . $this->template);
+	public function template() {
+		return $this->template;
+	}
 
-		// Make replacements :
-		$max = count($this->replacements);
-		$sql = $parts[0];
-		for($i = 0; $i < $max; $i++) {
-			$sql .= $this->replacements[$i]->sql($db);
-			$sql .= $parts[$i + 1];
-		}
-
-		return $sql;
+	/**
+	 * Replacements getter.
+	 *
+	 * @return array
+	 */
+	public function replacements() {
+		return $this->replacements;
 	}
 }

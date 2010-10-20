@@ -18,27 +18,27 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	 * @var GlueDB_Fragment_Builder_Join_From From clause.
 	 */
 	protected $from;
-	
+
 	/**
 	 * @var GlueDB_Fragment_Builder_Bool_Where Where clause.
 	 */
 	protected $where;
-	
+
 	/**
 	 * @var GlueDB_Fragment_Builder_List_Groupby Group by list.
 	 */
 	protected $groupby;
-	
+
 	/**
 	 * @var GlueDB_Fragment_Builder_Bool_Having Having clause.
 	 */
 	protected $having;
-	
+
 	/**
 	 * @var GlueDB_Fragment_Builder_List_Orderby Order by list.
 	 */
 	protected $orderby;
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -50,10 +50,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 		$this->having	= new GlueDB_Fragment_Builder_Bool_Having($this);
 		$this->orderby	= new GlueDB_Fragment_Builder_List_Orderby($this);
 	}
-	
+
 	/**
 	 * Returns the select list, initializing it with given parameters if any.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Builder_List_Select
 	 */
 	public function select() {
@@ -63,10 +63,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 		}
 		return $this->select;
 	}
-	
+
 	/**
 	 * Returns the from clause, initializing it with given parameters if any.
-	 * 
+	 *
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
@@ -80,7 +80,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 
 	/**
 	 * Returns the where clause, initializing it with given parameters if any.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Builder_Bool_Where
 	 */
 	public function where() {
@@ -89,11 +89,11 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 			call_user_func_array(array($this->where, 'init'), $args);
 		}
 		return $this->where;
-	}		
-	
+	}
+
 	/**
 	 * Returns the group by clause, initializing it with given parameters if any.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Builder_List_Groupby
 	 */
 	public function groupby() {
@@ -102,11 +102,11 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 			call_user_func_array(array($this->groupby, 'init'), $args);
 		}
 		return $this->groupby;
-	}	
-	
+	}
+
 	/**
 	 * Returns the group by clause, initializing it with given parameters if any.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Builder_Bool_Having
 	 */
 	public function having() {
@@ -116,10 +116,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 		}
 		return $this->having;
 	}
-	
+
 	/**
 	 * Returns the order by clause, initializing it with given parameters if any.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Builder_List_Orderby
 	 */
 	public function orderby() {
@@ -130,27 +130,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 		return $this->orderby;
 	}
 
-	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	protected function compile(GlueDB_Database $db) {
-		if ( ! $this->select->is_empty())	$selectsql	= $this->select->sql($db);	else $selectsql		= null; // TODO this should go in sql() ?
-		if ( ! $this->from->is_empty())		$fromsql	= $this->from->sql($db);	else $fromsql		= null;
-		if ( ! $this->where->is_empty())	$wheresql	= $this->where->sql($db);	else $wheresql		= null; 
-		if ( ! $this->groupby->is_empty())	$groupbysql	= $this->groupby->sql($db);	else $groupbysql	= null;
-		if ( ! $this->having->is_empty())	$havingsql	= $this->having->sql($db);	else $havingsql		= null;
-		if ( ! $this->orderby->is_empty())	$orderbysql	= $this->orderby->sql($db);	else $orderbysql	= null;
-		return $db->compile_query_select($selectsql, $fromsql, $wheresql, $groupbysql, $havingsql, $orderbysql);
-	}
-	
 	protected function find_db() {
 		// TODO
 	}
-	 
+
 	/*
 	 * Executes current query and returns a result set.
 	 *

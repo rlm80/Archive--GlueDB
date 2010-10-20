@@ -112,7 +112,7 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Compiles fragments into an SQL string.
+	 * Compiles given fragment into an SQL string.
 	 *
 	 * @param GlueDB_Fragment $fragment
 	 *
@@ -131,7 +131,14 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_ordered($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Column)
 			return $this->compile_column($fragment);
-
+		elseif ($fragment instanceof GlueDB_Fragment_Table)
+			return $this->compile_table($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Template)
+			return $this->compile_template($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Value)
+			return $this->compile_value($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Query_Select)
+			return $this->compile_query_select($fragment);
 	}
 
 	/**
@@ -220,7 +227,7 @@ abstract class GlueDB_Database extends PDO {
 			$sql	= '(' . $sql . ')';
 
 		// Add alias :
-		$sql .= ' AS ' . $this->compile_identifier($alias);
+		$sql .= ' AS ' . $this->quote_identifier($alias);
 
 		// Return SQL :
 		return $sql;
@@ -244,10 +251,10 @@ abstract class GlueDB_Database extends PDO {
 			$connector = ' ';
 
 		// Generate fragment SQL :
-		$sql = array();
-		foreach ($children() as $child)
-			$sql[] = $child->sql($this);
-		return implode($connector, $sql);
+		$sqls = array();
+		foreach ($children as $child)
+			$sqls[] = $child->sql($this);
+		$sql = implode($connector, $sqls);
 
 		// Return SQL :
 		return $sql;
@@ -260,7 +267,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	public function compile_ordered(GlueDB_Fragment_Ordered $fragment) {
+	protected function compile_ordered(GlueDB_Fragment_Ordered $fragment) {
 		// Get data from fragment :
 		$toorder	= $fragment->fragment();
 		$order		= $fragment->order();
@@ -290,9 +297,91 @@ abstract class GlueDB_Database extends PDO {
 	 * @return string
 	 */
 	protected function compile_column(GlueDB_Fragment_Column $fragment) {
-		$tablesql	= $this->compile_identifier($fragment->table_alias()->alias());
-		$columnsql	= $this->compile_identifier($fragment->column()->dbcolumn());
+		$tablesql	= $this->quote_identifier($fragment->table_alias()->alias());
+		$columnsql	= $this->quote_identifier($fragment->column()->dbcolumn());
 		return $tablesql . '.' . $columnsql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Column fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Table $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_table(GlueDB_Fragment_Table $fragment) {
+		return $this->quote_identifier($fragment->table()->dbtable());
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Template fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Template $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_template(GlueDB_Fragment_Template $fragment) {
+		// Get data from fragment :
+		$template		= $fragment->template();
+		$replacements	= $fragment->replacements();
+
+		// Break appart template :
+		$parts = explode('?', $template);
+		if (count($parts) !== count($replacements) + 1)
+			throw new Kohana_Exception("Number of placeholders different from number of replacements for " . $template);
+
+		// Make replacements :
+		$max = count($replacements);
+		$sql = $parts[0];
+		for($i = 0; $i < $max; $i++) {
+			$sql .= $replacements[$i]->sql($this);
+			$sql .= $parts[$i + 1];
+		}
+
+		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Value fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Value $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_value(GlueDB_Fragment_Value $fragment) {
+		// Get data from fragment :
+		$value = $fragment->value();
+
+		// Generate SQL :
+		return $this->quote_value($value);
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Query_Select fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Query_Select $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_query_select(GlueDB_Fragment_Query_Select $fragment) {
+		// Get data from fragment :
+		$selectsql	= $fragment->select()->sql($this);
+		$fromsql	= $fragment->from()->sql($this);
+		$wheresql	= $fragment->where()->sql($this);
+		$groupbysql	= $fragment->groupby()->sql($this);
+		$havingsql	= $fragment->having()->sql($this);
+		$orderbysql	= $fragment->orderby()->sql($this);
+
+		// Mandatory :
+		$sql = 'SELECT ' . (empty($selectsql) ? '*' : $selectsql) . ' FROM ' . $fromsql;
+
+		// Optional :
+		if ( ! empty($wheresql))		$sql .= ' WHERE '		. $wheresql;
+		if ( ! empty($groupbysql))	$sql .= ' GROUP BY '	. $groupbysql;
+		if ( ! empty($havingsql))	$sql .= ' HAVING '		. $havingsql;
+		if ( ! empty($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
+
+		return $sql;
 	}
 
 	/**
@@ -302,33 +391,30 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	public function compile_identifier($identifier) {
+	protected function quote_identifier($identifier) {
 		return '"' . $identifier . '"';
 	}
 
 	/**
 	 * Quotes a value for inclusion into an SQL query.
 	 *
-	 * Extends PDO::quote to deal with any PHP types (especially arrays), not just strings. Don't
-	 * redefine this, instead redefine one of its factor methods (compile_array, compile_integer, etc.).
-	 *
 	 * @param mixed $value
 	 *
 	 * @return string
 	 */
-	public function compile_value($value) {
+	protected function quote_value($value) {
 		if (is_string($value))
-			return $this->compile_string($value);
+			return $this->quote_string($value);
 		elseif (is_array($value))
-			return $this->compile_array($value);
+			return $this->quote_array($value);
 		elseif (is_bool($value))
-			return $this->compile_bool($value);
+			return $this->quote_bool($value);
 		elseif (is_integer($value))
-			return $this->compile_integer($value);
+			return $this->quote_integer($value);
 		elseif (is_float($value))
-			return $this->compile_float($value);
+			return $this->quote_float($value);
 		elseif (is_null($value))
-			return $this->compile_null($value);
+			return $this->quote_null($value);
 		else
 			throw new Kohana_Exception("Cannot quote objects.");
 	}
@@ -340,8 +426,8 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_string($value) {
-		return parent::quote($value);
+	protected function quote_string($value) {
+		return $this->quote($value);
 	}
 
 	/**
@@ -351,15 +437,10 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_array(array $value) {
-		// Empty arrays are not valid :
-		if (count($value) === 0)
-			throw new Kohana_Exception("Cannot quote empty array.");
-
-		// Recursion :
+	protected function quote_array(array $value) {
+		$arr = array();
 		foreach ($value as $val)
-			$arr[] = $this->compile_value($val);
-
+			$arr[] = $this->quote_value($val);
 		return '(' . implode(',', $arr) . ')';
 	}
 
@@ -370,7 +451,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_integer($value) {
+	protected function quote_integer($value) {
 		return (string) $value;
 	}
 
@@ -381,7 +462,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_bool($value) {
+	protected function quote_bool($value) {
 		return $value ? 'TRUE' : 'FALSE';
 	}
 
@@ -392,7 +473,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_float($value) {
+	protected function quote_float($value) {
 		return (string) $value;
 	}
 
@@ -403,33 +484,8 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_null($value) {
+	protected function quote_null($value) {
 		return 'NULL';
-	}
-
-	/**
-	 * Assembles components of a select query into an SQL string.
-	 *
-	 * @param string $selectsql
-	 * @param string $fromsql
-	 * @param string $wheresql
-	 * @param string $groupbysql
-	 * @param string $havingsql
-	 * @param string $orderbysql
-	 *
-	 * @return string
-	 */
-	public function compile_query_select($selectsql, $fromsql, $wheresql, $groupbysql, $havingsql, $orderbysql) {
-		// Mandatory :
-		$sql = 'SELECT ' . (isset($selectsql) ? $selectsql : '*') . ' FROM ' . $fromsql;
-
-		// Optional :
-		if (isset($wheresql))	$sql .= ' WHERE '		. $wheresql;
-		if (isset($groupbysql))	$sql .= ' GROUP BY '	. $groupbysql;
-		if (isset($havingsql))	$sql .= ' HAVING '		. $havingsql;
-		if (isset($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
-
-		return $sql;
 	}
 
 	/**

@@ -30,15 +30,4 @@ class GlueDB_Fragment_Table extends GlueDB_Fragment {
 	public function table() {
 		return $this->table;
 	}
-
-	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	protected function compile(GlueDB_Database $db) {
-		return $db->compile_identifier($this->table->dbtable());
-	}
 }

@@ -24,7 +24,7 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 	}
 
 	/**
-	 * If there is no parameters, returns the value. Otherwise changes the value and
+	 * If there is no parameters, returns the value. Otherwise updates the value and
 	 * invalidates the fragment.
 	 *
 	 * @param mixed $value
@@ -39,16 +39,5 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 			$this->invalidate();
 			return $this;
 		}
-	}
-
-	/**
-	 * Compiles the data structure and returns the resulting SQL string.
-	 *
-	 * @param GlueDB_Database $db
-	 *
-	 * @return string
-	 */
-	protected function compile(GlueDB_Database $db) {
-		return $db->compile_value($this->value);
 	}
 }
