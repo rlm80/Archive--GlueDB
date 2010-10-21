@@ -14,12 +14,12 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	const DESC	= 1;
 
 	/**
-	 * @var GlueDB_Fragment Fragment that needs to have an order set.
+	 * @var GlueDB_Fragment Fragment that needs to have an order.
 	 */
 	protected $fragment;
 
 	/**
-	 * @var integer Ordering.
+	 * @var integer Order.
 	 */
 	protected $order;
 
@@ -35,30 +35,34 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Returns fragment.
+	 * Fragment getter/setter.
+	 *
+	 * @param GlueDB_Fragment $fragment
 	 *
 	 * @return GlueDB_Fragment
 	 */
-	public function fragment() {
-		return $this->fragment;
+	public function fragment($fragment = null) {
+		if (func_num_args() === 0)
+			return $this->fragment;
+		else {
+			$this->fragment = $fragment;
+			$this->invalidate();
+		}
 	}
 
 	/**
-	 * Order setter.
+	 * Order getter/setter.
 	 *
 	 * @param integer $order
-	 */
-	public function set_order($order) {
-		$this->order = $order;
-		$this->invalidate();
-	}
-
-	/**
-	 * Returns order.
 	 *
 	 * @return integer
 	 */
-	public function order() {
-		return $this->order;
+	public function order($order = null) {
+		if (func_num_args() === 0)
+			return $this->order;
+		else {
+			$this->order = $order;
+			$this->invalidate();
+		}
 	}
 }

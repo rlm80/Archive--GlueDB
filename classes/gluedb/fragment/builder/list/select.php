@@ -10,15 +10,10 @@
 
 class GlueDB_Fragment_Builder_List_Select extends GlueDB_Fragment_Builder_List {
 	/**
-	 * @var GlueDB_Fragment_Query Query that owns this list.
-	 */
-	protected $query;
-
-	/**
 	 * @param GlueDB_Fragment_Query $query
 	 */
 	public function __construct(GlueDB_Fragment_Query $query = null) {
-		$this->query = $query;
+		$this->set_forward($query);
 	}
 
 	/**
@@ -37,7 +32,7 @@ class GlueDB_Fragment_Builder_List_Select extends GlueDB_Fragment_Builder_List {
 			$alias = $this->compute_alias_computed();
 
 		// Push fragment :
-		if ($first instanceof GlueDB_Fragment)	
+		if ($first instanceof GlueDB_Fragment)
 			$this->push(new GlueDB_Fragment_Aliased(
 				$first,
 				$alias

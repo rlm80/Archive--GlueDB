@@ -13,6 +13,7 @@ class GlueDB_Fragment_Table extends GlueDB_Fragment {
 	 * @var GlueDB_Table Table.
 	 */
 	protected $table;
+
 	/**
 	 * Constructor.
 	 *
@@ -23,11 +24,16 @@ class GlueDB_Fragment_Table extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Table getter.
+	 * Table setter/getter.
 	 *
 	 * @return GlueDB_Table
 	 */
-	public function table() {
-		return $this->table;
+	public function table($table_name = null) {
+		if (func_num_args() === 0)
+			return $this->table;
+		else {
+			$this->table = gluedb::table($table_name);
+			$this->invalidate();
+		}
 	}
 }

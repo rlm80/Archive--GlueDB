@@ -24,12 +24,11 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 	}
 
 	/**
-	 * If there is no parameters, returns the value. Otherwise updates the value and
-	 * invalidates the fragment.
+	 * Value setter/getter.
 	 *
 	 * @param mixed $value
 	 *
-	 * @return GlueDB_Fragment_Value
+	 * @return mixed
 	 */
 	public function value($value = null) {
 		if (func_num_args() === 0)
@@ -37,7 +36,6 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 		else {
 			$this->value = $value;
 			$this->invalidate();
-			return $this;
 		}
 	}
 }

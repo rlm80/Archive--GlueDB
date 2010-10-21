@@ -31,13 +31,13 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 * @return GlueDB_Database
 	 */
 	abstract protected function find_db();
-	
+
 	/**
 	 * Return current object. Useful to get the query from on of the children builders :
-	 * 
+	 *
 	 * $sql = gluedb::select('mytable')->where('1=1')->sql(); // Doesn't work ! Returns only the SQL of the last builder accessed : the where clause.
 	 * $sql = gluedb::select('mytable')->where('1=1')->query()->sql(); // Works. Returns the SQL of the whole query.
-	 * 
+	 *
 	 * @return GlueDB_Fragment_Query
 	 */
 	public function query() {
@@ -53,8 +53,7 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 * @see PDO::prepare()
 	 */
 	public function prepare($driver_options = null) {
-		$dbname	= $this->db()->name();
-		$sql	= $this->sql($dbname);
+		$sql = $this->sql($this->db());
 		return $this->db()->prepare($sql, $driver_options);
 	}
 
@@ -62,14 +61,4 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 * @see PDO::exec() and PDO::query()
 	 */
 	abstract public function execute();
-	
-	/**
-	 * Handles ambiguous function calls.
-	 * 
-	 * @param string $name
-	 * @param array $args
-	 */
-	public function __call($name, array $args) { // TODO factor this to avoid __call ?
-		throw new Kohana_Exception("Call to function " . $name . " is ambiguous. It may refer to more than one expression builder, or none at all.");
-	}
 }

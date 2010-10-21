@@ -10,15 +10,10 @@
 
 class GlueDB_Fragment_Builder_List_Groupby extends GlueDB_Fragment_Builder_List {
 	/**
-	 * @var GlueDB_Fragment_Query Query that owns this order by clause.
-	 */
-	protected $query;
-
-	/**
 	 * @param GlueDB_Fragment_Query $query
 	 */
-	public function __construct(GlueDB_Fragment_Query $query) {
-		$this->query = $query;
+	public function __construct(GlueDB_Fragment_Query $query = null) {
+		$this->set_forward($query);
 	}
 
 	/**
@@ -35,17 +30,5 @@ class GlueDB_Fragment_Builder_List_Groupby extends GlueDB_Fragment_Builder_List 
 			$this->push($first);
 		else
 			$this->push(new GlueDB_Fragment_Template($first, $params));
-	}
-
-	/**
-	 * Forwards unknown calls to query.
-	 *
-	 * @param unknown_type $name
-	 * @param unknown_type $args
-	 *
-	 * @return mixed
-	 */
-	public function __call($name, $args) {
-		return call_user_func_array(array($this->query, $name), $args);
 	}
 }

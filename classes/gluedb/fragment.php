@@ -27,6 +27,12 @@ abstract class GlueDB_Fragment {
 	protected $users;
 
 	/**
+	 * @var GlueDB_Fragment When this property is set, it means all unknown function calls on the current fragment
+	 * 						are forwarded tho that fragment.
+	 */
+	protected $forward;
+
+	/**
 	 * @var array Cached compiled SQL strings. One entry for each database.
 	 */
 	protected $sql = array();
@@ -96,6 +102,27 @@ abstract class GlueDB_Fragment {
 			foreach($this->users as $user)
 				$user['object']->invalidate();
 		}
+	}
+
+	/**
+	 * Forward fragment setter.
+	 *
+	 * @param GlueDB_Fragment $fragment
+	 */
+	protected function set_forward($fragment) {
+		$this->forward = $fragment;
+	}
+
+	/**
+	 * Forwards unknown calls to $forward fragment.
+	 *
+	 * @param string $name
+	 * @param string $args
+	 *
+	 * @return mixed
+	 */
+	public function __call($name, $args) {
+		return call_user_func_array(array($this->forward, $name), $args);
 	}
 }
 

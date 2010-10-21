@@ -100,5 +100,7 @@ class GlueDB_Fragment_Builder_Bool extends GlueDB_Fragment_Builder {
 			return call_user_func_array(array($this, '_or'), $args);
 		elseif ($name === 'and')
 			return call_user_func_array(array($this, '_and'), $args);
+		else
+			return parent::__call($name, $args);
 	}
 }

@@ -31,20 +31,34 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Operator getter.
+	 * Operator getter/setter.
+	 *
+	 * @param integer $operator
 	 *
 	 * @return integer
 	 */
-	public function operator() {
-		return $this->operator;
+	public function operator($operator = null) {
+		if (func_num_args() === 0)
+			return $this->operator;
+		else {
+			$this->operator = $operator;
+			$this->invalidate();
+		}
 	}
 
 	/**
-	 * Operand getter.
+	 * Operand getter/setter.
+	 *
+	 * @param GlueDB_Fragment $operand
 	 *
 	 * @return GlueDB_Fragment
 	 */
-	public function operand() {
-		return $this->operand;
+	public function operand($operand = null) {
+		if (func_num_args() === 0)
+			return $this->operand;
+		else {
+			$this->operand = $operand;
+			$this->invalidate();
+		}
 	}
 }

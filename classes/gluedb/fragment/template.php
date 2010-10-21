@@ -46,20 +46,34 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Template getter.
+	 * Template setter/getter.
+	 *
+	 * @param string $template
 	 *
 	 * @return string
 	 */
-	public function template() {
-		return $this->template;
+	public function template($template = null) {
+		if (func_num_args() === 0)
+			return $this->template;
+		else {
+			$this->template = $template;
+			$this->invalidate();
+		}
 	}
 
 	/**
-	 * Replacements getter.
+	 * Replacements setter/getter.
+	 *
+	 * @param array $replacements
 	 *
 	 * @return array
 	 */
-	public function replacements() {
-		return $this->replacements;
+	public function replacements($replacements = null) {
+		if (func_num_args() === 0)
+			return $this->replacements;
+		else {
+			$this->replacements = $replacements;
+			$this->invalidate();
+		}
 	}
 }

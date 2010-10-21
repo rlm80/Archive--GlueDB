@@ -48,16 +48,4 @@ abstract class GlueDB_Fragment_Builder_List extends GlueDB_Fragment_Builder {
 	 * @param array $params
 	 */
 	abstract protected function add($params);
-
-	/*
-	 * Forwards unknown calls to query.
-	 *
-	 * @param string $name
-	 * @param array $args
-	 *
-	 * @return mixed
-	 */
-	public function __call($name, $args) {
-		return call_user_func_array(array($this->query, $name), $args);
-	}
 }

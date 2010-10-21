@@ -10,30 +10,9 @@
 
 class GlueDB_Fragment_Builder_Bool_Where extends GlueDB_Fragment_Builder_Bool {
 	/**
-	 * @var GlueDB_Fragment_Query Query that owns this where clause.
-	 */
-	protected $query;
-
-	/**
 	 * @param GlueDB_Fragment_Query $query
 	 */
-	public function __construct(GlueDB_Fragment_Query $query) {
-		$this->query = $query;
-	}
-
-	/**
-	 * Forwards unknown calls to query.
-	 *
-	 * @param string $name
-	 * @param string $args
-	 *
-	 * @return mixed
-	 */
-	public function __call($name, $args) {
-		$return = parent::__call($name, $args);
-		if ( ! isset($return))
-			return call_user_func_array(array($this->query, $name), $args);
-		else
-			return $return;
+	public function __construct(GlueDB_Fragment_Query $query = null) {
+		$this->set_forward($query);
 	}
 }

@@ -10,15 +10,10 @@
 
 class GlueDB_Fragment_Builder_List_Orderby extends GlueDB_Fragment_Builder_List {
 	/**
-	 * @var GlueDB_Fragment_Query Query that owns this list.
-	 */
-	protected $query;
-
-	/**
 	 * @param GlueDB_Fragment_Query $query
 	 */
 	public function __construct(GlueDB_Fragment_Query $query = null) {
-		$this->query = $query;
+		$this->set_forward($query);
 	}
 
 	/**
@@ -46,7 +41,7 @@ class GlueDB_Fragment_Builder_List_Orderby extends GlueDB_Fragment_Builder_List 
 	 */
 	public function asc() {
 		if ($last = $this->last())
-			$last->set_order(GlueDB_Fragment_Ordered::ASC);
+			$last->order(GlueDB_Fragment_Ordered::ASC);
 		else
 			throw new Kohana_Exception("No column to set an order to.");
 
@@ -60,7 +55,7 @@ class GlueDB_Fragment_Builder_List_Orderby extends GlueDB_Fragment_Builder_List 
 	 */
 	public function desc() {
 		if ($last = $this->last())
-			$last->set_order(GlueDB_Fragment_Ordered::DESC);
+			$last->order(GlueDB_Fragment_Ordered::DESC);
 		else
 			throw new Kohana_Exception("No column to set an order to.");
 

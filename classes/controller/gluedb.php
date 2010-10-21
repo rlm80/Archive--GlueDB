@@ -105,25 +105,25 @@ class Controller_GlueDB extends Controller {
 			$join3,
 			"`mytable` AS `t3` LEFT OUTER JOIN `mytable` AS `myalias` ON (1=1)"
 		);
-		
+
 		$select1 = gluedb::select('mytable')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->query();
 		$tests['query select basic'] = array(
 			$select1,
 			"SELECT * FROM `mytable` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
 		);
-		
+/*
 		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'")->query();
 		$tests['query select alias'] = array(
 			$select2,
 			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
-		);		
-		
+		);
+
 		$select3 = gluedb::select('users', $a)->left('users', $b)->on("$a->login = $b->login")->query();
 		$tests['query select default alias and join'] = array(
 			$select3,
 			"SELECT * FROM `users` AS `users__0` LEFT OUTER JOIN `users` AS `users__1` ON (`users__0`.`login` = `users__1`.`login`)"
-		);			
-
+		);
+*/
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($f, $target) = $data;

@@ -40,15 +40,6 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	}
 
 	/**
-	 * Returns operator.
-	 *
-	 * @return integer
-	 */
-	public function operator() {
-		return $this->operator;
-	}
-
-	/**
 	 * Forwards call to on clause.
 	 */
 	public function init() {

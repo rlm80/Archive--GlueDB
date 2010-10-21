@@ -141,6 +141,8 @@ class GlueDB_Fragment_Builder_Join extends GlueDB_Fragment_Builder {
 		return $this;
 	}
 
+	//TODO manque andnot ornot
+
 	/*
 	 * Setup aliases for _or() and _and(). Required because keywords aren't valid function names in PHP.
 	 */
@@ -151,5 +153,7 @@ class GlueDB_Fragment_Builder_Join extends GlueDB_Fragment_Builder {
 			return call_user_func_array(array($this, '_and'), $args);
 		elseif ($name === 'as')
 			return call_user_func_array(array($this, '_as'), $args);
+		else
+			return parent::__call($name, $args);
 	}
 }
