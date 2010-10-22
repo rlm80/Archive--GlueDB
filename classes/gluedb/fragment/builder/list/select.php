@@ -90,7 +90,7 @@ class GlueDB_Fragment_Builder_List_Select extends GlueDB_Fragment_Builder_List {
 	 */
 	public function _as($alias) {
 		if ($last = $this->last())
-			$last->set_alias($alias);
+			$last->alias($alias);
 		else
 			throw new Kohana_Exception("No column to set an alias to.");
 

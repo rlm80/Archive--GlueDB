@@ -41,15 +41,23 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	}
 	
 	/**
-	 * Returns alias.
+	 * Alias getter/setter.
+	 *
+	 * @param string
 	 *
 	 * @return string
 	 */
-	public function alias() {
-		if ( ! isset($this->alias))
-			$this->alias = $this->create_alias();
-		return $this->alias;
-	}
+	public function alias($alias = null) {
+		if (func_num_args() === 0) {
+			if ( ! isset($this->alias))
+				$this->alias = $this->create_alias();
+			return $this->alias;
+		}
+		else {
+			$this->alias = $alias;
+			$this->invalidate();
+		}		
+	}	
 
 	/**
 	 * Generates unique alias.

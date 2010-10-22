@@ -69,7 +69,7 @@ class Controller_GlueDB extends Controller {
 			->then('?', 'test');
 		$tests['select'] = array(
 			$select,
-			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, 'test' AS `computed`, 'test' AS `computed1`"
+			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, ('test') AS `computed`, ('test') AS `computed1`"
 		);
 
 		$select = new GlueDB_Fragment_Builder_List_Orderby(null);
@@ -111,7 +111,7 @@ class Controller_GlueDB extends Controller {
 			$select1,
 			"SELECT * FROM `mytable` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
 		);
-/*
+
 		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'")->query();
 		$tests['query select alias'] = array(
 			$select2,
@@ -123,7 +123,7 @@ class Controller_GlueDB extends Controller {
 			$select3,
 			"SELECT * FROM `users` AS `users__0` LEFT OUTER JOIN `users` AS `users__1` ON (`users__0`.`login` = `users__1`.`login`)"
 		);
-*/
+
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($f, $target) = $data;

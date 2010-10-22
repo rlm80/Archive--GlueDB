@@ -32,30 +32,32 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Returns fragment.
+	 * Fragment getter/setter.
 	 *
 	 * @return GlueDB_Fragment
 	 */
-	public function fragment() {
-		return $this->fragment;
+	public function fragment($fragment = null) {
+		if (func_num_args() === 0)
+			return $this->fragment;
+		else {
+			$this->fragment = $fragment;
+			$this->invalidate();
+		}	
 	}
-
+	
 	/**
-	 * Alias setter.
+	 * Alias getter/setter.
 	 *
-	 * @param string $alias
-	 */
-	public function set_alias($alias) {
-		$this->alias = $alias;
-		$this->invalidate();
-	}
-
-	/**
-	 * Returns alias.
+	 * @param string
 	 *
 	 * @return string
 	 */
-	public function alias() {
-		return $this->alias;
+	public function alias($alias = null) {
+		if (func_num_args() === 0)
+			return $this->alias;
+		else {
+			$this->alias = $alias;
+			$this->invalidate();
+		}		
 	}
 }

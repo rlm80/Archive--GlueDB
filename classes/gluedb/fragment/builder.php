@@ -1,9 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Provides basic functionality for fragments that have children fragments and
- * that compile into an SQL string that is simply the concatenation of the SQL
- * strings of each child fragment, separated with a connector.
+ * Builders are fragments that provide a fluent API to build an assembly of children fragments.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -57,19 +55,9 @@ class GlueDB_Fragment_Builder extends GlueDB_Fragment {
 	 * @return GlueDB_Fragment_Builder
 	 */
 	public function reset() {
-		while ($fragment = array_pop($this->children))
-			$fragment->unregister_user($this);
-		$this->invalidate();
+		while (count($this->children) > 0)
+			$this->pop();
 		return $this;
-	}
-
-	/**
-	 * Whether or not children list is empty.
-	 *
-	 * @return boolean
-	 */
-	public function is_empty() { // TODO remove this. children() function is enough
-		return count($this->children) === 0;
 	}
 
 	/**
