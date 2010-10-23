@@ -38,6 +38,16 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	 * @var GlueDB_Fragment_Builder_List_Orderby Order by list.
 	 */
 	protected $orderby;
+	
+	/**
+	 * @var Integer Limit.
+	 */
+	protected $limit;
+
+	/**
+	 * @var Integer Offset.
+	 */
+	protected $offset;
 
 	/**
 	 * Constructor.
@@ -129,6 +139,40 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 		}
 		return $this->orderby;
 	}
+	
+	/**
+	 * Limit getter/setter.
+	 *
+	 * @param integer $limit
+	 *
+	 * @return integer
+	 */
+	public function limit($limit = null) {
+		if (func_num_args() === 0)
+			return $this->limit;
+		else {
+			$this->limit = $limit;
+			$this->invalidate();
+			return $this;
+		}
+	}
+	
+	/**
+	 * Offset getter/setter.
+	 *
+	 * @param integer $offset
+	 *
+	 * @return integer
+	 */
+	public function offset($offset = null) {
+		if (func_num_args() === 0)
+			return $this->offset;
+		else {
+			$this->offset = $offset;
+			$this->invalidate();
+			return $this;
+		}
+	}	
 
 	protected function find_db() {
 		// TODO

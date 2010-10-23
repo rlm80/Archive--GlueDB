@@ -371,15 +371,19 @@ abstract class GlueDB_Database extends PDO {
 		$groupbysql	= $fragment->groupby()->sql($this);
 		$havingsql	= $fragment->having()->sql($this);
 		$orderbysql	= $fragment->orderby()->sql($this);
+		$limit		= $fragment->limit();
+		$offset		= $fragment->offset();
 
 		// Mandatory :
 		$sql = 'SELECT ' . (empty($selectsql) ? '*' : $selectsql) . ' FROM ' . $fromsql;
 
 		// Optional :
-		if ( ! empty($wheresql))		$sql .= ' WHERE '		. $wheresql;
+		if ( ! empty($wheresql))	$sql .= ' WHERE '		. $wheresql;
 		if ( ! empty($groupbysql))	$sql .= ' GROUP BY '	. $groupbysql;
 		if ( ! empty($havingsql))	$sql .= ' HAVING '		. $havingsql;
 		if ( ! empty($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
+		if (   isset($limit))		$sql .= ' LIMIT '		. $limit;
+		if (   isset($offset))		$sql .= ' OFFSET '		. $offset;
 
 		return $sql;
 	}

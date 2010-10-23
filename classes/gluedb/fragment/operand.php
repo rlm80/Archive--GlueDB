@@ -35,7 +35,7 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 	 *
 	 * @param integer $operator
 	 *
-	 * @return integer
+	 * @return mixed
 	 */
 	public function operator($operator = null) {
 		if (func_num_args() === 0)
@@ -43,6 +43,7 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 		else {
 			$this->operator = $operator;
 			$this->invalidate();
+			return $this;
 		}
 	}
 
@@ -51,7 +52,7 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 	 *
 	 * @param GlueDB_Fragment $operand
 	 *
-	 * @return GlueDB_Fragment
+	 * @return mixed
 	 */
 	public function operand($operand = null) {
 		if (func_num_args() === 0)
@@ -59,6 +60,7 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 		else {
 			$this->operand = $operand;
 			$this->invalidate();
+			return $this;
 		}
 	}
 }

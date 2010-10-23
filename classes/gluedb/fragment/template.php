@@ -50,7 +50,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	 *
 	 * @param string $template
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public function template($template = null) {
 		if (func_num_args() === 0)
@@ -58,6 +58,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 		else {
 			$this->template = $template;
 			$this->invalidate();
+			return $this;
 		}
 	}
 
@@ -66,7 +67,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 	 *
 	 * @param array $replacements
 	 *
-	 * @return array
+	 * @return mixed
 	 */
 	public function replacements($replacements = null) {
 		if (func_num_args() === 0)
@@ -74,6 +75,7 @@ class GlueDB_Fragment_Template extends GlueDB_Fragment {
 		else {
 			$this->replacements = $replacements;
 			$this->invalidate();
+			return $this;
 		}
 	}
 }

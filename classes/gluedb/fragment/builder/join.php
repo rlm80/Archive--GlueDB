@@ -140,6 +140,36 @@ class GlueDB_Fragment_Builder_Join extends GlueDB_Fragment_Builder {
 			throw new Kohana_Exception("No operand yet in expression.");
 		return $this;
 	}
+	
+	/**
+	 * Forwards call to last operand.
+	 *
+	 * @return GlueDB_Fragment_Builder_Join
+	 */
+	public function andnot() {
+		if ($last = $this->last()) {
+			$args = func_get_args();
+			call_user_func_array(array($last, 'andnot'), $args);
+		}
+		else
+			throw new Kohana_Exception("No operand yet in expression.");
+		return $this;
+	}	
+	
+	/**
+	 * Forwards call to last operand.
+	 *
+	 * @return GlueDB_Fragment_Builder_Join
+	 */
+	public function ornot() {
+		if ($last = $this->last()) {
+			$args = func_get_args();
+			call_user_func_array(array($last, 'ornot'), $args);
+		}
+		else
+			throw new Kohana_Exception("No operand yet in expression.");
+		return $this;
+	}	
 
 	//TODO manque andnot ornot
 

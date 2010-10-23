@@ -39,7 +39,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	 *
 	 * @param GlueDB_Fragment $fragment
 	 *
-	 * @return GlueDB_Fragment
+	 * @return mixed
 	 */
 	public function fragment($fragment = null) {
 		if (func_num_args() === 0)
@@ -47,6 +47,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 		else {
 			$this->fragment = $fragment;
 			$this->invalidate();
+			return $this;
 		}
 	}
 
@@ -55,7 +56,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	 *
 	 * @param integer $order
 	 *
-	 * @return integer
+	 * @return mixed
 	 */
 	public function order($order = null) {
 		if (func_num_args() === 0)
@@ -63,6 +64,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 		else {
 			$this->order = $order;
 			$this->invalidate();
+			return $this;
 		}
 	}
 }

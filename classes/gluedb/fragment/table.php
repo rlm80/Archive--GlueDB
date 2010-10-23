@@ -26,7 +26,7 @@ class GlueDB_Fragment_Table extends GlueDB_Fragment {
 	/**
 	 * Table setter/getter.
 	 *
-	 * @return GlueDB_Table
+	 * @return mixed
 	 */
 	public function table($table_name = null) {
 		if (func_num_args() === 0)
@@ -34,6 +34,7 @@ class GlueDB_Fragment_Table extends GlueDB_Fragment {
 		else {
 			$this->table = gluedb::table($table_name);
 			$this->invalidate();
+			return $this;
 		}
 	}
 }

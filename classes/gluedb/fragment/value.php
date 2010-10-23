@@ -36,6 +36,7 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 		else {
 			$this->value = $value;
 			$this->invalidate();
+			return $this;
 		}
 	}
 }

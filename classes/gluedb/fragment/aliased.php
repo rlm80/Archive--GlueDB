@@ -34,14 +34,17 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	/**
 	 * Fragment getter/setter.
 	 *
-	 * @return GlueDB_Fragment
+	 * @param GlueDB_Fragment
+	 *
+	 * @return mixed
 	 */
-	public function fragment($fragment = null) {
+	public function fragment(GlueDB_Fragment $fragment = null) {
 		if (func_num_args() === 0)
 			return $this->fragment;
 		else {
 			$this->fragment = $fragment;
 			$this->invalidate();
+			return $this;
 		}	
 	}
 	
@@ -50,7 +53,7 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	 *
 	 * @param string
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public function alias($alias = null) {
 		if (func_num_args() === 0)
@@ -58,6 +61,7 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 		else {
 			$this->alias = $alias;
 			$this->invalidate();
+			return $this;
 		}		
 	}
 }

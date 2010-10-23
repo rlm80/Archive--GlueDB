@@ -45,7 +45,7 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	 *
 	 * @param string
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public function alias($alias = null) {
 		if (func_num_args() === 0) {
@@ -56,6 +56,7 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 		else {
 			$this->alias = $alias;
 			$this->invalidate();
+			return $this;
 		}		
 	}	
 
