@@ -70,7 +70,7 @@ class GlueDB {
 	/**
 	 * Returns a delete query object.
 	 *
-	 * @param string $table_name Name of the main table you're deleting from (= first table in the from clause).
+	 * @param string $table_name Name of the table you're deleting from.
 	 * @param $alias Table alias.
 	 *
 	 * @return GlueDB_Fragment_Query_Delete
@@ -78,7 +78,7 @@ class GlueDB {
 	public static function delete($table_name, &$alias = null) {
 		$query = new GlueDB_Fragment_Query_Delete();
 		$query->from($table_name, $alias);
-		return $query->from();
+		return $query;
 	}
 
 	/**

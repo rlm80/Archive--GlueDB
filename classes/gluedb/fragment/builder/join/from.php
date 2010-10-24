@@ -13,6 +13,9 @@ class GlueDB_Fragment_Builder_Join_From extends GlueDB_Fragment_Builder_Join {
 	 * @param GlueDB_Fragment_Query $query
 	 */
 	public function __construct(GlueDB_Fragment_Query $query = null) {
-		$this->set_forward($query);
+		if (isset($query)) {
+			$this->set_forward($query);
+			$this->register_user($query);
+		}
 	}
 }

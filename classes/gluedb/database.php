@@ -139,6 +139,8 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_value($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Query_Select)
 			return $this->compile_query_select($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Query_Delete)
+			return $this->compile_query_delete($fragment);			
 	}
 
 	/**
@@ -227,7 +229,8 @@ abstract class GlueDB_Database extends PDO {
 			$sql	= '(' . $sql . ')';
 
 		// Add alias :
-		$sql .= ' AS ' . $this->quote_identifier($alias);
+		if ( ! empty($alias))
+			$sql .= ' AS ' . $this->quote_identifier($alias);
 
 		// Return SQL :
 		return $sql;
@@ -297,9 +300,18 @@ abstract class GlueDB_Database extends PDO {
 	 * @return string
 	 */
 	protected function compile_column(GlueDB_Fragment_Column $fragment) {
-		$tablesql	= $this->quote_identifier($fragment->table_alias()->alias());
-		$columnsql	= $this->quote_identifier($fragment->column()->dbcolumn());
-		return $tablesql . '.' . $columnsql;
+		// Get alias :
+		$alias = $fragment->table_alias()->alias();
+		if (empty($alias))
+			$alias = $fragment->table_alias()->table()->dbtable();
+		
+		// Get column :
+		$column = $fragment->column()->dbcolumn();
+		
+		// Generate SQL :
+		$sql = $this->quote_identifier($alias) . '.' . $this->quote_identifier($column);
+		
+		return $sql;
 	}
 
 	/**
@@ -387,6 +399,27 @@ abstract class GlueDB_Database extends PDO {
 
 		return $sql;
 	}
+	
+	/**
+	 * Compiles GlueDB_Fragment_Query_Delete fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Query_Delete $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_query_delete(GlueDB_Fragment_Query_Delete $fragment) {
+		// Get data from fragment :
+		$fromsql	= $fragment->from()->sql($this);
+		$wheresql	= $fragment->where()->sql($this);
+
+		// Mandatory :
+		$sql = 'DELETE FROM ' . $fromsql;
+
+		// Optional :
+		if ( ! empty($wheresql)) $sql .= ' WHERE ' . $wheresql;
+
+		return $sql;
+	}	
 
 	/**
 	 * Quotes an identifier according to current database conventions.

@@ -28,7 +28,7 @@ abstract class GlueDB_Fragment {
 
 	/**
 	 * @var GlueDB_Fragment When this property is set, it means all unknown function calls on the current fragment
-	 * 						are forwarded tho that fragment.
+	 * 						are forwarded to the fragment stored in the $forward property.
 	 */
 	protected $forward;
 
@@ -38,7 +38,7 @@ abstract class GlueDB_Fragment {
 	protected $sql = array();
 
 	/**
-	 * Returns compiled SQL string for given database.
+	 * Returns compiled SQL string according to given database SQL dialect.
 	 *
 	 * @param GlueDB_Database $db
 	 *
@@ -48,14 +48,29 @@ abstract class GlueDB_Fragment {
 		// No database given ? Means default database :
 		if ( ! isset($db))
 			$db = gluedb::db(GlueDB_Database::DEFAULTDB);
-
-		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
+					
+		// Get name of given database instance :
 		$dbname = $db->name();
+		
+		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
 		if ( ! isset($this->sql[$dbname]))
-			$this->sql[$dbname] = $db->compile($this);
-
-		// Return SQL :
+			$this->sql[$dbname] = $this->compile($db);
+		
+		// Return SQL : 
 		return $this->sql[$dbname];
+	}
+	
+	/**
+	 * Returns freshly compiled (i.e. not retrieved from cache) SQL string, according
+	 * to given database SQL dialect.
+	 * 
+	 * @param GlueDB_Database $db
+	 * 
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db) {
+		// Forwards call to database :
+		return $db->compile($this);
 	}
 
 	/**
@@ -122,7 +137,10 @@ abstract class GlueDB_Fragment {
 	 * @return mixed
 	 */
 	public function __call($name, $args) {
-		return call_user_func_array(array($this->forward, $name), $args);
+		if (isset($this->forward))
+			return call_user_func_array(array($this->forward, $name), $args);
+		else
+			throw new Kohana_Exception("Unknown function " . $name . " called on an instance of class " . get_class($this));
 	}
 }
 

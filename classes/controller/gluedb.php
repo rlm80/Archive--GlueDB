@@ -118,10 +118,10 @@ class Controller_GlueDB extends Controller {
 			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
 		);
 
-		$select3 = gluedb::select('users', $a)->left('users', $b)->on("$a->login = $b->login")->query();
-		$tests['query select default alias and join'] = array(
+		$select3 = gluedb::select('users', $a)->left('users', $b)->as('myusers')->on("$a->login = $b->login")->query();
+		$tests['query select no alias'] = array(
 			$select3,
-			"SELECT * FROM `users` AS `users__0` LEFT OUTER JOIN `users` AS `users__1` ON (`users__0`.`login` = `users__1`.`login`)"
+			"SELECT * FROM `users` LEFT OUTER JOIN `users` AS `myusers` ON (`users`.`login` = `myusers`.`login`)"
 		);
 		
 		$select4 = gluedb::select('users', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20)->query();
@@ -135,6 +135,12 @@ class Controller_GlueDB extends Controller {
 			$select5,
 			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1)"
 		);			
+		
+		$delete1 = gluedb::delete('users', $a)->where("$a->login = 'test'")->query();
+		$tests['query delete'] = array(
+			$delete1,
+			"DELETE FROM `users` WHERE (`users`.`login` = 'test')"
+		);	
 
 		// Checks :
 		foreach($tests as $type => $data) {

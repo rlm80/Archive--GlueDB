@@ -12,11 +12,6 @@
 
 class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	/**
-	 * @var array Alias pool.
-	 */
-	static protected $aliases = array();
-
-	/**
 	 * @var array Column fragments cache.
 	 */
 	protected $columns = array();
@@ -32,46 +27,18 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	}
 	
 	/**
-	 * Returns the table object.
+	 * Table getter/setter.
 	 * 
-	 * @return GlueDB_Table 
+	 * @param string $table_name
+	 * 
+	 * @return mixed 
 	 */
-	public function table() {
-		return $this->fragment->table();
-	}
-	
-	/**
-	 * Alias getter/setter.
-	 *
-	 * @param string
-	 *
-	 * @return mixed
-	 */
-	public function alias($alias = null) {
-		if (func_num_args() === 0) {
-			if ( ! isset($this->alias))
-				$this->alias = $this->create_alias();
-			return $this->alias;
-		}
+	public function table($table_name = null) {
+		if (func_num_args() === 0)
+			return $this->fragment->table();
 		else {
-			$this->alias = $alias;
-			$this->invalidate();
-			return $this;
-		}		
-	}	
-
-	/**
-	 * Generates unique alias.
-	 *
-	 * @return string
-	 */
-	protected function create_alias() {
-		$table_name = $this->table()->name();
-		if ( ! isset(self::$aliases[$table_name]))
-			self::$aliases[$table_name] = 0;
-		else
-			self::$aliases[$table_name] ++;
-		return $table_name . '__' . self::$aliases[$table_name];
+			return $this->fragment(new GlueDB_Fragment_Table($table_name));
+		}			
 	}
 
 	/**
