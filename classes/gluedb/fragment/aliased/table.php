@@ -25,21 +25,6 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	public function __construct($table_name, $alias = null) {
 		parent::__construct(new GlueDB_Fragment_Table($table_name), $alias);
 	}
-	
-	/**
-	 * Table getter/setter.
-	 * 
-	 * @param string $table_name
-	 * 
-	 * @return mixed 
-	 */
-	public function table($table_name = null) {
-		if (func_num_args() === 0)
-			return $this->fragment->table();
-		else {
-			return $this->fragment(new GlueDB_Fragment_Table($table_name));
-		}			
-	}
 
 	/**
 	 * Returns children column fragments.
