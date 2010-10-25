@@ -538,29 +538,6 @@ abstract class GlueDB_Database extends PDO {
 	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered.
 	 *
-	 * Structure :
-	 * array(
-	 * 		'columns' => array(
-	 * 			0 => array (
-	 * 				'column'	=> < Column name >
-	 *				'type'		=> < Native database type >
-	 *				'nullable'	=> < Whether or not the column is nullable >
-	 *				'maxlength'	=> < Maximum length of a text column >
-	 *				'precision' => < Precision of the column >
-	 *				'scale' 	=> < Scale of the column >
-	 *				'default'	=> < Default value of the column (stored as is from the database, not type casted) >
-	 *				'auto'		=> <Whether or not the column auto-incrementing >
-	 *			)
-	 *			1 => ...
-	 *			...
-	 * 		)
-	 * 		'pk' => array(
-	 * 			0 => < columns 0>
-	 * 			1 => < columns 1>
-	 * 			...
-	 * 		)
-	 * )
-	 *
 	 * Be aware that this function is totally ignorant of any virtual table you may have
 	 * defined explicitely ! It's mostly useful internally to query the real underlying
 	 * database schema. Users should use the introspection API instead.

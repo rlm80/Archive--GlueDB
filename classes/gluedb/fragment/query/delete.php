@@ -21,24 +21,27 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param string $table_name Name of the main table you're updating (= first table in the update clause).
+	 * @param GlueDB_Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 */
-	public function __construct() {
-		$this->where = new GlueDB_Fragment_Builder_Bool_Where($this);
+	public function __construct($table_name = null, &$alias = null) {
+		$this->where	= new GlueDB_Fragment_Builder_Bool_Where($this);
+		$this->from		= new GlueDB_Fragment_Aliased_Table($table_name);
+		$this->from->register_user($this);
+		$alias = $this->from;
 	}
 
 	/**
-	 * Returns the from clause, initializing it with given parameters if any.
+	 * From table getter/setter.
 	 *
 	 * @param mixed $table_name Table name.
-	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
-	 * @return GlueDB_Fragment_Query_Delete
+	 * @return mixed
 	 */
-	public function from($table_name = null, &$alias = null) {
+	public function from($table_name = null) {
 		if (func_num_args() > 0) {
-			$this->from = new GlueDB_Fragment_Aliased_Table($table_name);
-			$this->from->register_user($this);
-			$alias = $this->from;
+			$this->from->fragment(new GlueDB_Fragment_Table($table_name));
 			return $this;
 		}
 		else

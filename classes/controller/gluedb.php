@@ -123,24 +123,24 @@ class Controller_GlueDB extends Controller {
 			$select3,
 			"SELECT * FROM `users` LEFT OUTER JOIN `users` AS `myusers` ON (`users`.`login` = `myusers`.`login`)"
 		);
-		
+
 		$select4 = gluedb::select('users', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20)->query();
 		$tests['query select limit offset'] = array(
 			$select4,
 			"SELECT * FROM `users` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
-		);	
+		);
 
 		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->then($a->password)->having("count(*) > 1")->select($a->login)->then($a->password)->query();
 		$tests['query select group by having'] = array(
 			$select5,
 			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1)"
-		);			
-		
+		);
+
 		$delete1 = gluedb::delete('users', $a)->where("$a->login = 'test'")->query();
 		$tests['query delete'] = array(
 			$delete1,
 			"DELETE FROM `users` WHERE (`users`.`login` = 'test')"
-		);	
+		);
 
 		// Checks :
 		foreach($tests as $type => $data) {

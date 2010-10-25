@@ -43,7 +43,7 @@ class GlueDB {
 	 * Returns a select query object.
 	 *
 	 * @param string $table_name Name of the main table you're selecting from (= first table in the from clause).
-	 * @param $alias Table alias.
+	 * @param GlueDB_Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 *
 	 * @return GlueDB_Fragment_Query_Select
 	 */
@@ -57,7 +57,7 @@ class GlueDB {
 	 * Returns an update query object.
 	 *
 	 * @param string $table_name Name of the main table you're updating (= first table in the update clause).
-	 * @param $alias Table alias.
+	 * @param GlueDB_Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 *
 	 * @return GlueDB_Fragment_Query_Update
 	 */
@@ -71,28 +71,24 @@ class GlueDB {
 	 * Returns a delete query object.
 	 *
 	 * @param string $table_name Name of the table you're deleting from.
-	 * @param $alias Table alias.
+	 * @param GlueDB_Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 *
 	 * @return GlueDB_Fragment_Query_Delete
 	 */
 	public static function delete($table_name, &$alias = null) {
-		$query = new GlueDB_Fragment_Query_Delete();
-		$query->from($table_name, $alias);
-		return $query;
+		return new GlueDB_Fragment_Query_Delete($table_name, $alias);
 	}
 
 	/**
 	 * Returns a insert query object.
 	 *
 	 * @param string $table_name Name of the table you're inserting data into.
-	 * @param $alias Table alias.
+	 * @param GlueDB_Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 *
 	 * @return GlueDB_Fragment_Query_Insert
 	 */
 	public static function insert($table_name, &$alias = null) {
-		$query = new GlueDB_Fragment_Query_Insert();
-		$query->from($table_name, $alias);
-		return $query->from();
+		return new GlueDB_Fragment_Query_Insert($table_name, $alias);
 	}
 
 	/**
@@ -110,7 +106,7 @@ class GlueDB {
 	 * Returns a new table fragment.
 	 *
 	 * @param string $table_name
-	 * @param string $alias Null means you let the system choose a unique alias. If you don't want an alias at all, pass an empty string.
+	 * @param string $alias
 	 *
 	 * @return GlueDB_Fragment_Table
 	 */

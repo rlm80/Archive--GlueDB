@@ -44,29 +44,6 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered.
 	 *
-	 * Structure : TODO move doc to comments in code below
-	 * array(
-	 * 		'columns' => array(
-	 * 			0 => array (
-	 * 				'column'	=> < Column name >
-	 *				'type'		=> < Native database type >
-	 *				'nullable'	=> < Whether or not the column is nullable >
-	 *				'maxlength'	=> < Maximum length of a text column >
-	 *				'precision' => < Precision of the column >
-	 *				'scale' 	=> < Scale of the column >
-	 *				'default'	=> < Default value of the column (stored as is from the database, not type casted) >
-	 *				'auto'		=> <Whether or not the column auto-incrementing >
-	 *			)
-	 *			1 => ...
-	 *			...
-	 * 		)
-	 * 		'pk' => array(
-	 * 			0 => < columns 0>
-	 * 			1 => < columns 1>
-	 * 			...
-	 * 		)
-	 * )
-	 *
 	 * Be aware that this function is totally ignorant of any virtual table you may have
 	 * defined explicitely ! It's mostly useful internally to query the real underlying
 	 * database schema. Users should use the introspection API instead.
@@ -100,14 +77,14 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 		$columns = array();
 		while ($row = $stmt->fetch()) {
 			$columns[] = array(
-				'column'	=> trim(strtolower($row[0])),
-				'type'		=> trim(strtolower($row[1])),
-				'nullable'	=> (boolean) $row[2],
-				'default'	=> $row[3],
-				'maxlength'	=> isset($row[4]) ? (integer) $row[4] : null,
-				'precision' => isset($row[5]) ? (integer) $row[5] : null,
-				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,
-				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,
+				'column'	=> trim(strtolower($row[0])),					// Column name
+				'type'		=> trim(strtolower($row[1])),					// Native database type
+				'nullable'	=> (boolean) $row[2],							// Whether or not the column is nullable
+				'default'	=> $row[3],										// Maximum length of a text column
+				'maxlength'	=> isset($row[4]) ? (integer) $row[4] : null,	// Precision of the column
+				'precision' => isset($row[5]) ? (integer) $row[5] : null,	// Scale of the column
+				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,	// Default value of the column (stored as is from the database, not type casted)
+				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,	// Whether or not the column auto-incrementing
 			);
 		}
 		sort($columns);
