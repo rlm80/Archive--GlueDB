@@ -220,12 +220,12 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function compile_aliased(GlueDB_Fragment_Aliased $fragment) {
 		// Get data from fragment :
-		$toalias	= $fragment->fragment();
+		$aliased	= $fragment->aliased();
 		$alias		= $fragment->alias();
 
 		// Generate fragment SQL :
-		$sql = $toalias->sql($this);
-		if ( ! ($toalias instanceof GlueDB_Fragment_Column || $toalias instanceof GlueDB_Fragment_Table))
+		$sql = $aliased->sql($this);
+		if ( ! ($aliased instanceof GlueDB_Fragment_Column || $aliased instanceof GlueDB_Fragment_Table))
 			$sql	= '(' . $sql . ')';
 
 		// Add alias :
@@ -237,7 +237,7 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Compiles GlueDB_Fragment_Builder fragments into an SQL string.
+	 * Compiles GlueDB_Fragment_Builder fragments into an SQL string. TODO factor this into children methods
 	 *
 	 * @param GlueDB_Fragment_Builder $fragment
 	 *
@@ -248,10 +248,12 @@ abstract class GlueDB_Database extends PDO {
 		$children = $fragment->children();
 
 		// Guess connector from fragment type :
-		if ($fragment instanceof GlueDB_Fragment_Builder_List)
-			$connector = ', ';
+		if ($fragment instanceof GlueDB_Fragment_Builder_Select		||
+			$fragment instanceof GlueDB_Fragment_Builder_Orderby	||
+			$fragment instanceof GlueDB_Fragment_Builder_Groupby)
+				$connector = ', ';
 		else
-			$connector = ' ';
+				$connector = ' ';
 
 		// Generate fragment SQL :
 		$sqls = array();
@@ -272,12 +274,12 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function compile_ordered(GlueDB_Fragment_Ordered $fragment) {
 		// Get data from fragment :
-		$toorder	= $fragment->fragment();
+		$ordered	= $fragment->ordered();
 		$order		= $fragment->order();
 
 		// Generate fragment SQL :
-		$sql = $toorder->sql($this);
-		if ( ! $toorder instanceof GlueDB_Fragment_Column)
+		$sql = $ordered->sql($this);
+		if ( ! $ordered instanceof GlueDB_Fragment_Column)
 			$sql	= '(' . $sql . ')';
 
 		// Add ordering :
@@ -303,7 +305,7 @@ abstract class GlueDB_Database extends PDO {
 		// Get alias :
 		$alias = $fragment->table_alias()->alias();
 		if (empty($alias))
-			$alias = $fragment->table_alias()->fragment()->table()->dbtable();
+			$alias = $fragment->table_alias()->aliased()->table()->dbtable();
 
 		// Get column :
 		$column = $fragment->column()->dbcolumn();

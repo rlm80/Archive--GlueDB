@@ -27,12 +27,6 @@ abstract class GlueDB_Fragment {
 	protected $users;
 
 	/**
-	 * @var GlueDB_Fragment When this property is set, it means all unknown function calls on the current fragment
-	 * 						are forwarded to the fragment stored in the $forward property.
-	 */
-	protected $forward;
-
-	/**
 	 * @var array Cached compiled SQL strings. One entry for each database.
 	 */
 	protected $sql = array();
@@ -48,24 +42,24 @@ abstract class GlueDB_Fragment {
 		// No database given ? Means default database :
 		if ( ! isset($db))
 			$db = gluedb::db(GlueDB_Database::DEFAULTDB);
-					
+
 		// Get name of given database instance :
 		$dbname = $db->name();
-		
+
 		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
 		if ( ! isset($this->sql[$dbname]))
 			$this->sql[$dbname] = $this->compile($db);
-		
-		// Return SQL : 
+
+		// Return SQL :
 		return $this->sql[$dbname];
 	}
-	
+
 	/**
 	 * Returns freshly compiled (i.e. not retrieved from cache) SQL string, according
 	 * to given database SQL dialect.
-	 * 
+	 *
 	 * @param GlueDB_Database $db
-	 * 
+	 *
 	 * @return string
 	 */
 	protected function compile(GlueDB_Database $db) {
@@ -120,16 +114,8 @@ abstract class GlueDB_Fragment {
 	}
 
 	/**
-	 * Forward fragment setter.
-	 *
-	 * @param GlueDB_Fragment $fragment
-	 */
-	protected function set_forward($fragment) {
-		$this->forward = $fragment;
-	}
-
-	/**
-	 * Forwards unknown calls to $forward fragment.
+	 * Forwards unknown calls to parent fragment. This means unknown calls bubble up the fragments tree
+	 * until they reach a fragment on which they can be applied.
 	 *
 	 * @param string $name
 	 * @param string $args
@@ -137,10 +123,13 @@ abstract class GlueDB_Fragment {
 	 * @return mixed
 	 */
 	public function __call($name, $args) {
-		if (isset($this->forward))
-			return call_user_func_array(array($this->forward, $name), $args);
+		if (count($this->users) === 1) {
+			$last	= end($this->users);
+			$parent	= $last['object'];
+			return call_user_func_array(array($parent, $name), $args);
+		}
 		else
-			throw new Kohana_Exception("Unknown function " . $name . " called on an instance of class " . get_class($this));
+			throw new Kohana_Exception("Unknown function '" . $name . "' called on an instance of class '" . get_class($this) . "'");
 	}
 }
 

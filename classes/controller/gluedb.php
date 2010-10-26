@@ -59,9 +59,9 @@ class Controller_GlueDB extends Controller {
 				),
 		);
 
-		$select = new GlueDB_Fragment_Builder_List_Select(null);
+		$select = new GlueDB_Fragment_Builder_Select(null);
 		$select
-			->init($t->login)
+			->then($t->login)
 			->then($t->password)
 			->then($t->login)->as('mylogin')
 			->then($t->login)
@@ -72,9 +72,9 @@ class Controller_GlueDB extends Controller {
 			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, ('test') AS `computed`, ('test') AS `computed1`"
 		);
 
-		$select = new GlueDB_Fragment_Builder_List_Orderby(null);
+		$select = new GlueDB_Fragment_Builder_Orderby(null);
 		$select
-			->init($t->login)
+			->then($t->login)
 			->then($t->password)
 			->then($t->login)->asc()
 			->then('?', 'test')->desc();

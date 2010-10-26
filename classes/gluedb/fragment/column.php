@@ -38,7 +38,7 @@ class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	 * @return GlueDB_Column
 	 */
 	public function column() {
-		return $this->table_alias->fragment()->table()->column($this->column);
+		return $this->table_alias->aliased()->table()->column($this->column);
 	}
 
 	/**

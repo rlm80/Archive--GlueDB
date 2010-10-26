@@ -10,7 +10,7 @@
 
 class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	/**
-	 * @var GlueDB_Fragment_Builder_List_Select Select list.
+	 * @var GlueDB_Fragment_Builder_Select Select list.
 	 */
 	protected $select;
 
@@ -25,7 +25,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	protected $where;
 
 	/**
-	 * @var GlueDB_Fragment_Builder_List_Groupby Group by list.
+	 * @var GlueDB_Fragment_Builder_Groupby Group by list.
 	 */
 	protected $groupby;
 
@@ -35,10 +35,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	protected $having;
 
 	/**
-	 * @var GlueDB_Fragment_Builder_List_Orderby Order by list.
+	 * @var GlueDB_Fragment_Builder_Orderby Order by list.
 	 */
 	protected $orderby;
-	
+
 	/**
 	 * @var Integer Limit.
 	 */
@@ -53,12 +53,18 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->select	= new GlueDB_Fragment_Builder_List_Select($this);
+		// Init children fragments :
+		$this->select	= new GlueDB_Fragment_Builder_Select();
 		$this->from		= new GlueDB_Fragment_Builder_Join_From($this);
 		$this->where	= new GlueDB_Fragment_Builder_Bool_Where($this);
-		$this->groupby	= new GlueDB_Fragment_Builder_List_Groupby($this);
+		$this->groupby	= new GlueDB_Fragment_Builder_Groupby();
 		$this->having	= new GlueDB_Fragment_Builder_Bool_Having($this);
-		$this->orderby	= new GlueDB_Fragment_Builder_List_Orderby($this);
+		$this->orderby	= new GlueDB_Fragment_Builder_Orderby();
+
+		// Set up dependencies :
+		$this->select->register_user($this);
+		$this->groupby->register_user($this);
+		$this->orderby->register_user($this);
 	}
 
 	/**
@@ -69,7 +75,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function select() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->select, 'init'), $args);
+			call_user_func_array(array($this->select, 'then'), $args);
 		}
 		return $this->select;
 	}
@@ -109,9 +115,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function groupby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->groupby, 'init'), $args);
+			return call_user_func_array(array($this->groupby, 'then'), $args);
 		}
-		return $this->groupby;
+		else
+			return $this->groupby;
 	}
 
 	/**
@@ -122,9 +129,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function having() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->having, 'init'), $args);
+			return call_user_func_array(array($this->having, 'init'), $args);
 		}
-		return $this->having;
+		else
+			return $this->having;
 	}
 
 	/**
@@ -135,11 +143,12 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function orderby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->orderby, 'init'), $args);
+			return call_user_func_array(array($this->orderby, 'then'), $args);
 		}
-		return $this->orderby;
+		else
+			return $this->orderby;
 	}
-	
+
 	/**
 	 * Limit getter/setter.
 	 *
@@ -156,7 +165,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 			return $this;
 		}
 	}
-	
+
 	/**
 	 * Offset getter/setter.
 	 *
@@ -172,7 +181,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 			$this->invalidate();
 			return $this;
 		}
-	}	
+	}
 
 	protected function find_db() {
 		// TODO

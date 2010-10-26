@@ -8,23 +8,17 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Builder_List_Select extends GlueDB_Fragment_Builder_List {
+class GlueDB_Fragment_Builder_Select extends GlueDB_Fragment_Builder {
 	/**
-	 * @param GlueDB_Fragment_Query $query
-	 */
-	public function __construct(GlueDB_Fragment_Query $query = null) {
-		if (isset($query)) {
-			$this->set_forward($query);
-			$this->register_user($query);
-		}
-	}
-
-	/**
-	 * Adds fragment of appropriate type.
+	 * Adds an element at the end of the select list. You may pass any fragment, or a string template
+	 * with question marks as placeholders, followed by their replacement values or fragments.
 	 *
-	 * @param array $params
+	 * @return GlueDB_Fragment_Aliased
 	 */
-	protected function add($params) {
+	public function then() {
+		// Get params :
+		$params	= func_get_args();
+
 		// Split params :
 		$first = array_shift($params);
 
@@ -34,17 +28,20 @@ class GlueDB_Fragment_Builder_List_Select extends GlueDB_Fragment_Builder_List {
 		else
 			$alias = $this->compute_alias_computed();
 
-		// Push fragment :
+		// Build fragment :
 		if ($first instanceof GlueDB_Fragment)
-			$this->push(new GlueDB_Fragment_Aliased(
-				$first,
-				$alias
-			));
+			$fragment = new GlueDB_Fragment_Aliased($first, $alias);
 		else
-			$this->push(new GlueDB_Fragment_Aliased(
+			$fragment = new GlueDB_Fragment_Aliased(
 				new GlueDB_Fragment_Template($first, $params),
 				$alias
-			));
+			);
+
+		// Push fragment :
+		$this->push($fragment);
+
+		// Return fragment :
+		return $fragment;
 	}
 
 	/**
@@ -84,35 +81,5 @@ class GlueDB_Fragment_Builder_List_Select extends GlueDB_Fragment_Builder_List {
 			return $column_name;
 		else
 			return $column_name . $i;
-	}
-
-	/**
-	 * Sets alias of the last element of the list.
-	 *
-	 * @return GlueDB_Fragment_Builder_Select
-	 */
-	public function _as($alias) {
-		if ($last = $this->last())
-			$last->alias($alias);
-		else
-			throw new Kohana_Exception("No column to set an alias to.");
-
-		return $this;
-	}
-
-	/*
-	 * Redefined to setup aliases for _as(). Required because keywords aren't valid function
-	 * names in PHP. Also forwards unknown calls to query.
-	 *
-	 * @param string $name
-	 * @param array $args
-	 *
-	 * @return mixed
-	 */
-	public function __call($name, $args) {
-		if ($name === 'as')
-			return call_user_func_array(array($this, '_as'), $args);
-		else
-			return parent::__call($name, $args);
 	}
 }

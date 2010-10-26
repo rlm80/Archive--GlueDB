@@ -16,7 +16,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	/**
 	 * @var GlueDB_Fragment Fragment that needs to have an order.
 	 */
-	protected $fragment;
+	protected $ordered;
 
 	/**
 	 * @var integer Order.
@@ -26,29 +26,30 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Fragment $fragment
+	 * @param GlueDB_Fragment $ordered
 	 */
-	public function __construct(GlueDB_Fragment $fragment, $order = null) {
+	public function __construct(GlueDB_Fragment $ordered, $order = null) {
 		$this->order	= $order;
-		$this->fragment	= $fragment;
-		$this->fragment->register_user($this);
+		$this->ordered	= $ordered;
+		$this->ordered->register_user($this);
 	}
 
 	/**
-	 * Fragment getter/setter.
+	 * Sets order to ASC.
 	 *
-	 * @param GlueDB_Fragment $fragment
-	 *
-	 * @return mixed
+	 * @return GlueDB_Fragment_Ordered
 	 */
-	public function fragment($fragment = null) {
-		if (func_num_args() === 0)
-			return $this->fragment;
-		else {
-			$this->fragment = $fragment;
-			$this->invalidate();
-			return $this;
-		}
+	public function asc() {
+		return $this->order(GlueDB_Fragment_Ordered::ASC);
+	}
+
+	/**
+	 * Sets order to DESC.
+	 *
+	 * @return GlueDB_Fragment_Ordered
+	 */
+	public function desc() {
+		return $this->order(GlueDB_Fragment_Ordered::DESC);
 	}
 
 	/**
@@ -63,6 +64,23 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 			return $this->order;
 		else {
 			$this->order = $order;
+			$this->invalidate();
+			return $this;
+		}
+	}
+
+	/**
+	 * Fragment getter/setter.
+	 *
+	 * @param GlueDB_Fragment $ordered
+	 *
+	 * @return mixed
+	 */
+	public function ordered($ordered = null) {
+		if (func_num_args() === 0)
+			return $this->ordered;
+		else {
+			$this->ordered = $ordered;
 			$this->invalidate();
 			return $this;
 		}

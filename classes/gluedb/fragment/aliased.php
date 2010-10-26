@@ -10,9 +10,9 @@
 
 class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	/**
-	 * @var GlueDB_Fragment Fragment.
+	 * @var GlueDB_Fragment Fragment that needs to have an alias.
 	 */
-	protected $fragment;
+	protected $aliased;
 
 	/**
 	 * @var string Alias.
@@ -22,32 +22,41 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Fragment $fragment
+	 * @param GlueDB_Fragment $aliased
 	 * @param string $alias
 	 */
-	public function __construct(GlueDB_Fragment $fragment, $alias = null) {
+	public function __construct(GlueDB_Fragment $aliased, $alias = null) {
 		$this->alias	= $alias;
-		$this->fragment	= $fragment;
-		$this->fragment->register_user($this);
+		$this->aliased	= $aliased;
+		$this->aliased->register_user($this);
 	}
 
 	/**
 	 * Fragment getter/setter.
 	 *
-	 * @param GlueDB_Fragment
+	 * @param GlueDB_Fragment $aliased
 	 *
 	 * @return mixed
 	 */
-	public function fragment(GlueDB_Fragment $fragment = null) {
+	public function aliased(GlueDB_Fragment $aliased = null) {
 		if (func_num_args() === 0)
-			return $this->fragment;
+			return $this->aliased;
 		else {
-			$this->fragment = $fragment;
+			$this->aliased = $aliased;
 			$this->invalidate();
 			return $this;
-		}	
+		}
 	}
-	
+
+	/**
+	 * Sets alias. Call as() instead of this.
+	 *
+	 * @return GlueDB_Fragment_Aliased
+	 */
+	public function _as($alias) {
+		return $this->alias($alias);
+	}
+
 	/**
 	 * Alias getter/setter.
 	 *
@@ -62,6 +71,22 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 			$this->alias = $alias;
 			$this->invalidate();
 			return $this;
-		}		
+		}
+	}
+
+	/*
+	 * Redefined to setup aliases for _as(). Required because keywords aren't valid function
+	 * names in PHP. Also forwards unknown calls to query.
+	 *
+	 * @param string $name
+	 * @param array $args
+	 *
+	 * @return mixed
+	 */
+	public function __call($name, $args) {
+		if ($name === 'as')
+			return call_user_func_array(array($this, '_as'), $args);
+		else
+			return parent::__call($name, $args);
 	}
 }
