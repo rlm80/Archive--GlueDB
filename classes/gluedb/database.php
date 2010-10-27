@@ -125,8 +125,22 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_operand_join($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Aliased)
 			return $this->compile_aliased($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder)
-			return $this->compile_builder($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Select)
+			return $this->compile_builder_select($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Orderby)
+			return $this->compile_builder_orderby($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Groupby)
+			return $this->compile_builder_groupby($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Bool_Where)
+			return $this->compile_builder_bool_where($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Bool_Having)
+			return $this->compile_builder_bool_having($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Bool)
+			return $this->compile_builder_bool($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Join_From)
+			return $this->compile_builder_join_from($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Join)
+			return $this->compile_builder_join($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Ordered)
 			return $this->compile_ordered($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Column)
@@ -237,32 +251,112 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Compiles GlueDB_Fragment_Builder fragments into an SQL string. TODO factor this into children methods
+	 * Compiles GlueDB_Fragment_Builder fragments into an SQL string.
 	 *
 	 * @param GlueDB_Fragment_Builder $fragment
+	 * @param string $connector
 	 *
 	 * @return string
 	 */
-	protected function compile_builder(GlueDB_Fragment_Builder $fragment) {
+	protected function compile_builder(GlueDB_Fragment_Builder $fragment, $connector) {
 		// Get data from fragment :
 		$children = $fragment->children();
 
-		// Guess connector from fragment type :
-		if ($fragment instanceof GlueDB_Fragment_Builder_Select		||
-			$fragment instanceof GlueDB_Fragment_Builder_Orderby	||
-			$fragment instanceof GlueDB_Fragment_Builder_Groupby)
-				$connector = ', ';
-		else
-				$connector = ' ';
-
-		// Generate fragment SQL :
+		// Generate children fragment SQL strings :
 		$sqls = array();
 		foreach ($children as $child)
 			$sqls[] = $child->sql($this);
-		$sql = implode($connector, $sqls);
 
 		// Return SQL :
-		return $sql;
+		return implode($connector, $sqls);
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Select fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Select $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_select(GlueDB_Fragment_Builder_Select $fragment) {
+		return $this->compile_builder($fragment, ', ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Orderby fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Orderby $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_orderby(GlueDB_Fragment_Builder_Orderby $fragment) {
+		return $this->compile_builder($fragment, ', ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Groupby fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Groupby $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_groupby(GlueDB_Fragment_Builder_Groupby $fragment) {
+		return $this->compile_builder($fragment, ', ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Bool fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Bool $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_bool(GlueDB_Fragment_Builder_Bool $fragment) {
+		return $this->compile_builder($fragment, ' ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Bool_Where fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Bool_Where $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_bool_where(GlueDB_Fragment_Builder_Bool_Where $fragment) {
+		return $this->compile_builder($fragment, ' ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Bool_Having fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Bool_Having $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_bool_having(GlueDB_Fragment_Builder_Bool_Having $fragment) {
+		return $this->compile_builder($fragment, ' ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Join fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Join $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_join(GlueDB_Fragment_Builder_Join $fragment) {
+		return $this->compile_builder($fragment, ' ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Join_From fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Join_From $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_join_from(GlueDB_Fragment_Builder_Join_From $fragment) {
+		return $this->compile_builder($fragment, ' ');
 	}
 
 	/**
