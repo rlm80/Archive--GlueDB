@@ -22,6 +22,7 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	/**
 	 * Constructor.
 	 *
+	 * @param GlueDB_Fragment $operand
 	 * @param integer $operator Null means first operand of join expression => no on clause.
 	 */
 	public function __construct(GlueDB_Fragment $operand, $operator = null) {
@@ -31,47 +32,15 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	}
 
 	/**
-	 * Returns on clause.
+	 *  Returns the on clause, initializing it with given parameters if any.
 	 *
 	 * @return GlueDB_Fragment_Builder_Bool
 	 */
 	public function on() {
-		return $this->on;
-	}
-
-	/**
-	 * Forwards call to on clause.
-	 */
-	public function init() {
-		if (isset($this->operator)) {
+		if (func_num_args() > 0) {
 			$args = func_get_args();
 			call_user_func_array(array($this->on, 'init'), $args);
 		}
-		else
-			throw new Kohana_Exception("Illegal call to init() : no ON clause on first operand of expression !");
-	}
-
-	/**
-	 * Forwards call to on clause.
-	 */
-	public function _or() {
-		if (isset($this->operator)) {
-			$args = func_get_args();
-			call_user_func_array(array($this->on, '_or'), $args);
-		}
-		else
-			throw new Kohana_Exception("Illegal call to or() : no ON clause on first operand of expression !");
-	}
-
-	/**
-	 * Forwards call to on clause.
-	 */
-	public function _and() {
-		if (isset($this->operator)) {
-			$args = func_get_args();
-			call_user_func_array(array($this->on, '_and'), $args);
-		}
-		else
-			throw new Kohana_Exception("Illegal call to and() : no ON clause on first operand of expression !");
+		return $this->on;
 	}
 }

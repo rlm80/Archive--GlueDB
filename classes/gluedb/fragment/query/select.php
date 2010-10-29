@@ -90,7 +90,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	 */
 	public function from($operand = null, &$alias = null) {
 		if (func_num_args() > 0)
-			$this->from->init($operand, $alias);
+			return $this->from->init($operand, $alias);
 		return $this->from;
 	}
 
@@ -102,9 +102,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function where() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->where, 'init'), $args);
+			return call_user_func_array(array($this->where, 'init'), $args);
 		}
-		return $this->where;
+		else
+			return $this->where;
 	}
 
 	/**

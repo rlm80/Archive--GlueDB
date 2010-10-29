@@ -42,11 +42,11 @@ class Controller_GlueDB extends Controller {
 					"'test\'test' test 10 template"
 				),
 			'boolean - simple' => array(
-					gluedb::bool("'test' = ?", "qsdf")->or("'test' IN ?", array('azer', 'qsdf')),
+					gluedb::bool("'test' = ?", "qsdf")->or("'test' IN ?", array('azer', 'qsdf'))->root(),
 					"('test' = 'qsdf') OR ('test' IN ('azer','qsdf'))"
 				),
 			'boolean - nested' => array(
-					gluedb::bool(gluedb::bool("1=1")->or("2=2"))->and("3=3"),
+					gluedb::bool(gluedb::bool("1=1")->or("2=2"))->and("3=3")->root(),
 					"((1=1) OR (2=2)) AND (3=3)"
 				),
 			'table' => array(
@@ -66,7 +66,8 @@ class Controller_GlueDB extends Controller {
 			->then($t->login)->as('mylogin')
 			->then($t->login)
 			->then('?', 'test')
-			->then('?', 'test');
+			->then('?', 'test')
+			->root();
 		$tests['select'] = array(
 			$select,
 			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, ('test') AS `computed`, ('test') AS `computed1`"
@@ -77,7 +78,8 @@ class Controller_GlueDB extends Controller {
 			->then($t->login)
 			->then($t->password)
 			->then($t->login)->asc()
-			->then('?', 'test')->desc();
+			->then('?', 'test')->desc()
+			->root();
 		$tests['select'] = array(
 			$select,
 			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, ('test') DESC"
@@ -85,14 +87,14 @@ class Controller_GlueDB extends Controller {
 
 		$join = gluedb::join('mytable')->as('t1')
 					->left('yourtable')->as('t2')->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
-					->right('histable')->as('t3')->on('1=1');
+					->right('histable')->as('t3')->on('1=1')->root();
 		$tests['join simple'] = array(
 			$join,
 			"`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)"
 		);
 
 		$join2 = gluedb::join('mytable')->as('t3')
-					->left($join)->on('5=5');
+					->left($join)->on('5=5')->root();
 		$tests['join nested'] = array(
 			$join2,
 			"`mytable` AS `t3` LEFT OUTER JOIN (`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)) ON (5=5)"
@@ -100,43 +102,43 @@ class Controller_GlueDB extends Controller {
 
 		$alias = gluedb::alias('mytable','myalias');
 		$join3 = gluedb::join('mytable')->as('t3')
-					->left($alias)->on('1=1');
+					->left($alias)->on('1=1')->root();
 		$tests['join alias'] = array(
 			$join3,
 			"`mytable` AS `t3` LEFT OUTER JOIN `mytable` AS `myalias` ON (1=1)"
 		);
 
-		$select1 = gluedb::select('mytable')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->query();
+		$select1 = gluedb::select('mytable')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->root();
 		$tests['query select basic'] = array(
 			$select1,
 			"SELECT * FROM `mytable` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
 		);
 
-		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'")->query();
+		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'");//->root();
 		$tests['query select alias'] = array(
 			$select2,
 			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
 		);
 
-		$select3 = gluedb::select('users', $a)->left('users', $b)->as('myusers')->on("$a->login = $b->login")->query();
+		$select3 = gluedb::select('users', $a)->left('users', $b)->as('myusers')->on("$a->login = $b->login")->root();
 		$tests['query select no alias'] = array(
 			$select3,
 			"SELECT * FROM `users` LEFT OUTER JOIN `users` AS `myusers` ON (`users`.`login` = `myusers`.`login`)"
 		);
 
-		$select4 = gluedb::select('users', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20)->query();
+		$select4 = gluedb::select('users', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20)->root();
 		$tests['query select limit offset'] = array(
 			$select4,
 			"SELECT * FROM `users` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
 		);
 
-		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->then($a->password)->having("count(*) > 1")->select($a->login)->then($a->password)->query();
+		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->then($a->password)->having("count(*) > 1")->select($a->login)->then($a->password)->root();
 		$tests['query select group by having'] = array(
 			$select5,
 			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1)"
 		);
 
-		$delete1 = gluedb::delete('users', $a)->where("$a->login = 'test'")->query();
+		$delete1 = gluedb::delete('users', $a)->where("$a->login = 'test'")->root();
 		$tests['query delete'] = array(
 			$delete1,
 			"DELETE FROM `users` WHERE (`users`.`login` = 'test')"

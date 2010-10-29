@@ -47,10 +47,14 @@ class GlueDB {
 	 *
 	 * @return GlueDB_Fragment_Query_Select
 	 */
-	public static function select($table_name, &$alias = null) {
-		$query = new GlueDB_Fragment_Query_Select();
-		$query->from($table_name, $alias);
-		return $query->from();
+	public static function select($table_name = null, &$alias = null) {
+		$f = new GlueDB_Fragment_Query_Select();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return $f->from($table_name, $alias);
+		}
+		else
+			return $f;
 	}
 
 	/**
@@ -145,11 +149,15 @@ class GlueDB {
 	 * @param string $table_name
 	 * @param string $alias
 	 *
-	 * @return GlueDB_Fragment_Builder_Join
+	 * @return mixed
 	 */
-	public static function join($table_name, &$alias = null) {
+	public static function join($table_name = null, &$alias = null) {
 		$f = new GlueDB_Fragment_Builder_Join();
-		$f->init($table_name, $alias);
-		return $f;
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return $f->init($table_name, $alias);
+		}
+		else
+			return $f;
 	}
 }

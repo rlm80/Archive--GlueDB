@@ -113,6 +113,23 @@ abstract class GlueDB_Fragment {
 		}
 	}
 
+	public function root() {
+		$parent = $this->parent();
+		if ( ! isset($parent))
+			return $this;
+		else
+			return $parent->root();
+	}
+
+	public function _parent() {
+		if (count($this->users) !== 0) {
+			$last = end($this->users);
+			return $last['object'];
+		}
+		else
+			return null;
+	}
+
 	/**
 	 * Forwards unknown calls to parent fragment. This means unknown calls bubble up the fragments tree
 	 * until they reach a fragment on which they can be applied.
@@ -123,13 +140,15 @@ abstract class GlueDB_Fragment {
 	 * @return mixed
 	 */
 	public function __call($name, $args) {
-		if (count($this->users) === 1) {
-			$last	= end($this->users);
-			$parent	= $last['object'];
-			return call_user_func_array(array($parent, $name), $args);
+		if ($name === 'parent')
+			return call_user_func(array($this, '_parent'));
+		else {
+			$parent = $this->parent();
+			if (isset($parent))
+				return call_user_func_array(array($parent, $name), $args);
+			else
+				throw new Kohana_Exception("Unknown function '" . $name . "' called on an instance of class '" . get_class($this) . "'");
 		}
-		else
-			throw new Kohana_Exception("Unknown function '" . $name . "' called on an instance of class '" . get_class($this) . "'");
 	}
 }
 
