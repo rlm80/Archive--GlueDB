@@ -61,12 +61,12 @@ class Controller_GlueDB extends Controller {
 
 		$select = new GlueDB_Fragment_Builder_Select(null);
 		$select
-			->then($t->login)
-			->then($t->password)
-			->then($t->login)->as('mylogin')
-			->then($t->login)
-			->then('?', 'test')
-			->then('?', 'test')
+			->and($t->login)
+			->and($t->password)
+			->and($t->login)->as('mylogin')
+			->and($t->login)
+			->and('?', 'test')
+			->and('?', 'test')
 			->root();
 		$tests['select'] = array(
 			$select,
@@ -75,10 +75,10 @@ class Controller_GlueDB extends Controller {
 
 		$select = new GlueDB_Fragment_Builder_Orderby(null);
 		$select
-			->then($t->login)
-			->then($t->password)
-			->then($t->login)->asc()
-			->then('?', 'test')->desc()
+			->and($t->login)
+			->and($t->password)
+			->and($t->login)->asc()
+			->and('?', 'test')->desc()
 			->root();
 		$tests['select'] = array(
 			$select,
@@ -114,7 +114,7 @@ class Controller_GlueDB extends Controller {
 			"SELECT * FROM `mytable` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
 		);
 
-		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'");//->root();
+		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'")->root();
 		$tests['query select alias'] = array(
 			$select2,
 			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
@@ -132,7 +132,7 @@ class Controller_GlueDB extends Controller {
 			"SELECT * FROM `users` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
 		);
 
-		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->then($a->password)->having("count(*) > 1")->select($a->login)->then($a->password)->root();
+		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->select($a->login)->and($a->password)->root();
 		$tests['query select group by having'] = array(
 			$select5,
 			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1)"

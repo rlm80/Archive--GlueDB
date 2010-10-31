@@ -69,32 +69,27 @@ abstract class GlueDB_Fragment {
 
 	/**
 	 * Adds a fragment to the list of fragments that make direct use of this
-	 * fragment to create their own SQL representation (a bit more complicated than
-	 * it seems because a user may be added more than once and we have to keep
-	 * track of that to remove it properly).
+	 * fragment to create their own SQL representation.
 	 *
 	 * @param GlueDB_Fragment $user
 	 */
 	protected function register_user(GlueDB_Fragment $user) {
-		$hash = spl_object_hash($user);
-		if ( ! isset($this->users[$hash]))
-			$this->users[$hash] = array('object' => $user, 'count' => 1);
-		else
-			$this->users[$hash]['count'] ++;
+		$this->users[] = $user;
 	}
 
 	/**
 	 * Removes a fragment from the list of fragments that make direct use of this
-	 * fragment to create their own SQL representation (a bit more complicated than
-	 * it seems because a user may be removed more than once).
+	 * fragment to create their own SQL representation.
 	 *
 	 * @param GlueDB_Fragment $user
 	 */
 	protected function unregister_user(GlueDB_Fragment $user) {
-		$hash = spl_object_hash($user);
-		$this->users[$hash]['count'] --;
-		if ($this->users[$hash]['count'] === 0)
-			unset($this->users[$hash]);
+		foreach (array_reverse($this->users, true) as $i => $u) {
+			if ($u === $user) {
+				unset($this->users[$i]);
+				break;
+			}
+		}
 	}
 
 	/**
@@ -109,47 +104,71 @@ abstract class GlueDB_Fragment {
 
 			// Cascade call to parent, because if a child is invalid, the parent is necessarily invalid too :
 			foreach($this->users as $user)
-				$user['object']->invalidate();
+				$user->invalidate();
 		}
 	}
-
-	public function root() {
-		$parent = $this->parent();
-		if ( ! isset($parent))
-			return $this;
-		else
-			return $parent->root();
-	}
-
-	public function _parent() {
-		if (count($this->users) !== 0) {
-			$last = end($this->users);
-			return $last['object'];
-		}
+	
+	/**
+	 * Returns the context, that is, the last parent fragment this fragment was attached to.
+	 * 
+	 * @return GlueDB_Fragment
+	 */
+	public function context() {
+		if (count($this->users) > 0)
+			return end($this->users);
 		else
 			return null;
-	}
+	}	
 
 	/**
-	 * Forwards unknown calls to parent fragment. This means unknown calls bubble up the fragments tree
-	 * until they reach a fragment on which they can be applied.
-	 *
-	 * @param string $name
-	 * @param string $args
-	 *
-	 * @return mixed
+	 * Returns the top-level context.
+	 * 
+	 * @return GlueDB_Fragment
+	 */
+	public function root() {
+		$context = $this->context();
+		if ( ! isset($context))
+			return $this;
+		else
+			return $context->root();
+	}
+	
+	/**
+	 * Throws an exception if there is no context to forward a function call, returns 
+	 * current context otherwise.
+	 * 
+	 * @return GlueDB_Fragment
+	 */	
+	protected function check_forwarding($function) {
+		$context = $this->context();
+		if ( ! isset($context))
+			throw new Kohana_Exception("Cannot call function '" . $function . "' in this context.");
+		else 
+			return $context;
+	}	
+	
+	/*
+	 * Sets up aliases for _or() and _and(). Required because
+	 * keywords aren't valid function names in PHP. Also forwards
+	 * unknown calls to context.
 	 */
 	public function __call($name, $args) {
-		if ($name === 'parent')
-			return call_user_func(array($this, '_parent'));
+		if ($name === 'or')
+			return call_user_func_array(array($this, '_or'), $args);
+		elseif ($name === 'and')
+			return call_user_func_array(array($this, '_and'), $args);
+		elseif ($name === 'as')
+			return call_user_func_array(array($this, '_as'), $args);
 		else {
-			$parent = $this->parent();
-			if (isset($parent))
-				return call_user_func_array(array($parent, $name), $args);
-			else
-				throw new Kohana_Exception("Unknown function '" . $name . "' called on an instance of class '" . get_class($this) . "'");
-		}
+			$context = $this->check_forwarding($name);
+			return call_user_func_array(array($context, $name), $args);
+		}	
 	}
+	
+	// Following functions cannot be forwarded with __call because __call doesn't support reference arguments.
+	public function left($arg1,  &$arg2 = null) { return $this->check_forwarding(__METHOD__)->left($arg1, $arg2); }
+	public function right($arg1, &$arg2 = null) { return $this->check_forwarding(__METHOD__)->right($arg1, $arg2); }	
+	public function inner($arg1, &$arg2 = null) { return $this->check_forwarding(__METHOD__)->inner($arg1, $arg2); }
 }
 
 

@@ -15,7 +15,7 @@ class GlueDB_Fragment_Builder_Select extends GlueDB_Fragment_Builder {
 	 *
 	 * @return GlueDB_Fragment_Aliased
 	 */
-	public function then() {
+	public function _and() {
 		// Get params :
 		$params	= func_get_args();
 
@@ -81,5 +81,5 @@ class GlueDB_Fragment_Builder_Select extends GlueDB_Fragment_Builder {
 			return $column_name;
 		else
 			return $column_name . $i;
-	}
+	}	
 }

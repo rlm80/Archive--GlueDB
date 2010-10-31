@@ -19,7 +19,7 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 *
 	 *  @return GlueDB_Database
 	 */
-	public function db() {
+	protected function db() {
 		if ( ! isset($this->db))
 			$this->db = $this->find_db();
 		return $this->db;
@@ -33,7 +33,7 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	abstract protected function find_db();
 
 	/**
-	 * Return current object. Useful to get the query from on of the children builders :
+	 * Return current object. Example usage :
 	 *
 	 * $sql = gluedb::select('mytable')->where('1=1')->sql(); // Doesn't work ! Returns only the SQL of the last builder accessed : the where clause.
 	 * $sql = gluedb::select('mytable')->where('1=1')->query()->sql(); // Works. Returns the SQL of the whole query.

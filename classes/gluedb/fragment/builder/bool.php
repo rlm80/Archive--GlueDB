@@ -89,18 +89,4 @@ class GlueDB_Fragment_Builder_Bool extends GlueDB_Fragment_Builder {
 		// Add operand :
 		$this->push(new GlueDB_Fragment_Operand_Bool($fragment, $operator));
 	}
-
-
-	/*
-	 * Redefined to setup aliases for _or() and _and(). Required because
-	 * keywords aren't valid function names in PHP.
-	 */
-	public function __call($name, $args) {
-		if ($name === 'or')
-			return call_user_func_array(array($this, '_or'), $args);
-		elseif ($name === 'and')
-			return call_user_func_array(array($this, '_and'), $args);
-		else
-			return parent::__call($name, $args);
-	}
 }

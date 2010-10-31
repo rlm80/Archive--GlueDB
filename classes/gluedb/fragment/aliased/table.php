@@ -12,10 +12,10 @@
 
 class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	/**
-	 * @var array Column fragments cache.
+	 * @var boolean Prevents setting of table and alias once a column fragment has been generated.
 	 */
-	protected $columns = array();
-
+	protected $lock = false;
+	
 	/**
 	 * Constructor.
 	 *
@@ -34,8 +34,7 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	 * @return GlueDB_Fragment_Column
 	 */
 	public function __get($column) {
-	    if ( ! isset($this->columns[$column]))
-			$this->columns[$column] = new GlueDB_Fragment_Column($this, $column);
-		return $this->columns[$column];
+		$this->lock = true;
+	    return new GlueDB_Fragment_Column($this, $column);
 	}
 }

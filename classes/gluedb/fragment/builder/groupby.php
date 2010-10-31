@@ -15,7 +15,7 @@ class GlueDB_Fragment_Builder_Groupby extends GlueDB_Fragment_Builder {
 	 *
 	 * @return GlueDB_Fragment_Builder_Groupby
 	 */
-	public function then() {
+	public function _and() {
 		// Get params :
 		$params	= func_get_args();
 
@@ -29,5 +29,5 @@ class GlueDB_Fragment_Builder_Groupby extends GlueDB_Fragment_Builder {
 			$this->push(new GlueDB_Fragment_Template($first, $params));
 
 		return $this;
-	}
+	}		
 }

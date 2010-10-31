@@ -75,7 +75,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function select() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->select, 'then'), $args);
+			call_user_func_array(array($this->select, 'and'), $args);
 		}
 		return $this->select;
 	}
@@ -116,7 +116,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function groupby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			return call_user_func_array(array($this->groupby, 'then'), $args);
+			return call_user_func_array(array($this->groupby, 'and'), $args);
 		}
 		else
 			return $this->groupby;
@@ -144,7 +144,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function orderby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			return call_user_func_array(array($this->orderby, 'then'), $args);
+			return call_user_func_array(array($this->orderby, 'and'), $args);
 		}
 		else
 			return $this->orderby;

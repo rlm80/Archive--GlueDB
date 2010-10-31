@@ -15,7 +15,7 @@ class GlueDB_Fragment_Builder_Orderby extends GlueDB_Fragment_Builder {
 	 *
 	 * @return GlueDB_Fragment_Ordered
 	 */
-	public function then() {
+	public function _and() {
 		// Get params :
 		$params	= func_get_args();
 
@@ -33,5 +33,5 @@ class GlueDB_Fragment_Builder_Orderby extends GlueDB_Fragment_Builder {
 
 		// Return fragment :
 		return $fragment;
-	}
+	}		
 }
