@@ -81,5 +81,5 @@ class GlueDB_Fragment_Builder_Select extends GlueDB_Fragment_Builder {
 			return $column_name;
 		else
 			return $column_name . $i;
-	}	
+	}
 }

@@ -33,7 +33,7 @@ class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->set		= new GlueDB_Fragment_Builder_List_Set($this);
+		$this->set		= new GlueDB_Fragment_Builder_Setlist($this);
 		$this->from		= new GlueDB_Fragment_Builder_Join_From($this);
 		$this->where	= new GlueDB_Fragment_Builder_Bool_Where($this);
 		$this->orderby	= new GlueDB_Fragment_Builder_List_Orderby($this);

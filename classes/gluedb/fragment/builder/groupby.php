@@ -29,5 +29,5 @@ class GlueDB_Fragment_Builder_Groupby extends GlueDB_Fragment_Builder {
 			$this->push(new GlueDB_Fragment_Template($first, $params));
 
 		return $this;
-	}		
+	}
 }

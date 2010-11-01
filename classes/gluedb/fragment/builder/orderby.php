@@ -33,5 +33,5 @@ class GlueDB_Fragment_Builder_Orderby extends GlueDB_Fragment_Builder {
 
 		// Return fragment :
 		return $fragment;
-	}		
+	}
 }

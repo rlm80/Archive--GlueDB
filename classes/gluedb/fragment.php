@@ -107,10 +107,10 @@ abstract class GlueDB_Fragment {
 				$user->invalidate();
 		}
 	}
-	
+
 	/**
 	 * Returns the context, that is, the last parent fragment this fragment was attached to.
-	 * 
+	 *
 	 * @return GlueDB_Fragment
 	 */
 	public function context() {
@@ -118,11 +118,11 @@ abstract class GlueDB_Fragment {
 			return end($this->users);
 		else
 			return null;
-	}	
+	}
 
 	/**
 	 * Returns the top-level context.
-	 * 
+	 *
 	 * @return GlueDB_Fragment
 	 */
 	public function root() {
@@ -132,23 +132,23 @@ abstract class GlueDB_Fragment {
 		else
 			return $context->root();
 	}
-	
+
 	/**
-	 * Throws an exception if there is no context to forward a function call, returns 
+	 * Throws an exception if there is no context to forward a function call, returns
 	 * current context otherwise.
-	 * 
+	 *
 	 * @return GlueDB_Fragment
-	 */	
+	 */
 	protected function check_forwarding($function) {
 		$context = $this->context();
 		if ( ! isset($context))
 			throw new Kohana_Exception("Cannot call function '" . $function . "' in this context.");
-		else 
+		else
 			return $context;
-	}	
-	
+	}
+
 	/*
-	 * Sets up aliases for _or() and _and(). Required because
+	 * Sets up aliases for _or(), _and() and _as(). Required because
 	 * keywords aren't valid function names in PHP. Also forwards
 	 * unknown calls to context.
 	 */
@@ -162,12 +162,12 @@ abstract class GlueDB_Fragment {
 		else {
 			$context = $this->check_forwarding($name);
 			return call_user_func_array(array($context, $name), $args);
-		}	
+		}
 	}
-	
+
 	// Following functions cannot be forwarded with __call because __call doesn't support reference arguments.
 	public function left($arg1,  &$arg2 = null) { return $this->check_forwarding(__METHOD__)->left($arg1, $arg2); }
-	public function right($arg1, &$arg2 = null) { return $this->check_forwarding(__METHOD__)->right($arg1, $arg2); }	
+	public function right($arg1, &$arg2 = null) { return $this->check_forwarding(__METHOD__)->right($arg1, $arg2); }
 	public function inner($arg1, &$arg2 = null) { return $this->check_forwarding(__METHOD__)->inner($arg1, $arg2); }
 }
 

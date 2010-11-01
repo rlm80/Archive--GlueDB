@@ -155,6 +155,10 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_query_select($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Query_Delete)
 			return $this->compile_query_delete($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Assignment)
+			return $this->compile_assignment($fragment);
+		else
+			throw new Kohana_Exception("Cannot compile fragment of class '" . $fragment->get_class() . "' : unknown fragment type.");
 	}
 
 	/**
@@ -235,7 +239,7 @@ abstract class GlueDB_Database extends PDO {
 	protected function compile_aliased(GlueDB_Fragment_Aliased $fragment) {
 		// Get data from fragment :
 		$aliased	= $fragment->aliased();
-		$alias		= $fragment->alias();
+		$as			= $fragment->as();
 
 		// Generate fragment SQL :
 		$sql = $aliased->sql($this);
@@ -243,8 +247,8 @@ abstract class GlueDB_Database extends PDO {
 			$sql	= '(' . $sql . ')';
 
 		// Add alias :
-		if ( ! empty($alias))
-			$sql .= ' AS ' . $this->quote_identifier($alias);
+		if ( ! empty($as))
+			$sql .= ' AS ' . $this->quote_identifier($as);
 
 		// Return SQL :
 		return $sql;
@@ -397,15 +401,15 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function compile_column(GlueDB_Fragment_Column $fragment) {
 		// Get alias :
-		$alias = $fragment->table_alias()->alias();
-		if (empty($alias))
-			$alias = $fragment->table_alias()->aliased()->table()->dbtable();
+		$as = $fragment->table_alias()->as();
+		if (empty($as))
+			$as = $fragment->table_alias()->aliased()->table()->dbtable();
 
 		// Get column :
 		$column = $fragment->column()->dbcolumn();
 
 		// Generate SQL :
-		$sql = $this->quote_identifier($alias) . '.' . $this->quote_identifier($column);
+		$sql = $this->quote_identifier($as) . '.' . $this->quote_identifier($column);
 
 		return $sql;
 	}
@@ -515,6 +519,21 @@ abstract class GlueDB_Database extends PDO {
 		if ( ! empty($wheresql)) $sql .= ' WHERE ' . $wheresql;
 
 		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Assignment fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Assignment $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_assignment(GlueDB_Fragment_Assignment $fragment) {
+		// Get data from fragment :
+		$assigneesql = $fragment->assignee()->sql($this);
+		$assignedsql = $fragment->assigned()->sql($this);
+
+		return $assigneesql . ' = ' . $assignedsql;
 	}
 
 	/**

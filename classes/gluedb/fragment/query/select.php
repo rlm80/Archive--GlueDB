@@ -55,33 +55,41 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function __construct() {
 		// Init children fragments :
 		$this->select	= new GlueDB_Fragment_Builder_Select();
-		$this->from		= new GlueDB_Fragment_Builder_Join_From($this);
-		$this->where	= new GlueDB_Fragment_Builder_Bool_Where($this);
+		$this->from		= new GlueDB_Fragment_Builder_Join_From();
+		$this->where	= new GlueDB_Fragment_Builder_Bool_Where();
 		$this->groupby	= new GlueDB_Fragment_Builder_Groupby();
-		$this->having	= new GlueDB_Fragment_Builder_Bool_Having($this);
+		$this->having	= new GlueDB_Fragment_Builder_Bool_Having();
 		$this->orderby	= new GlueDB_Fragment_Builder_Orderby();
 
-		// Set up dependencies :
+		// Set up dependecies :
 		$this->select->register_user($this);
+		$this->from->register_user($this);
+		$this->where->register_user($this);
 		$this->groupby->register_user($this);
+		$this->having->register_user($this);
 		$this->orderby->register_user($this);
 	}
 
 	/**
 	 * Returns the select list, initializing it with given parameters if any.
 	 *
+	 * I.e. "$query->select(...)" is the same as "$query->select()->and(...)".
+	 *
 	 * @return GlueDB_Fragment_Builder_List_Select
 	 */
 	public function select() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->select, 'and'), $args);
+			return call_user_func_array(array($this->select, 'and'), $args);
 		}
-		return $this->select;
+		else
+			return $this->select;
 	}
 
 	/**
 	 * Returns the from clause, initializing it with given parameters if any.
+	 *
+	 * I.e. "$query->from(...)" is the same as "$query->from()->init(...)".
 	 *
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
@@ -97,6 +105,8 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	/**
 	 * Returns the where clause, initializing it with given parameters if any.
 	 *
+	 * I.e. "$query->where(...)" is the same as "$query->where()->init(...)".
+	 *
 	 * @return GlueDB_Fragment_Builder_Bool_Where
 	 */
 	public function where() {
@@ -110,6 +120,8 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 
 	/**
 	 * Returns the group by clause, initializing it with given parameters if any.
+	 *
+	 * I.e. "$query->groupby(...)" is the same as "$query->groupby()->and(...)".
 	 *
 	 * @return GlueDB_Fragment_Builder_List_Groupby
 	 */
@@ -125,6 +137,8 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	/**
 	 * Returns the group by clause, initializing it with given parameters if any.
 	 *
+	 * I.e. "$query->having(...)" is the same as "$query->having()->init(...)".
+	 *
 	 * @return GlueDB_Fragment_Builder_Bool_Having
 	 */
 	public function having() {
@@ -138,6 +152,8 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 
 	/**
 	 * Returns the order by clause, initializing it with given parameters if any.
+	 *
+	 * I.e. "$query->orderby(...)" is the same as "$query->orderby()->and(...)".
 	 *
 	 * @return GlueDB_Fragment_Builder_List_Orderby
 	 */

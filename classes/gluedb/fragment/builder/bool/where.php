@@ -9,11 +9,4 @@
  */
 
 class GlueDB_Fragment_Builder_Bool_Where extends GlueDB_Fragment_Builder_Bool {
-	/**
-	 * @param GlueDB_Fragment_Query $query
-	 */
-	public function __construct(GlueDB_Fragment_Query $query = null) {
-		if (isset($query))
-			$this->register_user($query);
-	}
 }

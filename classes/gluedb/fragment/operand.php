@@ -25,9 +25,8 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 	 * @param integer $operator Null means first operand.
 	 */
 	public function __construct(GlueDB_Fragment $operand, $operator = null) {
-		$this->operator	= $operator;
-		$this->operand	= $operand;
-		$this->operand->register_user($this);
+		$this->operator($operator);
+		$this->operand($operand);
 	}
 
 	/**
@@ -54,11 +53,13 @@ abstract class GlueDB_Fragment_Operand extends GlueDB_Fragment {
 	 *
 	 * @return mixed
 	 */
-	public function operand($operand = null) {
+	public function operand(GlueDB_Fragment $operand = null) {
 		if (func_num_args() === 0)
 			return $this->operand;
 		else {
+			if (isset($this->operand)) $this->operand->unregister_user($this);
 			$this->operand = $operand;
+			$this->operand->register_user($this);
 			$this->invalidate();
 			return $this;
 		}

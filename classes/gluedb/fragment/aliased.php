@@ -17,18 +17,17 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	/**
 	 * @var string Alias.
 	 */
-	protected $alias;
+	protected $as;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param GlueDB_Fragment $aliased
-	 * @param string $alias
+	 * @param string $as
 	 */
-	public function __construct(GlueDB_Fragment $aliased, $alias = null) {
-		$this->alias	= $alias;
-		$this->aliased	= $aliased;
-		$this->aliased->register_user($this);
+	public function __construct(GlueDB_Fragment $aliased, $as = null) {
+		$this->as($as);
+		$this->aliased($aliased);
 	}
 
 	/**
@@ -42,33 +41,26 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 		if (func_num_args() === 0)
 			return $this->aliased;
 		else {
+			if (isset($this->aliased)) $this->aliased->unregister_user($this);
 			$this->aliased = $aliased;
+			$this->aliased->register_user($this);
 			$this->invalidate();
 			return $this;
 		}
 	}
 
 	/**
-	 * Sets alias. Call as() instead of this.
-	 *
-	 * @return GlueDB_Fragment_Aliased
-	 */
-	public function _as($alias) {
-		return $this->alias($alias);
-	}
-
-	/**
 	 * Alias getter/setter.
 	 *
-	 * @param string
+	 * @param string $as
 	 *
 	 * @return mixed
 	 */
-	public function alias($alias = null) {
+	public function _as($as = null) {
 		if (func_num_args() === 0)
-			return $this->alias;
+			return $this->as;
 		else {
-			$this->alias = $alias;
+			$this->as = $as;
 			$this->invalidate();
 			return $this;
 		}
