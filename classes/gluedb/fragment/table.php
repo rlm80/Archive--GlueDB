@@ -32,9 +32,8 @@ class GlueDB_Fragment_Table extends GlueDB_Fragment {
 		if (func_num_args() === 0)
 			return $this->table;
 		else {
-			$this->table = gluedb::table($table_name);
-			$this->invalidate();
-			return $this;
+			$table = gluedb::table($table_name);
+			return $this->set_property('table', $table);
 		}
 	}
 }

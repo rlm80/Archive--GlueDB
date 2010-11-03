@@ -10,66 +10,57 @@
 
 class GlueDB_Fragment_Assignment extends GlueDB_Fragment {
 	/**
-	 * @var GlueDB_Fragment_Column Column fragment.
+	 * @var GlueDB_Fragment_Column Left side of the assignment.
 	 */
-	protected $assignee;
+	protected $column;
 
 	/**
-	 * @var GlueDB_Fragment Right side of the equal.
+	 * @var GlueDB_Fragment Right side of the assignment.
 	 */
-	protected $assigned;
+	protected $to;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param GlueDB_Fragment_Column $assignee
-	 * @param mixed $assigned
+	 * @param GlueDB_Fragment_Column $set
+	 * @param mixed $to
 	 */
-	public function __construct(GlueDB_Fragment_Column $assignee, $assigned) {
-		$this->assignee($assignee);
-		$this->assigned($assigned);
+	public function __construct(GlueDB_Fragment_Column $column, $to = null) {
+		$this->column($column);
+		$this->to($to);
 	}
 
 	/**
-	 * Assignee getter/setter.
+	 * Left side of the assignment getter/setter.
 	 *
-	 * @param GlueDB_Fragment_Column $assignee
+	 * @param GlueDB_Fragment_Column $column
 	 *
 	 * @return mixed
 	 */
-	public function assignee(GlueDB_Fragment_Column $assignee = null) {
+	public function column(GlueDB_Fragment_Column $column = null) {
 		if (func_num_args() === 0)
-			return $this->assignee;
-		else {
-			if (isset($this->assignee)) $this->assignee->unregister_user($this);
-			$this->assignee = $assignee;
-			$this->assignee->register_user($this);
-			$this->invalidate();
-			return $this; // TODO this should return assignee + generalize this to all getter / setters ?
-		}
+			return $this->column;
+		else
+			return $this->set_property('column', $column);
 	}
 
 	/**
-	 * Assigned getter/setter.
+	 * Right side of the assignment getter/setter.
 	 *
-	 * @param mixed $assigned
+	 * @param mixed $to
 	 *
 	 * @return mixed
 	 */
-	public function assigned($assigned = null) {
+	public function to($to = null) {
 		if (func_num_args() === 0)
-			return $this->assigned;
+			return $this->to;
 		else {
 			// Turn parameter into a fragment if it isn't already :
-			if ( ! $assigned instanceof GlueDB_Fragment)
-				$assigned = new GlueDB_Fragment_Value($assigned);
+			if ( ! $to instanceof GlueDB_Fragment)
+				$to = new GlueDB_Fragment_Value($to);
 
-			// Replace assigned by new fragment :
-			if (isset($this->assigned)) $this->assigned->unregister_user($this);
-			$this->assigned = $assigned;
-			$this->assigned->register_user($this);
-			$this->invalidate();
-			return $this;
+			// Replace to by new fragment :
+			return $this->set_property('to', $to);
 		}
 	}
 }

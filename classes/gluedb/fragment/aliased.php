@@ -26,8 +26,8 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	 * @param string $as
 	 */
 	public function __construct(GlueDB_Fragment $aliased, $as = null) {
-		$this->as($as);
 		$this->aliased($aliased);
+		$this->as($as);
 	}
 
 	/**
@@ -40,13 +40,8 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	public function aliased(GlueDB_Fragment $aliased = null) {
 		if (func_num_args() === 0)
 			return $this->aliased;
-		else {
-			if (isset($this->aliased)) $this->aliased->unregister_user($this);
-			$this->aliased = $aliased;
-			$this->aliased->register_user($this);
-			$this->invalidate();
-			return $this;
-		}
+		else
+			return $this->set_property('aliased', $aliased);
 	}
 
 	/**
@@ -59,10 +54,7 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 	public function _as($as = null) {
 		if (func_num_args() === 0)
 			return $this->as;
-		else {
-			$this->as = $as;
-			$this->invalidate();
-			return $this;
-		}
+		else
+			return $this->set_property('as', $as);
 	}
 }

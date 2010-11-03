@@ -5,7 +5,7 @@
  *
  * A database object is a PDO instance connected to a specific database. This
  * class extends PDO and adds to it a unified interface for database introspection
- * and a query compiler to generate RDBMS specific SQL queries.
+ * and functions to generate RDBMS specific SQL.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -530,10 +530,10 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function compile_assignment(GlueDB_Fragment_Assignment $fragment) {
 		// Get data from fragment :
-		$assigneesql = $fragment->assignee()->sql($this);
-		$assignedsql = $fragment->assigned()->sql($this);
+		$columnsql	= $fragment->column()->sql($this);
+		$tosql		= $fragment->to()->sql($this);
 
-		return $assigneesql . ' = ' . $assignedsql;
+		return $columnsql . ' = ' . $tosql;
 	}
 
 	/**

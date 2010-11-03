@@ -14,8 +14,8 @@ class GlueDB_Fragment_Aliased_Table extends GlueDB_Fragment_Aliased {
 	/**
 	 * @var boolean Prevents setting of table and alias once a column fragment has been generated.
 	 */
-	protected $lock = false;
-	
+	protected $lock = false; // TODO make sure this works...and think again about necessity of returning NEW column fragment
+
 	/**
 	 * Constructor.
 	 *

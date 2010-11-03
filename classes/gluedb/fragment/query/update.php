@@ -10,7 +10,7 @@
 
 class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 	/**
-	 * @var GlueDB_Fragment_Builder_List_Set Set list.
+	 * @var GlueDB_Fragment_Builder_Setlist Set list.
 	 */
 	protected $set;
 
@@ -25,7 +25,7 @@ class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 	protected $where;
 
 	/**
-	 * @var GlueDB_Fragment_Builder_List_Orderby Order by list.
+	 * @var GlueDB_Fragment_Builder_Orderby Order by list.
 	 */
 	protected $orderby;
 
@@ -33,27 +33,39 @@ class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->set		= new GlueDB_Fragment_Builder_Setlist($this);
-		$this->from		= new GlueDB_Fragment_Builder_Join_From($this);
-		$this->where	= new GlueDB_Fragment_Builder_Bool_Where($this);
-		$this->orderby	= new GlueDB_Fragment_Builder_List_Orderby($this);
+		// Init children fragments :
+		$this->set		= new GlueDB_Fragment_Builder_Setlist();
+		$this->from		= new GlueDB_Fragment_Builder_Join_From();
+		$this->where	= new GlueDB_Fragment_Builder_Bool_Where();
+		$this->orderby	= new GlueDB_Fragment_Builder_List_Orderby();
+
+		// Set up dependecies :
+		$this->set->register_user($this);
+		$this->from->register_user($this);
+		$this->where->register_user($this);
+		$this->orderby->register_user($this);
 	}
 
 	/**
 	 * Returns the set list, initializing it with given parameters if any.
 	 *
+	 * I.e. "$query->set(...)" is the same as "$query->set()->and(...)".
+	 *
+	 * @param GlueDB_Fragment_Column $column
+	 * @param mixed $to
+	 *
 	 * @return GlueDB_Fragment_Builder_List_Set
 	 */
-	public function set() {
-		if (func_num_args() > 0) {
-			$args = func_get_args();
-			call_user_func_array(array($this->set, 'init'), $args);
-		}
+	public function set($column = null, $to = null) {
+		if (func_num_args() > 0)
+			return $this->set->and($column, $to);
 		return $this->set;
 	}
 
 	/**
 	 * Returns the from clause, initializing it with given parameters if any.
+	 *
+	 * I.e. "$query->from(...)" is the same as "$query->from()->init(...)".
 	 *
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
@@ -62,39 +74,46 @@ class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 	 */
 	public function from($operand = null, &$alias = null) {
 		if (func_num_args() > 0)
-			$this->from->init($operand, $alias);
+			return $this->from->init($operand, $alias);
 		return $this->from;
 	}
 
 	/**
 	 * Returns the where clause, initializing it with given parameters if any.
 	 *
+	 * I.e. "$query->where(...)" is the same as "$query->where()->init(...)".
+	 *
 	 * @return GlueDB_Fragment_Builder_Bool_Where
 	 */
 	public function where() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->where, 'init'), $args);
+			return call_user_func_array(array($this->where, 'init'), $args);
 		}
-		return $this->where;
+		else
+			return $this->where;
 	}
 
 	/**
 	 * Returns the order by clause, initializing it with given parameters if any.
+	 *
+	 * I.e. "$query->orderby(...)" is the same as "$query->orderby()->and(...)".
 	 *
 	 * @return GlueDB_Fragment_Builder_List_Orderby
 	 */
 	public function orderby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->orderby, 'init'), $args);
+			return call_user_func_array(array($this->orderby, 'and'), $args);
 		}
-		return $this->orderby;
+		else
+			return $this->orderby;
 	}
 
 	protected function find_db() {
 		// TODO
 	}
+
 	/*
 	 * Executes current query and returns the number of affected rows.
 	 *

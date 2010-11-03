@@ -27,10 +27,11 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	 * Constructor.
 	 *
 	 * @param GlueDB_Fragment $ordered
+	 * @param integer $ordered
 	 */
 	public function __construct(GlueDB_Fragment $ordered, $order = null) {
-		$this->order($order);
 		$this->ordered($ordered);
+		$this->order($order);
 	}
 
 	/**
@@ -61,11 +62,8 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	public function order($order = null) {
 		if (func_num_args() === 0)
 			return $this->order;
-		else {
-			$this->order = $order;
-			$this->invalidate();
-			return $this;
-		}
+		else
+			return $this->set_property('order', $order);
 	}
 
 	/**
@@ -78,12 +76,7 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 	public function ordered(GlueDB_Fragment $ordered = null) {
 		if (func_num_args() === 0)
 			return $this->ordered;
-		else {
-			if (isset($this->ordered)) $this->ordered->unregister_user($this);
-			$this->ordered = $ordered;
-			$this->ordered->register_user($this);
-			$this->invalidate();
-			return $this;
-		}
+		else
+			return $this->set_property('ordered', $ordered);
 	}
 }

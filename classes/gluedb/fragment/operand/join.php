@@ -36,7 +36,7 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 	 *
 	 * @return GlueDB_Fragment_Builder_Bool
 	 */
-	public function on() {
+	public function on() { // TODO think about this function
 		if (func_num_args() > 0) {
 			$args = func_get_args();
 			call_user_func_array(array($this->on, 'init'), $args);

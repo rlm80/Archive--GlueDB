@@ -109,6 +109,33 @@ abstract class GlueDB_Fragment {
 	}
 
 	/**
+	 * Helper function that sets the value of a property.
+	 *
+	 * @param string $prop
+	 * @param mixed $value
+	 *
+	 * @return GlueDB_Fragment
+	 */
+	protected function set_property($prop, $value) {
+		if ($this->$prop !== $value) {
+			// If old value of property is a fragment, we must remove the dependency :
+			if (isset($this->$prop) && $this->$prop instanceof GlueDB_Fragment)
+				$this->$prop->unregister_user($this);
+
+			// If new value of property is a fragment, we must set up the dependency :
+			if (isset($value) && $value instanceof GlueDB_Fragment)
+				$value->register_user($this);
+
+			// Set new value of property :
+			$this->$prop = $value;
+
+			// Invalidate fragment :
+			$this->invalidate();
+		}
+		return $this;
+	}
+
+	/**
 	 * Returns the context, that is, the last parent fragment this fragment was attached to.
 	 *
 	 * @return GlueDB_Fragment

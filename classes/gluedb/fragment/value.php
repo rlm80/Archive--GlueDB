@@ -33,10 +33,7 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 	public function value($value = null) {
 		if (func_num_args() === 0)
 			return $this->value;
-		else {
-			$this->value = $value;
-			$this->invalidate();
-			return $this;
-		}
+		else
+			return $this->set_property('value', $value);
 	}
 }
