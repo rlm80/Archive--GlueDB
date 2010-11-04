@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Builder_Select extends GlueDB_Fragment_Builder {
+class GlueDB_Fragment_Builder_Get extends GlueDB_Fragment_Builder {
 	/**
 	 * Adds an element at the end of the select list. You may pass any fragment, or a string template
 	 * with question marks as placeholders, followed by their replacement values or fragments.

@@ -4,7 +4,7 @@
  * Insert query data structure.
  *
  * @package GlueDB
- * @author R�gis Lemaigre
+ * @author Régis Lemaigre
  * @license MIT
  */
 

@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Fragment that represents a select query.
+ * Fragment that represents a get query.
  *
  * @package GlueDB
  * @author Régis Lemaigre
@@ -10,9 +10,9 @@
 
 class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	/**
-	 * @var GlueDB_Fragment_Builder_Select Select list.
+	 * @var GlueDB_Fragment_Builder_Get Select list.
 	 */
-	protected $select;
+	protected $get;
 
 	/**
 	 * @var GlueDB_Fragment_Builder_Join_From From clause.
@@ -54,7 +54,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	 */
 	public function __construct() {
 		// Init children fragments :
-		$this->select	= new GlueDB_Fragment_Builder_Select();
+		$this->get		= new GlueDB_Fragment_Builder_Get();
 		$this->from		= new GlueDB_Fragment_Builder_Join_From();
 		$this->where	= new GlueDB_Fragment_Builder_Bool_Where();
 		$this->groupby	= new GlueDB_Fragment_Builder_Groupby();
@@ -62,7 +62,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 		$this->orderby	= new GlueDB_Fragment_Builder_Orderby();
 
 		// Set up dependecies :
-		$this->select->register_user($this);
+		$this->get->register_user($this);
 		$this->from->register_user($this);
 		$this->where->register_user($this);
 		$this->groupby->register_user($this);
@@ -73,17 +73,17 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	/**
 	 * Returns the select list, initializing it with given parameters if any.
 	 *
-	 * I.e. "$query->select(...)" is the same as "$query->select()->and(...)".
+	 * I.e. "$query->get(...)" is the same as "$query->get()->and(...)".
 	 *
-	 * @return GlueDB_Fragment_Builder_List_Select
+	 * @return GlueDB_Fragment_Builder_Get
 	 */
-	public function select() {
+	public function get() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			return call_user_func_array(array($this->select, 'and'), $args);
+			return call_user_func_array(array($this->get, 'and'), $args);
 		}
 		else
-			return $this->select;
+			return $this->get;
 	}
 
 	/**

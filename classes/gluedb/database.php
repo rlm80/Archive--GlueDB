@@ -125,8 +125,8 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_operand_join($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Aliased)
 			return $this->compile_aliased($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Select)
-			return $this->compile_builder_select($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Get)
+			return $this->compile_builder_get($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Builder_Orderby)
 			return $this->compile_builder_orderby($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Builder_Groupby)
@@ -141,6 +141,8 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_builder_join_from($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Builder_Join)
 			return $this->compile_builder_join($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Setlist)
+			return $this->compile_builder_setlist($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Ordered)
 			return $this->compile_ordered($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Column)
@@ -155,6 +157,8 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_query_select($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Query_Delete)
 			return $this->compile_query_delete($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Query_Update)
+			return $this->compile_query_update($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Assignment)
 			return $this->compile_assignment($fragment);
 		else
@@ -276,13 +280,13 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Compiles GlueDB_Fragment_Builder_Select fragments into an SQL string.
+	 * Compiles GlueDB_Fragment_Builder_Get fragments into an SQL string.
 	 *
-	 * @param GlueDB_Fragment_Builder_Select $fragment
+	 * @param GlueDB_Fragment_Builder_Get $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_select(GlueDB_Fragment_Builder_Select $fragment) {
+	protected function compile_builder_get(GlueDB_Fragment_Builder_Get $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -361,6 +365,17 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function compile_builder_join_from(GlueDB_Fragment_Builder_Join_From $fragment) {
 		return $this->compile_builder($fragment, ' ');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Setlist fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Setlist $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_setlist(GlueDB_Fragment_Builder_Setlist $fragment) {
+		return $this->compile_builder($fragment, ', ');
 	}
 
 	/**
@@ -477,7 +492,7 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function compile_query_select(GlueDB_Fragment_Query_Select $fragment) {
 		// Get data from fragment :
-		$selectsql	= $fragment->select()->sql($this);
+		$selectsql	= $fragment->get()->sql($this);
 		$fromsql	= $fragment->from()->sql($this);
 		$wheresql	= $fragment->where()->sql($this);
 		$groupbysql	= $fragment->groupby()->sql($this);
@@ -517,6 +532,30 @@ abstract class GlueDB_Database extends PDO {
 
 		// Optional :
 		if ( ! empty($wheresql)) $sql .= ' WHERE ' . $wheresql;
+
+		return $sql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Query_Update fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Query_Update $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_query_update(GlueDB_Fragment_Query_Update $fragment) {
+		// Get data from fragment :
+		$setlistsql	= $fragment->set()->sql($this);
+		$fromsql	= $fragment->from()->sql($this);
+		$wheresql	= $fragment->where()->sql($this);
+		$orderbysql	= $fragment->orderby()->sql($this);
+
+		// Mandatory :
+		$sql = 'UPDATE ' . $fromsql . ' SET ' . $setlistsql;
+
+		// Optional :
+		if ( ! empty($wheresql))	$sql .= ' WHERE '		. $wheresql;
+		if ( ! empty($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
 
 		return $sql;
 	}

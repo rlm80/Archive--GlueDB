@@ -37,7 +37,7 @@ class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 		$this->set		= new GlueDB_Fragment_Builder_Setlist();
 		$this->from		= new GlueDB_Fragment_Builder_Join_From();
 		$this->where	= new GlueDB_Fragment_Builder_Bool_Where();
-		$this->orderby	= new GlueDB_Fragment_Builder_List_Orderby();
+		$this->orderby	= new GlueDB_Fragment_Builder_Orderby();
 
 		// Set up dependecies :
 		$this->set->register_user($this);

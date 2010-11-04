@@ -59,7 +59,7 @@ class Controller_GlueDB extends Controller {
 				),
 		);
 
-		$select = new GlueDB_Fragment_Builder_Select(null);
+		$select = new GlueDB_Fragment_Builder_Get(null);
 		$select
 			->and($t->login)
 			->and($t->password)
@@ -132,16 +132,22 @@ class Controller_GlueDB extends Controller {
 			"SELECT * FROM `users` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
 		);
 
-		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->select($a->login)->and($a->password)->root();
+		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->get($a->login)->and($a->password)->root();
 		$tests['query select group by having'] = array(
 			$select5,
-			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1)"
+			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
 		);
 
 		$delete1 = gluedb::delete('users', $a)->where("$a->login = 'test'")->root();
 		$tests['query delete'] = array(
 			$delete1,
 			"DELETE FROM `users` WHERE (`users`.`login` = 'test')"
+		);
+
+		$update1 = gluedb::update('users', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'")->root();
+		$tests['query update'] = array(
+			$update1,
+			"UPDATE `users` SET `users`.`login` = 'test', `users`.`password` = 'test' WHERE (`users`.`login` = 'test')"
 		);
 
 		// Checks :
