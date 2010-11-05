@@ -143,6 +143,8 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_builder_join($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Builder_Setlist)
 			return $this->compile_builder_setlist($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Rowlist)
+			return $this->compile_builder_rowlist($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Ordered)
 			return $this->compile_ordered($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Column)
@@ -161,6 +163,8 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_query_update($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Assignment)
 			return $this->compile_assignment($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Row)
+			return $this->compile_row($fragment);
 		else
 			throw new Kohana_Exception("Cannot compile fragment of class '" . $fragment->get_class() . "' : unknown fragment type.");
 	}
@@ -379,6 +383,17 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
+	 * Compiles GlueDB_Fragment_Builder_Rowlist fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Rowlist $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_rowlist(GlueDB_Fragment_Builder_Rowlist $fragment) {
+		return $this->compile_builder($fragment, ', ');
+	}
+
+	/**
 	 * Compiles GlueDB_Fragment_Ordered fragments into an SQL string.
 	 *
 	 * @param GlueDB_Fragment_Ordered $fragment
@@ -573,6 +588,26 @@ abstract class GlueDB_Database extends PDO {
 		$tosql		= $fragment->to()->sql($this);
 
 		return $columnsql . ' = ' . $tosql;
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Row fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Row $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_row(GlueDB_Fragment_Row $fragment) {
+		// Get data from fragment :
+		$values = $fragment->values();
+
+		// Generate value fragments SQL strings :
+		$sqls = array();
+		foreach ($values as $value)
+			$sqls[] = $value->sql($this);
+
+		// Return SQL :
+		return '(' . implode(',', $sqls) . ')';
 	}
 
 	/**

@@ -22,7 +22,7 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $table_name Name of the main table you're updating (= first table in the update clause).
+	 * @param string $table_name Name of the main table you're deleting from.
 	 * @param GlueDB_Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 */
 	public function __construct($table_name = null, &$alias = null) { // TODO think...why is this constructor different from the one of select query ?
@@ -47,7 +47,7 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 	 */
 	public function from($table_name = null) {
 		if (func_num_args() > 0) {
-			$this->from->fragment(new GlueDB_Fragment_Table($table_name));
+			$this->from->aliased(new GlueDB_Fragment_Table($table_name));
 			return $this;
 		}
 		else
