@@ -53,7 +53,7 @@ abstract class GlueDB_Database extends PDO {
 	 * 				This ensures correct singleton behaviour even though constructor must
 	 * 				remain public because parent constructor is. The other solution was
 	 * 				to wrap the PDO instance into this class instead of extending PDO,
-	 * 				but this is not good because I wish to expose all PDO features.
+	 * 				but this is not good because we wish to expose the whole PDO interface.
 	 */
 	private static $constuctor_locked = TRUE;
 
@@ -78,7 +78,7 @@ abstract class GlueDB_Database extends PDO {
 		parent::__construct($this->dsn(), $this->username, $this->password, $this->options);
 
 		// Unset connection parameters for security, to make sure no forgotten debug message
-		// displays them unintentionaly to a user :
+		// displays them unintentionaly to the user :
 		$this->username = null;
 		$this->password = null;
 
@@ -110,6 +110,75 @@ abstract class GlueDB_Database extends PDO {
 	protected function set_charset() {
 		$this->exec('SET NAMES ' . $this->quote($this->charset));
 	}
+
+	/**
+	 * Returns the appropriate formatter for given column.
+	 *
+	 * @param GlueDB_Column $column
+	 *
+	 * @return GlueDB_Formatter
+	 */
+	abstract public function get_formatter(GlueDB_Column $column);
+
+	/**
+	 * Returns structured information about the columns and primary key of a real database table.
+	 * Columns are returned alphabetically ordered.
+	 *
+	 * Be aware that this function is totally ignorant of any virtual table you may have
+	 * defined explicitely ! It's mostly useful internally to query the real underlying
+	 * database schema. Users should use the introspection API instead.
+	 *
+	 * @return array
+	 */
+	public abstract function table_info($name);
+
+	/**
+	 * Returns all tables present in current database as an array of table names.
+	 *
+	 * Be aware that this function is totally ignorant of any virtual table
+	 * you may have defined explicitely !
+	 *
+	 * @return array Array of table names, numerically indexed, alphabetically ordered.
+	 */
+	abstract public function real_tables();
+
+	/**
+	 * Lazy loads a database object, stores it in cache, and returns it.
+	 *
+	 * @param string $name
+	 *
+	 * @return GlueDB_Database
+	 */
+	static public function get($name) {
+		$name = strtolower($name);
+		if( ! isset(self::$instances[$name]))
+			self::$instances[$name] = self::create($name);
+		return self::$instances[$name];
+	}
+
+	/**
+	 * Returns a new database instance. Throws class not found exception if
+	 * no class is defined for given database.
+	 *
+	 * @param string $name
+	 *
+	 * @return GlueDB_Database
+	 */
+	static protected function create($name) {
+		// Class name :
+		$class = 'GlueDB_Database_'.ucfirst($name);
+
+		// Unlock constructor, create instance and relock constructor :
+		self::$constuctor_locked = false;
+		$instance = new $class($name);
+		self::$constuctor_locked = true;
+
+		return $instance;
+	}
+
+	/*******************************************************************************************************/
+	/************************************ FRAGMENT COMPILER FUNCTIONS **************************************/
+	/*******************************************************************************************************/
 
 	/**
 	 * Compiles GlueDB_Fragment_Operand_Bool fragments into an SQL string.
@@ -395,7 +464,7 @@ abstract class GlueDB_Database extends PDO {
 	public function compile_column(GlueDB_Fragment_Column $fragment, $style) {
 		// Get column :
 		$column = $fragment->column()->dbcolumn();
-		
+
 		// Generate SQL :
 		if ($style === GlueDB_Fragment_Column::STYLE_UNQUALIFIED) {
 			// Don't prepend table alias :
@@ -407,7 +476,7 @@ abstract class GlueDB_Database extends PDO {
 			if (empty($as))
 				$as = $fragment->table_alias()->aliased()->table()->dbtable();
 			$sql = $this->quote_identifier($as) . '.' . $this->quote_identifier($column);
-		}	
+		}
 
 		return $sql;
 	}
@@ -542,7 +611,7 @@ abstract class GlueDB_Database extends PDO {
 
 		return $sql;
 	}
-	
+
 	/**
 	 * Compiles GlueDB_Fragment_Query_Insert fragments into an SQL string.
 	 *
@@ -554,7 +623,7 @@ abstract class GlueDB_Database extends PDO {
 		// Get data from fragment :
 		$intosql	= $fragment->into()->sql($this);
 		$valuessql	= $fragment->values()->sql($this);
-		$columnssql	= $fragment->columns()->sql($this);		
+		$columnssql	= $fragment->columns()->sql($this);
 
 		// Generate SQL :
 		$sql = 'INSERT INTO ' . $intosql .
@@ -562,7 +631,7 @@ abstract class GlueDB_Database extends PDO {
 				' VALUES ' . $valuessql;
 
 		return $sql;
-	}	
+	}
 
 	/**
 	 * Compiles GlueDB_Fragment_Assignment fragments into an SQL string.
@@ -701,70 +770,5 @@ abstract class GlueDB_Database extends PDO {
 	 */
 	protected function quote_null($value) {
 		return 'NULL';
-	}
-
-	/**
-	 * Returns the appropriate formatter for given column.
-	 *
-	 * @param GlueDB_Column $column
-	 *
-	 * @return GlueDB_Formatter
-	 */
-	abstract public function get_formatter(GlueDB_Column $column);
-
-	/**
-	 * Returns structured information about the columns and primary key of a real database table.
-	 * Columns are returned alphabetically ordered.
-	 *
-	 * Be aware that this function is totally ignorant of any virtual table you may have
-	 * defined explicitely ! It's mostly useful internally to query the real underlying
-	 * database schema. Users should use the introspection API instead.
-	 *
-	 * @return array
-	 */
-	public abstract function table_info($name);
-
-	/**
-	 * Returns all tables present in current database as an array of table names.
-	 *
-	 * Be aware that this function is totally ignorant of any virtual table
-	 * you may have defined explicitely !
-	 *
-	 * @return array Array of table names, numerically indexed, alphabetically ordered.
-	 */
-	abstract public function real_tables();
-
-	/**
-	 * Lazy loads a database object, stores it in cache, and returns it.
-	 *
-	 * @param string $name
-	 *
-	 * @return GlueDB_Database
-	 */
-	static public function get($name) {
-		$name = strtolower($name);
-		if( ! isset(self::$instances[$name]))
-			self::$instances[$name] = self::create($name);
-		return self::$instances[$name];
-	}
-
-	/**
-	 * Returns a new database instance. Throws class not found exception if
-	 * no class is defined for given database.
-	 *
-	 * @param string $name
-	 *
-	 * @return GlueDB_Database
-	 */
-	static protected function create($name) {
-		// Class name :
-		$class = 'GlueDB_Database_'.ucfirst($name);
-
-		// Unlock constructor, create instance and relock constructor :
-		self::$constuctor_locked = false;
-		$instance = new $class($name);
-		self::$constuctor_locked = true;
-
-		return $instance;
 	}
 }

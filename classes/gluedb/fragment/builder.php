@@ -26,15 +26,21 @@ abstract class GlueDB_Fragment_Builder extends GlueDB_Fragment {
 	}
 
 	/**
-	 * Returns last fragment pushed, or null if there is no such fragment.
+	 * Returns last fragment pushed, or false if there is no such fragment.
 	 *
 	 * @return GlueDB_Fragment
 	 */
-	protected function last() {
-		if ($count = count($this->children))
-			return $this->children[$count - 1];
-		else
-			return null;
+	public function last() {
+		return end($this->children);
+	}
+
+	/**
+	 * Returns first fragment pushed, or false if there is no such fragment.
+	 *
+	 * @return GlueDB_Fragment
+	 */
+	public function first() {
+		return reset($this->children);
 	}
 
 	/**

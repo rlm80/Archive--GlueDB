@@ -18,7 +18,7 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 	 * @var GlueDB_Fragment_Builder_Rowlist Row list.
 	 */
 	protected $values;
-	
+
 	/**
 	 * @var GlueDB_Fragment_Builder_Columns Columns list.
 	 */
@@ -70,13 +70,13 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 	public function values() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			$this->values->reset();			
+			$this->values->reset();
 			return call_user_func_array(array($this->values, 'and'), $args);
 		}
 		else
 			return $this->values;
 	}
-	
+
 	/**
 	 * Returns the columns fragment, initializing it with given parameters if any.
 	 * You may pass an array of columns or an unlimited number of parameters.
@@ -91,17 +91,22 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 				$columns = $args[0];
 			else
 				$columns = $args;
-			
+
 			// Add columns :
 			$this->columns->reset();
 			foreach($columns as $column)
-				$this->columns->and($column);			
+				$this->columns->and($column);
 		}
 		return $this->columns;
-	}	
+	}
 
+	/**
+	 * Returns database inferred from tables used in the query.
+	 *
+	 * @return GlueDB_Database
+	 */
 	protected function find_db() {
-		// TODO
+		$this->into()->aliased()->table()->db();
 	}
 
 	/*
@@ -112,7 +117,7 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 	public function execute() {
 		return $this->db->exec($this->compile());
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -124,5 +129,5 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 	protected function compile(GlueDB_Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_query_insert($this, $style);
-	}		
+	}
 }

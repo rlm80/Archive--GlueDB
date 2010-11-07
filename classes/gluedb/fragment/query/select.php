@@ -207,8 +207,16 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 		}
 	}
 
+	/**
+	 * Returns database inferred from tables used in the query.
+	 *
+	 * @return GlueDB_Database
+	 */
 	protected function find_db() {
-		// TODO
+		$op = $this->from();
+		while ($op instanceof GlueDB_Fragment_Builder_Join)
+			$op = $op->first()->operand();
+		return $op->aliased()->table()->db();
 	}
 
 	/*
@@ -219,7 +227,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function execute($arg1 = null, $arg2 = null, $arg3 = null) {
 		return $this->db->query($this->compile(), $arg1, $arg2, $arg3);
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -231,5 +239,5 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	protected function compile(GlueDB_Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_query_select($this, $style);
-	}		
+	}
 }

@@ -69,8 +69,13 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 			return $this->where;
 	}
 
+	/**
+	 * Returns database inferred from tables used in the query.
+	 *
+	 * @return GlueDB_Database
+	 */
 	protected function find_db() {
-		// TODO
+		$this->from()->aliased()->table()->db();
 	}
 
 	/*
@@ -81,7 +86,7 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 	public function execute() {
 		return $this->db->exec($this->compile());
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -93,5 +98,5 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 	protected function compile(GlueDB_Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_query_delete($this, $style);
-	}		
+	}
 }

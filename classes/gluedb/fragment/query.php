@@ -19,7 +19,7 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	 *
 	 *  @return GlueDB_Database
 	 */
-	protected function db() {
+	public function db() {
 		if ( ! isset($this->db))
 			$this->db = $this->find_db();
 		return $this->db;
