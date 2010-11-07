@@ -57,4 +57,17 @@ class GlueDB_Fragment_Aliased extends GlueDB_Fragment {
 		else
 			return $this->set_property('as', $as);
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_aliased($this, $style);
+	}	
 }

@@ -82,4 +82,17 @@ class GlueDB_Fragment_Builder_Get extends GlueDB_Fragment_Builder {
 		else
 			return $column_name . $i;
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_builder_get($this, $style);
+	}	
 }

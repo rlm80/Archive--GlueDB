@@ -81,4 +81,17 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 	public function execute() {
 		return $this->db->exec($this->compile());
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_query_delete($this, $style);
+	}		
 }

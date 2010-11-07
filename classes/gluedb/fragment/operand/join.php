@@ -43,4 +43,17 @@ class GlueDB_Fragment_Operand_Join extends GlueDB_Fragment_Operand {
 		}
 		return $this->on;
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_operand_join($this, $style);
+	}		
 }

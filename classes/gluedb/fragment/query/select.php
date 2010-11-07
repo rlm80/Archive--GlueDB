@@ -219,4 +219,17 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function execute($arg1 = null, $arg2 = null, $arg3 = null) {
 		return $this->db->query($this->compile(), $arg1, $arg2, $arg3);
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_query_select($this, $style);
+	}		
 }

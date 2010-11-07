@@ -8,7 +8,7 @@
  * @license    MIT
  */
 
-class GlueDB_Fragment_Builder extends GlueDB_Fragment {
+abstract class GlueDB_Fragment_Builder extends GlueDB_Fragment {
 	/**
 	 * @var array List of children fragments.
 	 */

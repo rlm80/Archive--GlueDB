@@ -57,4 +57,17 @@ class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	public function __toString() {
 		return $this->sql($this->column()->table()->db());
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_column($this, $style);
+	}	
 }

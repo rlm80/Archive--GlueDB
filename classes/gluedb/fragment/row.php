@@ -59,4 +59,17 @@ class GlueDB_Fragment_Row extends GlueDB_Fragment {
 			return $this;
 		}
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_row($this, $style);
+	}	
 }

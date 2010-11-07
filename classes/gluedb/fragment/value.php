@@ -36,4 +36,17 @@ class GlueDB_Fragment_Value extends GlueDB_Fragment {
 		else
 			return $this->set_property('value', $value);
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_value($this, $style);
+	}
 }

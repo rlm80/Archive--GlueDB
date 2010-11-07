@@ -89,4 +89,17 @@ class GlueDB_Fragment_Builder_Bool extends GlueDB_Fragment_Builder {
 		// Add operand :
 		$this->push(new GlueDB_Fragment_Operand_Bool($fragment, $operator));
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_builder_bool($this, $style);
+	}	
 }

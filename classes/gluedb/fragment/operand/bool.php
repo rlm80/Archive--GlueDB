@@ -14,4 +14,17 @@ class GlueDB_Fragment_Operand_Bool extends GlueDB_Fragment_Operand {
 	const _OR		= 1;
 	const ANDNOT	= 2;
 	const ORNOT		= 3;
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_operand_bool($this, $style);
+	}		
 }

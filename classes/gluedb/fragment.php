@@ -69,10 +69,7 @@ abstract class GlueDB_Fragment {
 	 *
 	 * @return string
 	 */
-	protected function compile(GlueDB_Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile($this, $style);
-	}
+	abstract protected function compile(GlueDB_Database $db, $style);
 
 	/**
 	 * Adds a fragment to the list of fragments that make direct use of this

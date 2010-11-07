@@ -79,4 +79,17 @@ class GlueDB_Fragment_Ordered extends GlueDB_Fragment {
 		else
 			return $this->set_property('ordered', $ordered);
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_ordered($this, $style);
+	}	
 }

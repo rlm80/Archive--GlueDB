@@ -32,4 +32,17 @@ class GlueDB_Fragment_Builder_Rowlist extends GlueDB_Fragment_Builder {
 		// Return fragment :
 		return $fragment;
 	}
+	
+	/**
+	 * Forwards call to given database.
+	 *
+	 * @param GlueDB_Database $db
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(GlueDB_Database $db, $style) {
+		// Forwards call to database :
+		return $db->compile_builder_rowlist($this, $style);
+	}	
 }

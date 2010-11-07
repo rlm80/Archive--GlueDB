@@ -112,76 +112,13 @@ abstract class GlueDB_Database extends PDO {
 	}
 
 	/**
-	 * Compiles given fragment into an SQL string.
-	 *
-	 * @param GlueDB_Fragment $fragment
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	public function compile(GlueDB_Fragment $fragment, $style) {
-		if ($fragment instanceof GlueDB_Fragment_Operand_Bool)
-			return $this->compile_operand_bool($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Operand_Join)
-			return $this->compile_operand_join($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Aliased)
-			return $this->compile_aliased($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Get)
-			return $this->compile_builder_get($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Orderby)
-			return $this->compile_builder_orderby($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Groupby)
-			return $this->compile_builder_groupby($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Bool_Where)
-			return $this->compile_builder_bool_where($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Bool_Having)
-			return $this->compile_builder_bool_having($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Bool)
-			return $this->compile_builder_bool($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Join_From)
-			return $this->compile_builder_join_from($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Join)
-			return $this->compile_builder_join($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Setlist)
-			return $this->compile_builder_setlist($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Rowlist)
-			return $this->compile_builder_rowlist($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Builder_Columns)
-			return $this->compile_builder_columns($fragment);			
-		elseif ($fragment instanceof GlueDB_Fragment_Ordered)
-			return $this->compile_ordered($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Column)
-			return $this->compile_column($fragment, $style);
-		elseif ($fragment instanceof GlueDB_Fragment_Table)
-			return $this->compile_table($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Template)
-			return $this->compile_template($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Value)
-			return $this->compile_value($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Query_Select)
-			return $this->compile_query_select($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Query_Delete)
-			return $this->compile_query_delete($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Query_Update)
-			return $this->compile_query_update($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Query_Insert)
-			return $this->compile_query_insert($fragment);			
-		elseif ($fragment instanceof GlueDB_Fragment_Assignment)
-			return $this->compile_assignment($fragment);
-		elseif ($fragment instanceof GlueDB_Fragment_Row)
-			return $this->compile_row($fragment);
-		else
-			throw new Kohana_Exception("Cannot compile fragment of class '" . $fragment->get_class() . "' : unknown fragment type.");
-	}
-
-	/**
 	 * Compiles GlueDB_Fragment_Operand_Bool fragments into an SQL string.
 	 *
 	 * @param GlueDB_Fragment_Operand_Bool $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_operand_bool(GlueDB_Fragment_Operand_Bool $fragment) {
+	public function compile_operand_bool(GlueDB_Fragment_Operand_Bool $fragment) {
 		// Get data from fragment :
 		$operator	= $fragment->operator();
 		$operand	= $fragment->operand();
@@ -210,7 +147,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_operand_join(GlueDB_Fragment_Operand_Join $fragment) {
+	public function compile_operand_join(GlueDB_Fragment_Operand_Join $fragment) {
 		// Get data from fragment :
 		$operator	= $fragment->operator();
 		$operand	= $fragment->operand();
@@ -249,7 +186,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_aliased(GlueDB_Fragment_Aliased $fragment) {
+	public function compile_aliased(GlueDB_Fragment_Aliased $fragment) {
 		// Get data from fragment :
 		$aliased	= $fragment->aliased();
 		$as			= $fragment->as();
@@ -275,7 +212,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder(GlueDB_Fragment_Builder $fragment, $connector) {
+	public function compile_builder(GlueDB_Fragment_Builder $fragment, $connector) {
 		// Get data from fragment :
 		$children = $fragment->children();
 
@@ -295,7 +232,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_get(GlueDB_Fragment_Builder_Get $fragment) {
+	public function compile_builder_get(GlueDB_Fragment_Builder_Get $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -306,7 +243,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_orderby(GlueDB_Fragment_Builder_Orderby $fragment) {
+	public function compile_builder_orderby(GlueDB_Fragment_Builder_Orderby $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -317,7 +254,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_groupby(GlueDB_Fragment_Builder_Groupby $fragment) {
+	public function compile_builder_groupby(GlueDB_Fragment_Builder_Groupby $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -328,7 +265,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_bool(GlueDB_Fragment_Builder_Bool $fragment) {
+	public function compile_builder_bool(GlueDB_Fragment_Builder_Bool $fragment) {
 		return $this->compile_builder($fragment, ' ');
 	}
 
@@ -339,7 +276,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_bool_where(GlueDB_Fragment_Builder_Bool_Where $fragment) {
+	public function compile_builder_bool_where(GlueDB_Fragment_Builder_Bool_Where $fragment) {
 		return $this->compile_builder($fragment, ' ');
 	}
 
@@ -350,7 +287,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_bool_having(GlueDB_Fragment_Builder_Bool_Having $fragment) {
+	public function compile_builder_bool_having(GlueDB_Fragment_Builder_Bool_Having $fragment) {
 		return $this->compile_builder($fragment, ' ');
 	}
 
@@ -361,7 +298,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_join(GlueDB_Fragment_Builder_Join $fragment) {
+	public function compile_builder_join(GlueDB_Fragment_Builder_Join $fragment) {
 		return $this->compile_builder($fragment, ' ');
 	}
 
@@ -372,7 +309,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_join_from(GlueDB_Fragment_Builder_Join_From $fragment) {
+	public function compile_builder_join_from(GlueDB_Fragment_Builder_Join_From $fragment) {
 		return $this->compile_builder($fragment, ' ');
 	}
 
@@ -383,7 +320,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_setlist(GlueDB_Fragment_Builder_Setlist $fragment) {
+	public function compile_builder_setlist(GlueDB_Fragment_Builder_Setlist $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -394,7 +331,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_rowlist(GlueDB_Fragment_Builder_Rowlist $fragment) {
+	public function compile_builder_rowlist(GlueDB_Fragment_Builder_Rowlist $fragment) {
 		return $this->compile_builder($fragment, ',');
 	}
 
@@ -405,7 +342,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_columns(GlueDB_Fragment_Builder_Columns $fragment) {
+	public function compile_builder_columns(GlueDB_Fragment_Builder_Columns $fragment) {
 		// Get data from fragment :
 		$children = $fragment->children();
 
@@ -425,7 +362,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_ordered(GlueDB_Fragment_Ordered $fragment) {
+	public function compile_ordered(GlueDB_Fragment_Ordered $fragment) {
 		// Get data from fragment :
 		$ordered	= $fragment->ordered();
 		$order		= $fragment->order();
@@ -455,7 +392,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_column(GlueDB_Fragment_Column $fragment, $style) {
+	public function compile_column(GlueDB_Fragment_Column $fragment, $style) {
 		// Get column :
 		$column = $fragment->column()->dbcolumn();
 		
@@ -482,7 +419,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_table(GlueDB_Fragment_Table $fragment) {
+	public function compile_table(GlueDB_Fragment_Table $fragment) {
 		return $this->quote_identifier($fragment->table()->dbtable());
 	}
 
@@ -493,7 +430,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_template(GlueDB_Fragment_Template $fragment) {
+	public function compile_template(GlueDB_Fragment_Template $fragment) {
 		// Get data from fragment :
 		$template		= $fragment->template();
 		$replacements	= $fragment->replacements();
@@ -521,7 +458,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_value(GlueDB_Fragment_Value $fragment) {
+	public function compile_value(GlueDB_Fragment_Value $fragment) {
 		// Get data from fragment :
 		$value = $fragment->value();
 
@@ -536,7 +473,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_query_select(GlueDB_Fragment_Query_Select $fragment) {
+	public function compile_query_select(GlueDB_Fragment_Query_Select $fragment) {
 		// Get data from fragment :
 		$selectsql	= $fragment->get()->sql($this);
 		$fromsql	= $fragment->from()->sql($this);
@@ -568,7 +505,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_query_delete(GlueDB_Fragment_Query_Delete $fragment) {
+	public function compile_query_delete(GlueDB_Fragment_Query_Delete $fragment) {
 		// Get data from fragment :
 		$fromsql	= $fragment->from()->sql($this);
 		$wheresql	= $fragment->where()->sql($this);
@@ -589,7 +526,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_query_update(GlueDB_Fragment_Query_Update $fragment) {
+	public function compile_query_update(GlueDB_Fragment_Query_Update $fragment) {
 		// Get data from fragment :
 		$setlistsql	= $fragment->set()->sql($this);
 		$fromsql	= $fragment->from()->sql($this);
@@ -613,7 +550,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_query_insert(GlueDB_Fragment_Query_Insert $fragment) {
+	public function compile_query_insert(GlueDB_Fragment_Query_Insert $fragment) {
 		// Get data from fragment :
 		$intosql	= $fragment->into()->sql($this);
 		$valuessql	= $fragment->values()->sql($this);
@@ -634,7 +571,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_assignment(GlueDB_Fragment_Assignment $fragment) {
+	public function compile_assignment(GlueDB_Fragment_Assignment $fragment) {
 		// Get data from fragment :
 		$columnsql	= $fragment->column()->sql($this);
 		$tosql		= $fragment->to()->sql($this);
@@ -649,7 +586,7 @@ abstract class GlueDB_Database extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_row(GlueDB_Fragment_Row $fragment) {
+	public function compile_row(GlueDB_Fragment_Row $fragment) {
 		// Get data from fragment :
 		$values = $fragment->values();
 
