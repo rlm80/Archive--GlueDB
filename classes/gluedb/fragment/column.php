@@ -11,6 +11,11 @@
 
 class GlueDB_Fragment_Column extends GlueDB_Fragment {
 	/**
+	 * @var integer Return SQL without table qualifier.
+	 */	
+	const STYLE_UNQUALIFIED	= 1;
+	
+	/**
 	 * @var GlueDB_Fragment_Aliased_Table
 	 */
 	protected $table_alias;

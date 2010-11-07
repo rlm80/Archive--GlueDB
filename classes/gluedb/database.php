@@ -115,10 +115,11 @@ abstract class GlueDB_Database extends PDO {
 	 * Compiles given fragment into an SQL string.
 	 *
 	 * @param GlueDB_Fragment $fragment
+	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	public function compile(GlueDB_Fragment $fragment) {
+	public function compile(GlueDB_Fragment $fragment, $style) {
 		if ($fragment instanceof GlueDB_Fragment_Operand_Bool)
 			return $this->compile_operand_bool($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Operand_Join)
@@ -145,10 +146,12 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_builder_setlist($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Builder_Rowlist)
 			return $this->compile_builder_rowlist($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Builder_Columns)
+			return $this->compile_builder_columns($fragment);			
 		elseif ($fragment instanceof GlueDB_Fragment_Ordered)
 			return $this->compile_ordered($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Column)
-			return $this->compile_column($fragment);
+			return $this->compile_column($fragment, $style);
 		elseif ($fragment instanceof GlueDB_Fragment_Table)
 			return $this->compile_table($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Template)
@@ -161,6 +164,8 @@ abstract class GlueDB_Database extends PDO {
 			return $this->compile_query_delete($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Query_Update)
 			return $this->compile_query_update($fragment);
+		elseif ($fragment instanceof GlueDB_Fragment_Query_Insert)
+			return $this->compile_query_insert($fragment);			
 		elseif ($fragment instanceof GlueDB_Fragment_Assignment)
 			return $this->compile_assignment($fragment);
 		elseif ($fragment instanceof GlueDB_Fragment_Row)
@@ -390,7 +395,27 @@ abstract class GlueDB_Database extends PDO {
 	 * @return string
 	 */
 	protected function compile_builder_rowlist(GlueDB_Fragment_Builder_Rowlist $fragment) {
-		return $this->compile_builder($fragment, ', ');
+		return $this->compile_builder($fragment, ',');
+	}
+
+	/**
+	 * Compiles GlueDB_Fragment_Builder_Columns fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Builder_Columns $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_builder_columns(GlueDB_Fragment_Builder_Columns $fragment) {
+		// Get data from fragment :
+		$children = $fragment->children();
+
+		// Generate children fragment SQL strings :
+		$sqls = array();
+		foreach ($children as $child)
+			$sqls[] = $child->sql($this, GlueDB_Fragment_Column::STYLE_UNQUALIFIED);
+
+		// Return SQL :
+		return implode(', ', $sqls);
 	}
 
 	/**
@@ -426,20 +451,26 @@ abstract class GlueDB_Database extends PDO {
 	 * Compiles GlueDB_Fragment_Column fragments into an SQL string.
 	 *
 	 * @param GlueDB_Fragment_Column $fragment
+	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile_column(GlueDB_Fragment_Column $fragment) {
-		// Get alias :
-		$as = $fragment->table_alias()->as();
-		if (empty($as))
-			$as = $fragment->table_alias()->aliased()->table()->dbtable();
-
+	protected function compile_column(GlueDB_Fragment_Column $fragment, $style) {
 		// Get column :
 		$column = $fragment->column()->dbcolumn();
-
+		
 		// Generate SQL :
-		$sql = $this->quote_identifier($as) . '.' . $this->quote_identifier($column);
+		if ($style === GlueDB_Fragment_Column::STYLE_UNQUALIFIED) {
+			// Don't prepend table alias :
+			$sql = $this->quote_identifier($column);
+		}
+		else {
+			// Prepend table alias :
+			$as = $fragment->table_alias()->as();
+			if (empty($as))
+				$as = $fragment->table_alias()->aliased()->table()->dbtable();
+			$sql = $this->quote_identifier($as) . '.' . $this->quote_identifier($column);
+		}	
 
 		return $sql;
 	}
@@ -574,6 +605,27 @@ abstract class GlueDB_Database extends PDO {
 
 		return $sql;
 	}
+	
+	/**
+	 * Compiles GlueDB_Fragment_Query_Insert fragments into an SQL string.
+	 *
+	 * @param GlueDB_Fragment_Query_Insert $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_query_insert(GlueDB_Fragment_Query_Insert $fragment) {
+		// Get data from fragment :
+		$intosql	= $fragment->into()->sql($this);
+		$valuessql	= $fragment->values()->sql($this);
+		$columnssql	= $fragment->columns()->sql($this);		
+
+		// Generate SQL :
+		$sql = 'INSERT INTO ' . $intosql .
+				(empty($columnssql) ? '' : ' (' . $columnssql . ')') .
+				' VALUES ' . $valuessql;
+
+		return $sql;
+	}	
 
 	/**
 	 * Compiles GlueDB_Fragment_Assignment fragments into an SQL string.

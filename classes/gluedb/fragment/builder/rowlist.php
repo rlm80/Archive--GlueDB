@@ -10,18 +10,6 @@
 
 class GlueDB_Fragment_Builder_Rowlist extends GlueDB_Fragment_Builder {
 	/**
-	 * Constructor. You may pass an array of values arrays.
-	 *
-	 * @param array $rows
-	 */
-	public function __construct(array $rows = null) {
-		if (isset($rows)) {
-			foreach($rows as $values)
-				$this->and($values);
-		}
-	}
-
-	/**
 	 * Adds an element at the end of the rows list. You may pass an array of values,
 	 * or an unlimited number of parameters.
 	 *

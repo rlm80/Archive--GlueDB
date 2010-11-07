@@ -62,6 +62,7 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 	public function where() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
+			$this->where->reset();
 			return call_user_func_array(array($this->where, 'init'), $args);
 		}
 		else

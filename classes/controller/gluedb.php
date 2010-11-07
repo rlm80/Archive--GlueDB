@@ -149,6 +149,12 @@ class Controller_GlueDB extends Controller {
 			$update1,
 			"UPDATE `users` SET `users`.`login` = 'test', `users`.`password` = 'test' WHERE (`users`.`login` = 'test')"
 		);
+		
+		$insert1 = gluedb::insert('users', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2)->root();
+		$tests['query insert'] = array(
+			$insert1,
+			"INSERT INTO `users` (`login`, `password`, `id`) VALUES ('test\'1','test\'2'),(1,2)"
+		);		
 
 		// Checks :
 		foreach($tests as $type => $data) {

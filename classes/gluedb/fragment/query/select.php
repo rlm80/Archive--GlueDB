@@ -80,6 +80,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function get() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
+			$this->get->reset();
 			return call_user_func_array(array($this->get, 'and'), $args);
 		}
 		else
@@ -97,8 +98,10 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	 * @return GlueDB_Fragment_Builder_Join
 	 */
 	public function from($operand = null, &$alias = null) {
-		if (func_num_args() > 0)
+		if (func_num_args() > 0) {
+			$this->from->reset();
 			return $this->from->init($operand, $alias);
+		}
 		return $this->from;
 	}
 
@@ -112,6 +115,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function where() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
+			$this->where->reset();
 			return call_user_func_array(array($this->where, 'init'), $args);
 		}
 		else
@@ -128,6 +132,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function groupby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
+			$this->groupby->reset();
 			return call_user_func_array(array($this->groupby, 'and'), $args);
 		}
 		else
@@ -144,6 +149,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function having() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
+			$this->having->reset();
 			return call_user_func_array(array($this->having, 'init'), $args);
 		}
 		else
@@ -160,6 +166,7 @@ class GlueDB_Fragment_Query_Select extends GlueDB_Fragment_Query {
 	public function orderby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
+			$this->orderby->reset();
 			return call_user_func_array(array($this->orderby, 'and'), $args);
 		}
 		else

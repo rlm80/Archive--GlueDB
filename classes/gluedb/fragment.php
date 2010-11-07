@@ -22,6 +22,11 @@
 
 abstract class GlueDB_Fragment {
 	/**
+	 * @var integer Default SQL style.
+	 */
+	const STYLE_DEFAULT = -1;
+	
+	/**
 	 * @var array List of fragments that make direct use of this fragment to create their own SQL representation.
 	 */
 	protected $users;
@@ -34,11 +39,12 @@ abstract class GlueDB_Fragment {
 	/**
 	 * Returns compiled SQL string according to given database SQL dialect.
 	 *
-	 * @param GlueDB_Database $db
+	 * @param GlueDB_Database $db Database that defines what SQL dialect must be used to compile the fragment.
+	 * @param integer $style 
 	 *
 	 * @return string
 	 */
-	public function sql(GlueDB_Database $db = null) {
+	public function sql(GlueDB_Database $db = null, $style = self::STYLE_DEFAULT) {
 		// No database given ? Means default database :
 		if ( ! isset($db))
 			$db = gluedb::db(GlueDB_Database::DEFAULTDB);
@@ -47,11 +53,11 @@ abstract class GlueDB_Fragment {
 		$dbname = $db->name();
 
 		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
-		if ( ! isset($this->sql[$dbname]))
-			$this->sql[$dbname] = $this->compile($db);
+		if ( ! isset($this->sql[$dbname][$style]))
+			$this->sql[$dbname][$style] = $this->compile($db, $style);
 
 		// Return SQL :
-		return $this->sql[$dbname];
+		return $this->sql[$dbname][$style];
 	}
 
 	/**
@@ -59,12 +65,13 @@ abstract class GlueDB_Fragment {
 	 * to given database SQL dialect.
 	 *
 	 * @param GlueDB_Database $db
+	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(GlueDB_Database $db) {
+	protected function compile(GlueDB_Database $db, $style) {
 		// Forwards call to database :
-		return $db->compile($this);
+		return $db->compile($this, $style);
 	}
 
 	/**
