@@ -4,7 +4,7 @@ class Controller_GlueDB extends Controller {
 	public function action_test() {
 		echo ("<pre>");
 		$this->test_fragments();
-		//$this->test_columns();
+		$this->test_queries();
 	}
 
 	private function test_fragments() {
@@ -149,12 +149,12 @@ class Controller_GlueDB extends Controller {
 			$update1,
 			"UPDATE `users` SET `users`.`login` = 'test', `users`.`password` = 'test' WHERE (`users`.`login` = 'test')"
 		);
-		
+
 		$insert1 = gluedb::insert('users', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2)->root();
 		$tests['query insert'] = array(
 			$insert1,
 			"INSERT INTO `users` (`login`, `password`, `id`) VALUES ('test\'1','test\'2'),(1,2)"
-		);		
+		);
 
 		// Checks :
 		foreach($tests as $type => $data) {
@@ -171,8 +171,23 @@ class Controller_GlueDB extends Controller {
 		return true;
 	}
 
-	private function test_columns() {
-		$j = gluedb::join('users', $u);
-		echo $u['login'];
+	private function test_queries() {
+		$statement = gluedb::insert('users', $u)
+						->columns($u->login, $u->password)
+						->values('test1', 'test1')
+							->and('test2', 'test2')
+							->and('test3', 'test3')
+						->prepare();
+
+		$statement->execute();
+		echo 'rows = ' . $statement->rowCount() . ' last = ' . $statement->lastInsertId();
+
+				list($rows, $last) = gluedb::insert('users', $u)
+						->columns($u->login, $u->password)
+						->values('test1', 'test1')
+							->and('test2', 'test2')
+
+						->execute();
+	echo 'rows = ' . $rows . ' last = ' . $last;
 	}
 }

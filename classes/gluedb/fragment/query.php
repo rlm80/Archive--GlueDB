@@ -15,6 +15,20 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 	protected $db;
 
 	/**
+	 * @var integer Number of rows affected by the last call to execute().
+	 */
+	protected $row_count;
+
+	/**
+	 * Number of rows affected by the last call to execute().
+	 *
+	 * @return integer
+	 */
+	public function rowCount() {
+		return $this->row_count;
+	}
+
+	/**
 	 * Returns database object, determined from the tables this query manipulates.
 	 *
 	 *  @return GlueDB_Database
@@ -44,21 +58,29 @@ abstract class GlueDB_Fragment_Query extends GlueDB_Fragment {
 		return $this;
 	}
 
-	/*
+	/**
 	 * Compiles this query into an SQL string and asks PDO to prepare it for execution. Returns
 	 * a PDOStatement object that can be executed multiple times. If you need to execute a statement
 	 * more than once, or if you need query parameters, this is the method of choice for security
 	 * and performance.
 	 *
-	 * @see PDO::prepare()
+	 * @return GlueDB_Statement
 	 */
-	public function prepare($driver_options = null) {
-		$sql = $this->sql($this->db());
-		return $this->db()->prepare($sql, $driver_options);
+	public function prepare(array $driver_options = array()) {
+		$db = $this->db();
+		$sql = $this->sql($db);
+		return $db->prepare($sql, $driver_options);
 	}
 
-	/*
-	 * @see PDO::exec() and PDO::query()
+	/**
+	 * Executes current query.
+	 *
+	 * @return GlueDB_Fragment_Query
 	 */
-	abstract public function execute();
+	public function execute() {
+		$db = $this->db();
+		$sql = $this->sql($db);
+		$this->row_count = (integer) $db->exec($sql);
+		return $this;
+	}
 }

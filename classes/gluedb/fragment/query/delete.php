@@ -75,16 +75,7 @@ class GlueDB_Fragment_Query_Delete extends GlueDB_Fragment_Query {
 	 * @return GlueDB_Database
 	 */
 	protected function find_db() {
-		$this->from()->aliased()->table()->db();
-	}
-
-	/*
-	 * Executes current query and returns the number of affected rows.
-	 *
-	 * @see PDO::exec()
-	 */
-	public function execute() {
-		return $this->db->exec($this->compile());
+		return $this->from()->aliased()->table()->db();
 	}
 
 	/**

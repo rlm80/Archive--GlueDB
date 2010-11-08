@@ -128,15 +128,6 @@ class GlueDB_Fragment_Query_Update extends GlueDB_Fragment_Query {
 		return $op->aliased()->table()->db();
 	}
 
-	/*
-	 * Executes current query and returns the number of affected rows.
-	 *
-	 * @see PDO::exec()
-	 */
-	public function execute() {
-		return $this->db->exec($this->compile());
-	}
-
 	/**
 	 * Forwards call to given database.
 	 *

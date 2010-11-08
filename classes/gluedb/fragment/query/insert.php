@@ -25,6 +25,11 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 	protected $columns;
 
 	/**
+	 * @var integer Last inserted id following the last call to execute().
+	 */
+	protected $last_insert_id;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $table_name Name of the table you're inserting rows into.
@@ -106,16 +111,27 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 	 * @return GlueDB_Database
 	 */
 	protected function find_db() {
-		$this->into()->aliased()->table()->db();
+		return $this->into()->aliased()->table()->db();
 	}
 
-	/*
-	 * Executes current query and returns the number of affected rows.
+	/**
+	 * Executes current query.
 	 *
-	 * @see PDO::exec()
+	 * @return GlueDB_Fragment_Query_Insert
 	 */
 	public function execute() {
-		return $this->db->exec($this->compile());
+		$return = parent::execute();
+		$this->last_insert_id = (integer) $db->lastInsertId();
+		return $return;
+	}
+
+	/**
+	 * Returns the last inserted id following the last call to execute().
+	 *
+	 * @return integer
+	 */
+	public function lastInsertId() {
+		return $this->last_insert_id;
 	}
 
 	/**

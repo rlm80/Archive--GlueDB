@@ -114,7 +114,9 @@ class GlueDB {
 	 *
 	 * @return GlueDB_Fragment_Table
 	 */
-	public static function alias($table_name, $alias = null) {
+	public static function alias($table_name, $alias = null) {  // TODO : would it be possible to rename this "table" and define
+																// a toString method in the table fragments ? so that the aliasing
+																// system may still be used with custom queries
 		return new GlueDB_Fragment_Aliased_Table($table_name, $alias);
 	}
 
