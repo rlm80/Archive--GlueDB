@@ -1,1 +1,0 @@
-Cache directory for serialized virtual table objects.

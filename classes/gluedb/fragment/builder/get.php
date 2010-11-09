@@ -53,14 +53,14 @@ class GlueDB_Fragment_Builder_Get extends GlueDB_Fragment_Builder {
 		// Count number of computed columns so far :
 		$i = 0;
 		foreach ($this->children as $child)
-			if ($child instanceof GlueDB_Fragment_Aliased_Computed)
+			if ( ! $child->aliased() instanceof GlueDB_Fragment_Column)
 				$i++;
 
 		// Compute alias :
 		if ($i === 0)
 			return 'computed';
 		else
-			return 'computed' . $i;
+			return 'computed' . ($i + 1);
 	}
 
 	/**
@@ -72,17 +72,17 @@ class GlueDB_Fragment_Builder_Get extends GlueDB_Fragment_Builder {
 		// Count number of columns with such a name so far :
 		$i = 0;
 		foreach ($this->children as $child)
-			if ($child instanceof GlueDB_Fragment_Aliased_Column)
-				if ($child->column()->column()->name() === $column_name)
+			if ($child->aliased() instanceof GlueDB_Fragment_Column)
+				if ($child->aliased()->column()->name() === $column_name)
 					$i++;
 
 		// Compute alias :
 		if ($i === 0)
 			return $column_name;
 		else
-			return $column_name . $i;
+			return $column_name . ($i + 1);
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -94,5 +94,5 @@ class GlueDB_Fragment_Builder_Get extends GlueDB_Fragment_Builder {
 	protected function compile(GlueDB_Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_get($this, $style);
-	}	
+	}
 }

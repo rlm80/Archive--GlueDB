@@ -42,7 +42,7 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 
 	/**
 	 * Returns structured information about the columns and primary key of a real database table.
-	 * Columns are returned alphabetically ordered.
+	 * Columns are returned alphabetically ordered. Returns FALSE if table doesn't exist in database.
 	 *
 	 * Be aware that this function is totally ignorant of any virtual table you may have
 	 * defined explicitely ! It's mostly useful internally to query the real underlying
@@ -88,6 +88,10 @@ class GlueDB_Database_MySQL extends GlueDB_Database {
 			);
 		}
 		sort($columns);
+
+		// No columns ? Means table didn't exist :
+		if (count($columns) === 0)
+			return FALSE;
 
 		// Query information schema to get pk information :
 		$stmt = $this->prepare("

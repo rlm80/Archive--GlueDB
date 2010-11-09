@@ -3,8 +3,29 @@
 class Controller_GlueDB extends Controller {
 	public function action_test() {
 		echo ("<pre>");
-		$this->test_fragments();
-		$this->test_queries();
+		$this->test_create_test_tables();
+		try {
+			$this->test_fragments();
+			$this->test_queries();
+		}
+		catch (Exception $e) {
+			$this->test_drop_test_tables();
+			throw $e;
+		}
+		$this->test_drop_test_tables();
+	}
+
+	private function test_create_test_tables() {
+		$this->test_drop_test_tables();
+		gluedb::db()->exec("create table glusers (id integer auto_increment, login varchar(31), password varchar(31), primary key(id))");
+		gluedb::db()->exec("create table glprofiles (id integer auto_increment, email varchar(255), primary key(id))");
+		gluedb::db()->exec("create table glposts (id integer auto_increment, content text, gluser_id integer, primary key(id))");
+	}
+
+	private function test_drop_test_tables() {
+		try { gluedb::db()->exec("drop table glusers");		} catch (Exception $e) {};
+		try { gluedb::db()->exec("drop table glprofiles");	} catch (Exception $e) {};
+		try { gluedb::db()->exec("drop table glposts");		} catch (Exception $e) {};
 	}
 
 	private function test_fragments() {
@@ -50,8 +71,8 @@ class Controller_GlueDB extends Controller {
 					"((1=1) OR (2=2)) AND (3=3)"
 				),
 			'table' => array(
-					$t = gluedb::alias('users', 'myalias'),
-					"`users` AS `myalias`"
+					$t = gluedb::alias('glusers', 'myalias'),
+					"`glusers` AS `myalias`"
 				),
 			'column' => array(
 					$t->login,
@@ -59,8 +80,8 @@ class Controller_GlueDB extends Controller {
 				),
 		);
 
-		$obj = new GlueDB_Fragment_Builder_Get(null);
-		$obj
+		$get = new GlueDB_Fragment_Builder_Get(null);
+		$get
 			->and($t->login)
 			->and($t->password)
 			->and($t->login)->as('mylogin')
@@ -69,91 +90,91 @@ class Controller_GlueDB extends Controller {
 			->and('?', 'test')
 			->root();
 		$tests['get'] = array(
-			$obj,
-			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login2`, ('test') AS `computed`, ('test') AS `computed1`"
+			$get,
+			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login3`, ('test') AS `computed`, ('test') AS `computed2`"
 		);
 
-		$obj = new GlueDB_Fragment_Builder_Orderby(null);
-		$obj
+		$orderby = new GlueDB_Fragment_Builder_Orderby(null);
+		$orderby
 			->and($t->login)
 			->and($t->password)
 			->and($t->login)->asc()
 			->and('?', 'test')->desc()
 			->root();
 		$tests['orderby'] = array(
-			$obj,
+			$orderby,
 			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, ('test') DESC"
 		);
 
-		$join = gluedb::join('mytable')->as('t1')
-					->left('yourtable')->as('t2')->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
-					->right('histable')->as('t3')->on('1=1')->root();
+		$join = gluedb::join('glusers')->as('t1')
+					->left('glprofiles')->as('t2')->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
+					->right('glposts')->as('t3')->on('1=1')->root();
 		$tests['join simple'] = array(
 			$join,
-			"`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)"
+			"`glusers` AS `t1` LEFT OUTER JOIN `glprofiles` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `glposts` AS `t3` ON (1=1)"
 		);
 
-		$join2 = gluedb::join('mytable')->as('t3')
+		$join2 = gluedb::join('glusers')->as('t3')
 					->left($join)->on('5=5')->root();
 		$tests['join nested'] = array(
 			$join2,
-			"`mytable` AS `t3` LEFT OUTER JOIN (`mytable` AS `t1` LEFT OUTER JOIN `yourtable` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `histable` AS `t3` ON (1=1)) ON (5=5)"
+			"`glusers` AS `t3` LEFT OUTER JOIN (`glusers` AS `t1` LEFT OUTER JOIN `glprofiles` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `glposts` AS `t3` ON (1=1)) ON (5=5)"
 		);
 
-		$alias = gluedb::alias('mytable','myalias');
-		$join3 = gluedb::join('mytable')->as('t3')
+		$alias = gluedb::alias('glusers','myalias');
+		$join3 = gluedb::join('glprofiles')->as('t3')
 					->left($alias)->on('1=1')->root();
 		$tests['join alias'] = array(
 			$join3,
-			"`mytable` AS `t3` LEFT OUTER JOIN `mytable` AS `myalias` ON (1=1)"
+			"`glprofiles` AS `t3` LEFT OUTER JOIN `glusers` AS `myalias` ON (1=1)"
 		);
 
-		$select1 = gluedb::select('mytable')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->root();
+		$select1 = gluedb::select('glusers')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->root();
 		$tests['query select basic'] = array(
 			$select1,
-			"SELECT * FROM `mytable` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
+			"SELECT * FROM `glusers` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
 		);
 
-		$select2 = gluedb::select('users', $u)->as('myusers')->where("$u->login = 'mylogin'")->root();
+		$select2 = gluedb::select('glusers', $u)->as('myusers')->where("$u->login = 'mylogin'")->root();
 		$tests['query select alias'] = array(
 			$select2,
-			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
+			"SELECT * FROM `glusers` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
 		);
 
-		$select3 = gluedb::select('users', $a)->left('users', $b)->as('myusers')->on("$a->login = $b->login")->root();
+		$select3 = gluedb::select('glusers', $a)->left('glusers', $b)->as('myusers')->on("$a->login = $b->login")->root();
 		$tests['query select no alias'] = array(
 			$select3,
-			"SELECT * FROM `users` LEFT OUTER JOIN `users` AS `myusers` ON (`users`.`login` = `myusers`.`login`)"
+			"SELECT * FROM `glusers` LEFT OUTER JOIN `glusers` AS `myusers` ON (`glusers`.`login` = `myusers`.`login`)"
 		);
 
-		$select4 = gluedb::select('users', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20)->root();
+		$select4 = gluedb::select('glusers', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20)->root();
 		$tests['query select limit offset'] = array(
 			$select4,
-			"SELECT * FROM `users` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
+			"SELECT * FROM `glusers` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
 		);
 
-		$select5 = gluedb::select('users', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->get($a->login)->and($a->password)->root();
+		$select5 = gluedb::select('glusers', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->get($a->login)->and($a->password)->root();
 		$tests['query select group by having'] = array(
 			$select5,
-			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
+			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `glusers` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
 		);
 
-		$delete1 = gluedb::delete('users', $a)->where("$a->login = 'test'")->root();
+		$delete1 = gluedb::delete('glusers', $a)->where("$a->login = 'test'")->root();
 		$tests['query delete'] = array(
 			$delete1,
-			"DELETE FROM `users` WHERE (`users`.`login` = 'test')"
+			"DELETE FROM `glusers` WHERE (`glusers`.`login` = 'test')"
 		);
 
-		$update1 = gluedb::update('users', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'")->root();
+		$update1 = gluedb::update('glusers', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'")->root();
 		$tests['query update'] = array(
 			$update1,
-			"UPDATE `users` SET `users`.`login` = 'test', `users`.`password` = 'test' WHERE (`users`.`login` = 'test')"
+			"UPDATE `glusers` SET `glusers`.`login` = 'test', `glusers`.`password` = 'test' WHERE (`glusers`.`login` = 'test')"
 		);
 
-		$insert1 = gluedb::insert('users', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2)->root();
+		$insert1 = gluedb::insert('glusers', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2)->root();
 		$tests['query insert'] = array(
 			$insert1,
-			"INSERT INTO `users` (`login`, `password`, `id`) VALUES ('test\'1','test\'2'),(1,2)"
+			"INSERT INTO `glusers` (`login`, `password`, `id`) VALUES ('test\'1','test\'2'),(1,2)"
 		);
 
 		// Checks :
@@ -172,22 +193,12 @@ class Controller_GlueDB extends Controller {
 	}
 
 	private function test_queries() {
-		$statement = gluedb::insert('users', $u)
+		$statement = gluedb::insert('glusers', $u)
 						->columns($u->login, $u->password)
 						->values('test1', 'test1')
 							->and('test2', 'test2')
 							->and('test3', 'test3')
 						->prepare();
-
 		$statement->execute();
-		echo 'rows = ' . $statement->rowCount() . ' last = ' . $statement->lastInsertId();
-
-				list($rows, $last) = gluedb::insert('users', $u)
-						->columns($u->login, $u->password)
-						->values('test1', 'test1')
-							->and('test2', 'test2')
-
-						->execute();
-	echo 'rows = ' . $rows . ' last = ' . $last;
 	}
 }

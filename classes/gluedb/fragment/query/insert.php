@@ -121,7 +121,7 @@ class GlueDB_Fragment_Query_Insert extends GlueDB_Fragment_Query {
 	 */
 	public function execute() {
 		$return = parent::execute();
-		$this->last_insert_id = (integer) $db->lastInsertId();
+		$this->last_insert_id = (integer) $this->db()->lastInsertId();
 		return $return;
 	}
 
