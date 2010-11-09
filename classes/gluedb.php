@@ -15,7 +15,7 @@ class GlueDB {
 	 * Returns the database object identified by $db_name.
 	 *
 	 * Subsequent calls to this function with the same parameter will return the same database
-	 * instance, not create a new one.
+	 * instance, instead of creating a new one.
 	 *
 	 * @param string $db_name
 	 *
@@ -29,7 +29,7 @@ class GlueDB {
 	 * Returns the virtual table identified by $table_name.
 	 *
 	 * Subsequent calls to this function with the same parameter will return the same
-	 * virtual table instance, not create a new one.
+	 * virtual table instance, instead of creating a new one.
 	 *
 	 * @param string $table_name
 	 *

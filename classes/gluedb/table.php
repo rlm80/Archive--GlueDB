@@ -264,18 +264,41 @@ class GlueDB_Table {
 	static public function get($name) {
 		$name = strtolower($name);
 		if( ! isset(self::$instances[$name]))
-			self::$instances[$name] = self::create($name);
+			self::$instances[$name] = self::create_from_cache($name);
 		return self::$instances[$name];
 	}
+	
+	/**
+	 * Loads a virtual table from the disk cache. If it isn't there already, creates
+	 * a new cache entry for it.
+	 *
+	 * @param string $name Virtual table name.
+	 *
+	 * @return GlueDB_Table
+	 */
+	static protected function create_from_cache($name) {	
+		// Look up object into cache directory :
+		$path = MODPATH . "gluedb/cache/tables/" . $name . ".tmp";
+		
+		// Check cache availability :
+		if ( ! file_exists($path)) {
+			$table = self::create_from_class($name);
+			file_put_contents($path, serialize($table));
+		}
+		
+		// Return table from cache :
+		return unserialize(file_get_contents($path));
+	}
+
 
 	/**
-	 * Returns a new virtual table instance.
+	 * Loads a virtual table by instanciating the appropriate class.
 	 *
 	 * @param string $name
 	 *
 	 * @return GlueDB_Table
 	 */
-	static protected function create($name) {
+	static protected function create_from_class($name) {
 		$class = 'GlueDB_Table_' . ucfirst($name);
 		if (class_exists($class))
 			return new $class($name);
